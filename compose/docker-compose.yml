@@ -144,6 +144,42 @@ services:
       - traefik.http.routers.audiobookshelf.rule=Host(`abs.tehmatt.com`)
       - traefik.http.routers.audiobookshelf.entrypoints=websecure
       - traefik.http.routers.audiobookshelf.tls.certresolver=letsencrypt
+  
+  calibre:
+    image: ghcr.io/linuxserver/calibre
+    container_name: calibre
+    environment:
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - /home/matt/calibre:/config
+      - books-uploads:/uploads
+      - books-plugins:/plugins
+    ports:
+      - 8383:8080
+      - 8283:8081
+    restart: unless-stopped
+
+  calibre-web:
+    image: lscr.io/linuxserver/calibre-web:latest
+    container_name: calibre-web
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - DOCKER_MODS=linuxserver/mods:universal-calibre #optional
+      - OAUTHLIB_RELAX_TOKEN_SCOPE=1 #optional
+    volumes:
+      - /home/matt/calibre:/config
+      - books:/books
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.calibre.rule=Host(`calibre.tehmatt.com`)
+      - traefik.http.routers.calibre.entrypoints=websecure
+      - traefik.http.routers.calibre.tls.certresolver=letsencrypt
+    ports:
+      - 8083:8083
+    restart: unless-stopped
 
   homebridge:
     image: homebridge/homebridge:latest
@@ -242,6 +278,42 @@ services:
       - traefik.http.routers.homepage.tls.certresolver=letsencrypt
     restart: unless-stopped
 
+  nordlynx:
+    image: ghcr.io/bubuntux/nordlynx
+    container_name: nordlynx
+    cap_add:
+      - NET_ADMIN                             # required
+      - SYS_MODULE                            # maybe
+    environment:
+      - PRIVATE_KEY=${NORDLYNX_KEY}
+      - QUERY=filters\[servers_groups\]\[identifier\]=legacy_p2p
+      - NET_LOCAL=192.168.0.0/16
+      - TZ=America/Chicago
+    ports:
+      - 8089:8089 # qbittorrent web interface
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+      - net.ipv4.conf.all.rp_filter=2
+      - net.ipv6.conf.all.disable_ipv6=1
+
+  qbittorrent:
+    image: linuxserver/qbittorrent:latest
+    network_mode: service:nordlynx
+    container_name: qbittorrent
+    depends_on:
+      - nordlynx
+    environment:
+      - WEBUI_PORT=8089
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Toronto
+        #ports:
+        #- 8089:8089
+    volumes:
+      - /home/matt/qbittorrent:/config
+      - tdownloads:/downloads"
+    restart: always
+
 volumes: 
   tv-current: 
     external: true
@@ -250,6 +322,12 @@ volumes:
   movies:
     external: true
   books:
+    external: true
+  books-plugins:
+    external: true
+  books-uploads:
+    external: true
+  tdownloads:
     external: true
   downloads:
     external: true
