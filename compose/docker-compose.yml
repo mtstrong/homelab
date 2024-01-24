@@ -314,6 +314,17 @@ services:
       - tdownloads:/downloads"
     restart: always
 
+  handbrake:
+    image: jlesage/handbrake:latest
+    container_name: handbrake
+    ports:
+      - 5800:5800
+    volumes:
+      - /home/matt/handbrake:/config
+      - hb-storage:/storage
+      - hb-watch:/watch
+      - hb-output:/output
+
 volumes: 
   tv-current: 
     external: true
@@ -336,4 +347,10 @@ volumes:
   audiobooks:
     external: true
   netboot:
+    external: true
+  hb-storage:
+    external: true
+  hb-watch:
+    external: true
+  hb-output:
     external: true
