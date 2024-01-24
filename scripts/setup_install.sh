@@ -33,3 +33,6 @@ docker volume create tdownloads --driver local --opt type=nfs --opt o=addr=192.1
 docker volume create audiobooks --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/audiobooks"
 docker volume create podcasts --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/podcasts"
 docker volume create netboot --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/netboot"
+docker volume create hb-storage --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/hb-storage"
+docker volume create hb-watch --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/hb-watch"
+docker volume create hb-output --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/hb-output"
