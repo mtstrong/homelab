@@ -12,6 +12,7 @@ sudo apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plug
 sudo groupadd -f docker
 sudo usermod -aG docker $USER
 newgrp docker
+sudo apt-get install git
 sudo apt install nfs-common
 sudo mkdir /mnt/ws2022
 sudo mount 192.168.1.153:/ws2022 /mnt/ws2022
