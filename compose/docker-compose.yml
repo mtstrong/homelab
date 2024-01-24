@@ -1,0 +1,261 @@
+version: '3.9'
+services:
+  traefik:
+    container_name: traefik
+    image: traefik:latest 
+    ports:
+      - 80:80
+      - 443:443
+      - 8080:8080
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /home/matt/traefik/acme:/acme
+      - /home/matt/traefik/logs:/logs
+
+    environment:
+      - CF_API_EMAIL=${CF_EMAIL}
+      - CF_API_KEY=${CF_API_KEY}
+
+    command:            
+      - --api=true
+      - --global.checkNewVersion=true
+      - --log.level=DEBUG.
+      - --log.filePath=/logs/traefik.log
+      - --accessLog.filePath=/logs/access.log
+      - --accessLog.bufferingSize=100                                     
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.endpoint=unix:///var/run/docker.sock
+      - --entryPoints.console.address=:8080
+      - --entryPoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --entryPoints.web.http.redirections.entryPoint.to=websecure
+      - --entryPoints.web.http.redirections.entryPoint.scheme=https
+      - --entryPoints.web.http.redirections.entrypoint.permanent=true
+      - --certificatesResolvers.letsencrypt.acme.email=${ACME_EMAIL}
+      - --certificatesResolvers.letsencrypt.acme.storage=acme/acme.json
+      - --certificatesResolvers.letsencrypt.acme.dnsChallenge=true
+      - --certificatesResolvers.letsencrypt.acme.dnsChallenge.provider=cloudflare
+    labels:
+      - traefik.enable=true
+      - traefik.http.middlewares.admin.basicauth.users=${TRAEFIK_USERS}
+      - traefik.http.routers.thisproxylocal.rule=Host(`192.168.1.84`)
+      - traefik.http.routers.thisproxylocal.entryPoints=console
+      - traefik.http.routers.thisproxylocal.service=api@internal
+      - traefik.http.routers.thisproxylocal.middlewares=admin
+      - traefik.http.services.thisproxytls.loadbalancer.server.port=8080
+      - traefik.http.routers.thisproxytls.rule=Host(`traefik.tehmatt.com`)
+      - traefik.http.routers.thisproxytls.entrypoints=websecure
+      - traefik.http.routers.thisproxytls.service=api@internal
+      - traefik.http.routers.thisproxytls.middlewares=admin
+      - traefik.http.routers.thisproxytls.tls.certresolver=letsencrypt
+    restart: always
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=UTC
+      - UMASK_SET=022 #optional
+    volumes:
+      - /home/matt/sonarr:/config
+      - tv-current:/tv
+      - tv-completed:/tv2
+      - downloads:/downloads
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.sonarr.rule=Host(`sonarr.tehmatt.com`)
+      - traefik.http.routers.sonarr.entrypoints=websecure
+      - traefik.http.routers.sonarr.tls.certresolver=letsencrypt
+    restart: unless-stopped
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=UTC
+      - UMASK_SET=022
+    volumes:
+      - /home/matt/radarr:/config
+      - movies:/movies
+      - downloads:/downloads
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.radarr.rule=Host(`radarr.tehmatt.com`)
+      - traefik.http.routers.radarr.entrypoints=websecure
+      - traefik.http.routers.radarr.tls.certresolver=letsencrypt
+    restart: unless-stopped
+
+  readarr:
+    image: lscr.io/linuxserver/readarr:nightly
+    container_name: readarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+    volumes:
+      - /home/matt/readarr:/config
+      - books:/books
+      - downloads:/downloads
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.readarr.rule=Host(`readarr.tehmatt.com`)
+      - traefik.http.routers.readarr.entrypoints=websecure
+      - traefik.http.routers.readarr.tls.certresolver=letsencrypt
+    ports:
+      - 8787:8787
+    restart: unless-stopped
+
+  nzbget:
+    image: lscr.io/linuxserver/nzbget:latest
+    container_name: nzbget
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=UTC
+    volumes:
+      - /home/matt/nzbget:/config
+      - downloads:/downloads
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.nzbget.rule=Host(`nzb.tehmatt.com`)
+      - traefik.http.routers.nzbget.entrypoints=websecure
+      - traefik.http.routers.nzbget.tls.certresolver=letsencrypt
+    ports:
+      - 6789:6789
+    restart: unless-stopped
+
+  audiobookshelf:
+    image: ghcr.io/advplyr/audiobookshelf:latest
+    container_name: audiobookshelf
+    ports:
+      - 13378:80
+    volumes:
+      - audiobooks:/audiobooks
+      - podcasts:/podcasts
+      - /home/matt/audiobookshelf:/config
+      - /home/matt/audiobookshelf:/metadata
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.audiobookshelf.rule=Host(`abs.tehmatt.com`)
+      - traefik.http.routers.audiobookshelf.entrypoints=websecure
+      - traefik.http.routers.audiobookshelf.tls.certresolver=letsencrypt
+
+  homebridge:
+    image: homebridge/homebridge:latest
+    container_name: homebridge
+    restart: always
+    network_mode: host
+    volumes:
+      - /home/matt/homebridge:/homebridge
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.homebridge.rule=Host(`hb.tehmatt.com`)
+      - traefik.http.routers.homebridge.entrypoints=websecure
+      - traefik.http.routers.homebridge.tls.certresolver=letsencrypt
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '1'
+    healthcheck:
+      test: curl --fail localhost:8581 || exit 1
+      interval: 60s
+      retries: 5
+      start_period: 300s
+      timeout: 2s
+
+  homeassistant:
+    container_name: homeassistant
+    image: "ghcr.io/home-assistant/home-assistant:stable"
+    volumes:
+      - /home/matt/homeassistant:/config
+      - /etc/localtime:/etc/localtime:ro
+      - /run/dbus:/run/dbus:ro
+    ports:
+     - "8123:8123"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.homeassistant.rule=Host(`ha.tehmatt.com`)
+      - traefik.http.routers.homeassistant.entrypoints=websecure
+      - traefik.http.routers.homeassistant.tls.certresolver=letsencrypt
+      - traefik.http.routers.homeassistant.tls.domains[0].main=ha.tehmatt.com
+      - traefik.http.services.homeassistant.loadbalancer.server.port=8123
+    restart: unless-stopped
+      #privileged: true
+      #network_mode: host
+  
+  netbootxyz:
+    image: lscr.io/linuxserver/netbootxyz:latest
+    container_name: netbootxyz
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - MENU_VERSION=1.9.9
+      - PORT_RANGE=30000:30010
+      - SUBFOLDER=/ 
+    volumes:
+      - /home/matt/netboot:/config
+      - netboot:/assets
+    ports:
+      - 3000:3000
+      - 69:69/udp
+      - 8880:80
+    restart: unless-stopped
+
+  heimdall:
+    image: lscr.io/linuxserver/heimdall:latest
+    container_name: heimdall
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - /home/matt/heimdall:/config
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.heimdall.rule=Host(`heimdall.tehmatt.com`)
+      - traefik.http.routers.heimdall.entrypoints=websecure
+      - traefik.http.routers.heimdall.tls.certresolver=letsencrypt
+    restart: unless-stopped
+
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    environment:
+      PUID: 1000
+      PGID: 1000
+    ports:
+      - 3003:3000
+    volumes:
+      - /home/matt/homepage:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.homepage.rule=Host(`homepage.tehmatt.com`)
+      - traefik.http.routers.homepage.entrypoints=websecure
+      - traefik.http.routers.homepage.tls.certresolver=letsencrypt
+    restart: unless-stopped
+
+volumes: 
+  tv-current: 
+    external: true
+  tv-completed: 
+    external: true
+  movies:
+    external: true
+  books:
+    external: true
+  downloads:
+    external: true
+  podcasts:
+    external: true
+  audiobooks:
+    external: true
+  netboot:
+    external: true
