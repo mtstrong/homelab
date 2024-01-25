@@ -207,13 +207,13 @@ services:
 
   homeassistant:
     container_name: homeassistant
-    image: "ghcr.io/home-assistant/home-assistant:stable"
+    image: ghcr.io/home-assistant/home-assistant:stable
     volumes:
       - /home/matt/homeassistant:/config
       - /etc/localtime:/etc/localtime:ro
       - /run/dbus:/run/dbus:ro
     ports:
-     - "8123:8123"
+     - 8123:8123
     labels:
       - traefik.enable=true
       - traefik.http.routers.homeassistant.rule=Host(`ha.tehmatt.com`)
@@ -312,6 +312,11 @@ services:
     volumes:
       - /home/matt/qbittorrent:/config
       - tdownloads:/downloads"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.qbittorrent.rule=Host(`qt.tehmatt.com`)
+      - traefik.http.routers.qbittorrent.entrypoints=websecure
+      - traefik.http.routers.qbittorrent.tls.certresolver=letsencrypt
     restart: always
 
   handbrake:
