@@ -25,6 +25,7 @@ docker volume create movies --driver local --opt type=nfs --opt o=addr=192.168.1
 docker volume create tv-completed --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/tv shows/completed"
 docker volume create tv-current --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/tv shows/currently airing"
 docker volume create movies --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/bluray rips"
+docker volume create comics --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/comics"
 docker volume create books --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/books"
 docker volume create books-uploads --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/books/uploads"
 docker volume create books-plugins --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/books/plugins"
@@ -36,3 +37,5 @@ docker volume create netboot --driver local --opt type=nfs --opt o=addr=192.168.
 docker volume create hb-storage --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/hb-storage"
 docker volume create hb-watch --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/hb-watch"
 docker volume create hb-output --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/hb-output"
+docker volume create grafana-data --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/grafana-data"
+docker volume create prometheus-data --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/prometheus-data"
