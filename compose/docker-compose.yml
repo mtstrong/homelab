@@ -39,7 +39,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.middlewares.admin.basicauth.users=${TRAEFIK_USERS}
-      - traefik.http.routers.thisproxylocal.rule=Host(`192.168.1.84`)
+      - traefik.http.routers.thisproxylocal.rule=Host(`192.168.1.210`)
       - traefik.http.routers.thisproxylocal.entryPoints=console
       - traefik.http.routers.thisproxylocal.service=api@internal
       - traefik.http.routers.thisproxylocal.middlewares=admin
@@ -329,26 +329,6 @@ services:
       - hb-storage:/storage
       - hb-watch:/watch
       - hb-output:/output
-
-  grafana:
-    image: grafana/grafana-oss:latest
-    container_name: grafana
-    ports:
-      - 3333:3000
-    volumes:
-      - grafana-data:/var/lib/grafana
-    restart: unless-stopped
-
-  prometheus:
-    image: prom/prometheus:v2.37.9
-    container_name: prometheus
-    ports:
-      - 9090:9090
-    command: "--config.file=/etc/prometheus/prometheus.yaml"
-    volumes:
-      - /home/matt/prometheus/prometheus.yaml:/etc/prometheus/prometheus.yaml:ro
-      - prometheus-data:/prometheus
-    restart: unless-stopped
 
   mealie:
     image: ghcr.io/mealie-recipes/mealie:latest
