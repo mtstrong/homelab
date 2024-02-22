@@ -39,7 +39,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.middlewares.admin.basicauth.users=${TRAEFIK_USERS}
-      - traefik.http.routers.thisproxylocal.rule=Host(`192.168.1.84`)
+      - traefik.http.routers.thisproxylocal.rule=Host(${TRAEFIK_IP})
       - traefik.http.routers.thisproxylocal.entryPoints=console
       - traefik.http.routers.thisproxylocal.service=api@internal
       - traefik.http.routers.thisproxylocal.middlewares=admin
@@ -144,6 +144,42 @@ services:
       - traefik.http.routers.audiobookshelf.rule=Host(`abs.tehmatt.com`)
       - traefik.http.routers.audiobookshelf.entrypoints=websecure
       - traefik.http.routers.audiobookshelf.tls.certresolver=letsencrypt
+  
+  calibre:
+    image: ghcr.io/linuxserver/calibre
+    container_name: calibre
+    environment:
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - /home/matt/calibre:/config
+      - books-uploads:/uploads
+      - books-plugins:/plugins
+    ports:
+      - 8383:8080
+      - 8283:8081
+    restart: unless-stopped
+
+  calibre-web:
+    image: lscr.io/linuxserver/calibre-web:latest
+    container_name: calibre-web
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - DOCKER_MODS=linuxserver/mods:universal-calibre #optional
+      - OAUTHLIB_RELAX_TOKEN_SCOPE=1 #optional
+    volumes:
+      - /home/matt/calibre:/config
+      - books:/books
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.calibre.rule=Host(`calibre.tehmatt.com`)
+      - traefik.http.routers.calibre.entrypoints=websecure
+      - traefik.http.routers.calibre.tls.certresolver=letsencrypt
+    ports:
+      - 8083:8083
+    restart: unless-stopped
 
   homebridge:
     image: homebridge/homebridge:latest
@@ -171,13 +207,13 @@ services:
 
   homeassistant:
     container_name: homeassistant
-    image: "ghcr.io/home-assistant/home-assistant:stable"
+    image: ghcr.io/home-assistant/home-assistant:stable
     volumes:
       - /home/matt/homeassistant:/config
       - /etc/localtime:/etc/localtime:ro
       - /run/dbus:/run/dbus:ro
     ports:
-     - "8123:8123"
+     - 8123:8123
     labels:
       - traefik.enable=true
       - traefik.http.routers.homeassistant.rule=Host(`ha.tehmatt.com`)
@@ -242,6 +278,117 @@ services:
       - traefik.http.routers.homepage.tls.certresolver=letsencrypt
     restart: unless-stopped
 
+  nordlynx:
+    image: ghcr.io/bubuntux/nordlynx
+    container_name: nordlynx
+    cap_add:
+      - NET_ADMIN                             # required
+      - SYS_MODULE                            # maybe
+    environment:
+      - PRIVATE_KEY=${NORDLYNX_KEY}
+      - QUERY=filters\[servers_groups\]\[identifier\]=legacy_p2p
+      - NET_LOCAL=192.168.0.0/16
+      - TZ=America/Chicago
+    ports:
+      - 8089:8089 # qbittorrent web interface
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+      - net.ipv4.conf.all.rp_filter=2
+      - net.ipv6.conf.all.disable_ipv6=1
+
+  qbittorrent:
+    image: linuxserver/qbittorrent:latest
+    network_mode: service:nordlynx
+    container_name: qbittorrent
+    depends_on:
+      - nordlynx
+    environment:
+      - WEBUI_PORT=8089
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Toronto
+        #ports:
+        #- 8089:8089
+    volumes:
+      - /home/matt/qbittorrent:/config
+      - tdownloads:/downloads"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.qbittorrent.rule=Host(`qt.tehmatt.com`)
+      - traefik.http.routers.qbittorrent.entrypoints=websecure
+      - traefik.http.routers.qbittorrent.tls.certresolver=letsencrypt
+    restart: always
+
+  handbrake:
+    image: jlesage/handbrake:latest
+    container_name: handbrake
+    ports:
+      - 5800:5800
+    volumes:
+      - /home/matt/handbrake:/config
+      - hb-storage:/storage
+      - hb-watch:/watch
+      - hb-output:/output
+
+  mealie:
+    image: ghcr.io/mealie-recipes/mealie:latest
+    container_name: mealie
+    ports:
+        - 9925:9000 
+    deploy:
+      resources:
+        limits:
+          memory: 1000M
+    volumes:
+      - /home/matt/mealie:/app/data/
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mealie.rule=Host(`mealie.tehmatt.com`)
+      - traefik.http.routers.mealie.entrypoints=websecure
+      - traefik.http.routers.mealie.tls.certresolver=letsencrypt
+    environment:
+    # Set Backend ENV Variables Here
+      - ALLOW_SIGNUP=true
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+      - MAX_WORKERS=1
+      - WEB_CONCURRENCY=1
+      - BASE_URL=https://mealie.tehmatt.com
+    restart: always
+
+  kavita:
+    image: jvmilazz0/kavita:latest
+    container_name: kavita
+    volumes:
+      - comics:/comics
+      - /home/matt/kavita:/kavita/config
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.kavita.rule=Host(`kavita.tehmatt.com`)
+      - traefik.http.routers.kavita.entrypoints=websecure
+      - traefik.http.routers.kavita.tls.certresolver=letsencrypt
+    environment:
+      - TZ=America/Chicago
+    ports:
+      - 5005:5000
+    restart: unless-stopped
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    ports:
+      - 9443:9443
+    volumes:
+      - /home/matt/portainer:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.portainer.rule=Host(`portainer.tehmatt.com`)
+      - traefik.http.routers.portainer.entrypoints=websecure
+      - traefik.http.routers.portainer.tls.certresolver=letsencrypt
+    restart: unless-stopped
+
 volumes: 
   tv-current: 
     external: true
@@ -249,7 +396,15 @@ volumes:
     external: true
   movies:
     external: true
+  comics:
+    external: true
   books:
+    external: true
+  books-plugins:
+    external: true
+  books-uploads:
+    external: true
+  tdownloads:
     external: true
   downloads:
     external: true
@@ -258,4 +413,14 @@ volumes:
   audiobooks:
     external: true
   netboot:
+    external: true
+  hb-storage:
+    external: true
+  hb-watch:
+    external: true
+  hb-output:
+    external: true
+  grafana-data:
+    external: true
+  prometheus-data:
     external: true
