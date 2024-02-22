@@ -16,14 +16,8 @@ sudo apt-get install git
 sudo apt install nfs-common
 sudo mkdir /mnt/ws2022
 sudo mount 192.168.1.153:/ws2022 /mnt/ws2022
-docker volume create sabnzbd --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:/ws2022/homelab/git/homelab/compose/sabnbd/config
-docker volume create nzbget --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:/ws2022/homelab/git/homelab/compose/nzbget/config
-docker volume create dls --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:/ws2022/homelab/git/homelab/compose/nzbget/downloads
-docker volume create traefik --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:/ws2022/homelab/git/homelab/compose/traefik-app
-docker volume create sonarr --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:/ws2022/homelab/git/homelab/compose/sonarr/config
 docker volume create movies --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/bluray rips"
-docker volume create tv-completed --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/tv shows/completed"
-docker volume create tv-current --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/tv shows/currently airing"
+docker volume create tv --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/tv shows/completed"
 docker volume create movies --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/bluray rips"
 docker volume create comics --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/comics"
 docker volume create books --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/books"

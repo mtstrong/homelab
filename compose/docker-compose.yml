@@ -296,28 +296,28 @@ services:
       - net.ipv4.conf.all.rp_filter=2
       - net.ipv6.conf.all.disable_ipv6=1
 
-  qbittorrent:
-    image: linuxserver/qbittorrent:latest
-    network_mode: service:nordlynx
-    container_name: qbittorrent
-    depends_on:
-      - nordlynx
-    environment:
-      - WEBUI_PORT=8089
-      - PUID=1000
-      - PGID=1000
-      - TZ=America/Toronto
+        #  qbittorrent:
+        #image: linuxserver/qbittorrent:latest
+        #network_mode: service:nordlynx
+        #container_name: qbittorrent
+        #depends_on:
+        #- nordlynx
+        #environment:
+        #- WEBUI_PORT=8089
+        #- PUID=1000
+        #- PGID=1000
+        #- TZ=America/Toronto
         #ports:
         #- 8089:8089
-    volumes:
-      - /home/matt/qbittorrent:/config
-      - tdownloads:/downloads"
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.qbittorrent.rule=Host(`qt.tehmatt.com`)
-      - traefik.http.routers.qbittorrent.entrypoints=websecure
-      - traefik.http.routers.qbittorrent.tls.certresolver=letsencrypt
-    restart: always
+        #volumes:
+        #- /home/matt/qbittorrent:/config
+        #- tdownloads:/downloads"
+        #labels:
+        #- traefik.enable=true
+        #- traefik.http.routers.qbittorrent.rule=Host(`qt.tehmatt.com`)
+        #- traefik.http.routers.qbittorrent.entrypoints=websecure
+        #- traefik.http.routers.qbittorrent.tls.certresolver=letsencrypt
+        #restart: always
 
   handbrake:
     image: jlesage/handbrake:latest
