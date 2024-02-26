@@ -14,28 +14,14 @@ sudo usermod -aG docker $USER
 newgrp docker
 sudo apt-get install git
 sudo apt install nfs-common
-sudo mkdir /mnt/ws2022
-sudo mount 192.168.1.153:/ws2022 /mnt/ws2022
-docker volume create sabnzbd --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:/ws2022/homelab/git/homelab/compose/sabnbd/config
-docker volume create nzbget --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:/ws2022/homelab/git/homelab/compose/nzbget/config
-docker volume create dls --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:/ws2022/homelab/git/homelab/compose/nzbget/downloads
-docker volume create traefik --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:/ws2022/homelab/git/homelab/compose/traefik-app
-docker volume create sonarr --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:/ws2022/homelab/git/homelab/compose/sonarr/config
-docker volume create movies --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/bluray rips"
-docker volume create tv-completed --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/tv shows/completed"
-docker volume create tv-current --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/tv shows/currently airing"
-docker volume create movies --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/bluray rips"
-docker volume create comics --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/comics"
-docker volume create books --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/books"
-docker volume create books-uploads --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/books/uploads"
-docker volume create books-plugins --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/books/plugins"
-docker volume create downloads --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/downloads"
-docker volume create tdownloads --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/tdownloads"
-docker volume create audiobooks --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/audiobooks"
-docker volume create podcasts --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/podcasts"
-docker volume create netboot --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/netboot"
-docker volume create hb-storage --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/hb-storage"
-docker volume create hb-watch --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/hb-watch"
-docker volume create hb-output --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/hb-output"
-docker volume create grafana-data --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/grafana-data"
-docker volume create prometheus-data --driver local --opt type=nfs --opt o=addr=192.168.1.153,rw --opt device=:"/ws2022/prometheus-data"
+
+docker volume create movies --driver local --opt type=nfs --opt o=addr=192.168.1.203,rw --opt device=:"mnt/TrueNAS/movies"
+docker volume create tv --driver local --opt type=nfs --opt o=addr=192.168.1.203,rw --opt device=:"/mnt/TrueNAS/tv"
+docker volume create audiobooks --driver local --opt type=nfs --opt o=addr=192.168.1.203,rw --opt device=:"/mnt/TrueNAS/audiobooks"
+docker volume create podcasts --driver local --opt type=nfs --opt o=addr=192.168.1.203,rw --opt device=:"/mnt/TrueNAS/podcasts"
+docker volume create torrent-dls --driver local --opt type=nfs --opt o=addr=192.168.1.203,rw --opt device=:"/mnt/TrueNAS/torrent-dls"
+docker volume create nzb-dls --driver local --opt type=nfs --opt o=addr=192.168.1.203,rw --opt device=:"/mnt/TrueNAS/nzb-dls"
+docker volume create handbrake --driver local --opt type=nfs --opt o=addr=192.168.1.203,rw --opt device=:"/mnt/TrueNAS/handbrake"
+docker volume create comics --driver local --opt type=nfs --opt o=addr=192.168.1.203,rw --opt device=:"/mnt/TrueNAS/comics"
+docker volume create books --driver local --opt type=nfs --opt o=addr=192.168.1.203,rw --opt device=:"/mnt/TrueNAS/books"
+docker volume create b-dls --driver local --opt type=nfs --opt o=addr=192.168.1.203,rw --opt device=:"/mnt/TrueNAS/b-dls"
