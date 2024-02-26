@@ -159,11 +159,6 @@ services:
       - net.ipv4.conf.all.src_valid_mark=1
       - net.ipv4.conf.all.rp_filter=2
       - net.ipv6.conf.all.disable_ipv6=1
-        #labels:
-        #- traefik.enable=true
-        #- traefik.http.routers.qbittorrent.rule=Host(`qt.tehmatt.com`)
-        #- traefik.http.routers.qbittorrent.entrypoints=websecure
-        #- traefik.http.routers.qbittorrent.tls.certresolver=letsencrypt
     restart: unless-stopped
 
   qbittorrent:
@@ -183,6 +178,11 @@ services:
     volumes:
       - /home/matt/qbittorrent:/config
       - torrent-dls:/downloads
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.qbittorrent.rule=Host(`qt.tehmatt.com`)
+      - traefik.http.routers.qbittorrent.entrypoints=websecure
+      - traefik.http.routers.qbittorrent.tls.certresolver=letsencrypt
     restart: unless-stopped
 
   handbrake:
@@ -195,6 +195,23 @@ services:
       - handbrake:/storage 
       - handbrake:/watch
       - handbrake:/output
+
+  kavita:
+    image: jvmilazz0/kavita:latest
+    container_name: kavita
+    volumes:
+      - comics:/comics
+      - /home/matt/kavita:/kavita/config
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.kavita.rule=Host(`kavita.tehmatt.com`)
+      - traefik.http.routers.kavita.entrypoints=websecure
+      - traefik.http.routers.kavita.tls.certresolver=letsencrypt
+    environment:
+      - TZ=America/Chicago
+    ports:
+      - 5005:5000
+    restart: unless-stopped
 
 volumes: 
   tv:
