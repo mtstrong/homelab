@@ -61,9 +61,8 @@ services:
       - UMASK_SET=022 #optional
     volumes:
       - /home/matt/sonarr:/config
-      - tv-current:/tv
-      - tv-completed:/tv2
-      - downloads:/downloads
+      - tv:/tv
+      - nzb-dls:/downloads
     labels:
       - traefik.enable=true
       - traefik.http.routers.sonarr.rule=Host(`sonarr.tehmatt.com`)
@@ -82,7 +81,7 @@ services:
     volumes:
       - /home/matt/radarr:/config
       - movies:/movies
-      - downloads:/downloads
+      - nzb-dls:/downloads
     labels:
       - traefik.enable=true
       - traefik.http.routers.radarr.rule=Host(`radarr.tehmatt.com`)
@@ -100,7 +99,7 @@ services:
     volumes:
       - /home/matt/readarr:/config
       - books:/books
-      - downloads:/downloads
+      - b-dls:/downloads
     labels:
       - traefik.enable=true
       - traefik.http.routers.readarr.rule=Host(`readarr.tehmatt.com`)
@@ -119,7 +118,7 @@ services:
       - TZ=UTC
     volumes:
       - /home/matt/nzbget:/config
-      - downloads:/downloads
+      - nzb-dls:/downloads
     labels:
       - traefik.enable=true
       - traefik.http.routers.nzbget.rule=Host(`nzb.tehmatt.com`)
@@ -144,121 +143,6 @@ services:
       - traefik.http.routers.audiobookshelf.rule=Host(`abs.tehmatt.com`)
       - traefik.http.routers.audiobookshelf.entrypoints=websecure
       - traefik.http.routers.audiobookshelf.tls.certresolver=letsencrypt
-  
-  calibre:
-    image: ghcr.io/linuxserver/calibre
-    container_name: calibre
-    environment:
-      - PUID=1000
-      - PGID=1000
-    volumes:
-      - /home/matt/calibre:/config
-      - books-uploads:/uploads
-      - books-plugins:/plugins
-    ports:
-      - 8383:8080
-      - 8283:8081
-    restart: unless-stopped
-
-  calibre-web:
-    image: lscr.io/linuxserver/calibre-web:latest
-    container_name: calibre-web
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
-      - DOCKER_MODS=linuxserver/mods:universal-calibre #optional
-      - OAUTHLIB_RELAX_TOKEN_SCOPE=1 #optional
-    volumes:
-      - /home/matt/calibre:/config
-      - books:/books
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.calibre.rule=Host(`calibre.tehmatt.com`)
-      - traefik.http.routers.calibre.entrypoints=websecure
-      - traefik.http.routers.calibre.tls.certresolver=letsencrypt
-    ports:
-      - 8083:8083
-    restart: unless-stopped
-
-  homebridge:
-    image: homebridge/homebridge:latest
-    container_name: homebridge
-    restart: always
-    network_mode: host
-    volumes:
-      - /home/matt/homebridge:/homebridge
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.homebridge.rule=Host(`hb.tehmatt.com`)
-      - traefik.http.routers.homebridge.entrypoints=websecure
-      - traefik.http.routers.homebridge.tls.certresolver=letsencrypt
-    logging:
-      driver: json-file
-      options:
-        max-size: '10m'
-        max-file: '1'
-    healthcheck:
-      test: curl --fail localhost:8581 || exit 1
-      interval: 60s
-      retries: 5
-      start_period: 300s
-      timeout: 2s
-
-  homeassistant:
-    container_name: homeassistant
-    image: ghcr.io/home-assistant/home-assistant:stable
-    volumes:
-      - /home/matt/homeassistant:/config
-      - /etc/localtime:/etc/localtime:ro
-      - /run/dbus:/run/dbus:ro
-    ports:
-     - 8123:8123
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.homeassistant.rule=Host(`ha.tehmatt.com`)
-      - traefik.http.routers.homeassistant.entrypoints=websecure
-      - traefik.http.routers.homeassistant.tls.certresolver=letsencrypt
-      - traefik.http.routers.homeassistant.tls.domains[0].main=ha.tehmatt.com
-      - traefik.http.services.homeassistant.loadbalancer.server.port=8123
-    restart: unless-stopped
-      #privileged: true
-      #network_mode: host
-  
-  netbootxyz:
-    image: lscr.io/linuxserver/netbootxyz:latest
-    container_name: netbootxyz
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
-      - MENU_VERSION=1.9.9
-      - PORT_RANGE=30000:30010
-      - SUBFOLDER=/ 
-    volumes:
-      - /home/matt/netboot:/config
-      - netboot:/assets
-    ports:
-      - 3000:3000
-      - 69:69/udp
-      - 8880:80
-    restart: unless-stopped
-
-  heimdall:
-    image: lscr.io/linuxserver/heimdall:latest
-    container_name: heimdall
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
-    volumes:
-      - /home/matt/heimdall:/config
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.heimdall.rule=Host(`heimdall.tehmatt.com`)
-      - traefik.http.routers.heimdall.entrypoints=websecure
-      - traefik.http.routers.heimdall.tls.certresolver=letsencrypt
-    restart: unless-stopped
 
   homepage:
     image: ghcr.io/gethomepage/homepage:latest
@@ -295,6 +179,7 @@ services:
       - net.ipv4.conf.all.src_valid_mark=1
       - net.ipv4.conf.all.rp_filter=2
       - net.ipv6.conf.all.disable_ipv6=1
+    restart: unless-stopped
 
   qbittorrent:
     image: linuxserver/qbittorrent:latest
@@ -306,18 +191,19 @@ services:
       - WEBUI_PORT=8089
       - PUID=1000
       - PGID=1000
-      - TZ=America/Toronto
+      - TZ=America/Chicago
+      - NETWORK=192.168.1.0/24  # So it can be accessed within the local network
         #ports:
         #- 8089:8089
     volumes:
       - /home/matt/qbittorrent:/config
-      - tdownloads:/downloads"
+      - torrent-dls:/downloads
     labels:
       - traefik.enable=true
       - traefik.http.routers.qbittorrent.rule=Host(`qt.tehmatt.com`)
       - traefik.http.routers.qbittorrent.entrypoints=websecure
       - traefik.http.routers.qbittorrent.tls.certresolver=letsencrypt
-    restart: always
+    restart: unless-stopped
 
   handbrake:
     image: jlesage/handbrake:latest
@@ -326,36 +212,9 @@ services:
       - 5800:5800
     volumes:
       - /home/matt/handbrake:/config
-      - hb-storage:/storage
-      - hb-watch:/watch
-      - hb-output:/output
-
-  mealie:
-    image: ghcr.io/mealie-recipes/mealie:latest
-    container_name: mealie
-    ports:
-        - 9925:9000 
-    deploy:
-      resources:
-        limits:
-          memory: 1000M
-    volumes:
-      - /home/matt/mealie:/app/data/
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.mealie.rule=Host(`mealie.tehmatt.com`)
-      - traefik.http.routers.mealie.entrypoints=websecure
-      - traefik.http.routers.mealie.tls.certresolver=letsencrypt
-    environment:
-    # Set Backend ENV Variables Here
-      - ALLOW_SIGNUP=true
-      - PUID=1000
-      - PGID=1000
-      - TZ=America/Chicago
-      - MAX_WORKERS=1
-      - WEB_CONCURRENCY=1
-      - BASE_URL=https://mealie.tehmatt.com
-    restart: always
+      - handbrake:/storage 
+      - handbrake:/watch
+      - handbrake:/output
 
   kavita:
     image: jvmilazz0/kavita:latest
@@ -374,25 +233,8 @@ services:
       - 5005:5000
     restart: unless-stopped
 
-  portainer:
-    image: portainer/portainer-ce:latest
-    container_name: portainer
-    ports:
-      - 9443:9443
-    volumes:
-      - /home/matt/portainer:/data
-      - /var/run/docker.sock:/var/run/docker.sock
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.portainer.rule=Host(`portainer.tehmatt.com`)
-      - traefik.http.routers.portainer.entrypoints=websecure
-      - traefik.http.routers.portainer.tls.certresolver=letsencrypt
-    restart: unless-stopped
-
 volumes: 
-  tv-current: 
-    external: true
-  tv-completed: 
+  tv:
     external: true
   movies:
     external: true
@@ -400,27 +242,15 @@ volumes:
     external: true
   books:
     external: true
-  books-plugins:
+  nzb-dls:
     external: true
-  books-uploads:
+  torrent-dls:
     external: true
-  tdownloads:
-    external: true
-  downloads:
-    external: true
-  podcasts:
+  b-dls:
     external: true
   audiobooks:
     external: true
-  netboot:
+  podcasts:
     external: true
-  hb-storage:
-    external: true
-  hb-watch:
-    external: true
-  hb-output:
-    external: true
-  grafana-data:
-    external: true
-  prometheus-data:
+  handbrake:
     external: true
