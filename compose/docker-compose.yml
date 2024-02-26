@@ -89,6 +89,26 @@ services:
       - traefik.http.routers.radarr.tls.certresolver=letsencrypt
     restart: unless-stopped
 
+  readarr:
+    image: lscr.io/linuxserver/readarr:nightly
+    container_name: readarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+    volumes:
+      - /home/matt/readarr:/config
+      - books:/books
+      - b-dls:/downloads
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.readarr.rule=Host(`readarr.tehmatt.com`)
+      - traefik.http.routers.readarr.entrypoints=websecure
+      - traefik.http.routers.readarr.tls.certresolver=letsencrypt
+    ports:
+      - 8787:8787
+    restart: unless-stopped
+
   nzbget:
     image: lscr.io/linuxserver/nzbget:latest
     container_name: nzbget
@@ -220,15 +240,17 @@ volumes:
     external: true
   comics:
     external: true
+  books:
+    external: true
   nzb-dls:
     external: true
   torrent-dls:
     external: true
+  b-dls:
+    external: true
   audiobooks:
     external: true
   podcasts:
-    external: true
-  books:
     external: true
   handbrake:
     external: true
