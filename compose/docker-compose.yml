@@ -128,6 +128,27 @@ services:
       - 6789:6789
     restart: unless-stopped
 
+  sabnzbd:
+    image: lscr.io/linuxserver/sabnzbd:latest
+    container_name: sabnzbd
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - HAS_IPV6=false
+    volumes:
+      - /home/matt/sabnzbd:/config
+      - nzb-dls:/downloads
+      - nzb-dls:/incomplete-downloads
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.sabnzbd.rule=Host(`sab.tehmatt.com`)
+      - traefik.http.routers.sabnzbd.entrypoints=websecure
+      - traefik.http.routers.sabnzbd.tls.certresolver=letsencrypt
+    ports:
+      - 8585:8585
+    restart: unless-stopped
+
   audiobookshelf:
     image: ghcr.io/advplyr/audiobookshelf:latest
     container_name: audiobookshelf
@@ -231,6 +252,25 @@ services:
       - TZ=America/Chicago
     ports:
       - 5005:5000
+    restart: unless-stopped
+
+  netbootxyz:
+    image: lscr.io/linuxserver/netbootxyz:latest
+    container_name: netbootxyz
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - MENU_VERSION=1.9.9
+      - PORT_RANGE=30000:30010
+      - SUBFOLDER=/ 
+    volumes:
+      - /home/matt/netboot:/config
+      - netboot:/assets
+    ports:
+      - 3000:3000
+      - 69:69/udp
+      - 8880:80
     restart: unless-stopped
 
 volumes: 
