@@ -88,6 +88,24 @@ services:
       - traefik.http.routers.radarr.entrypoints=websecure
       - traefik.http.routers.radarr.tls.certresolver=letsencrypt
     restart: unless-stopped
+  
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - /home/matt/prowlarr:/config
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.prowlarr.rule=Host(`prowlarr.tehmatt.com`)
+      - traefik.http.routers.prowlarr.entrypoints=websecure
+      - traefik.http.routers.prowlarr.tls.certresolver=letsencrypt
+    ports:
+      - 9696:9696
+    restart: unless-stopped
 
   readarr:
     image: lscr.io/linuxserver/readarr:nightly
@@ -293,4 +311,6 @@ volumes:
   podcasts:
     external: true
   handbrake:
+    external: true
+  netboot:
     external: true
