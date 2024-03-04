@@ -26,3 +26,5 @@ docker volume create comics --driver local --opt type=nfs --opt o=addr=192.168.1
 docker volume create books --driver local --opt type=nfs --opt o=addr=192.168.1.240,rw --opt device=:"/mnt/TrueNAS/books"
 docker volume create b-dls --driver local --opt type=nfs --opt o=addr=192.168.1.240,rw --opt device=:"/mnt/TrueNAS/b-dls"
 docker volume create netboot --driver local --opt type=nfs --opt o=addr=192.168.1.240,rw --opt device=:"/mnt/TrueNAS/netboot"
+docker volume create book-uploads --driver local --opt type=nfs --opt o=addr=192.168.1.240,rw --opt device=:"/mnt/TrueNAS/book-uploads"
+docker volume create book-plugins --driver local --opt type=nfs --opt o=addr=192.168.1.240,rw --opt device=:"/mnt/TrueNAS/book-plugins"
