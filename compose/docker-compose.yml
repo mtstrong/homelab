@@ -321,6 +321,68 @@ services:
      - "8123:8123"
     restart: unless-stopped
 
+  mealie:
+    image: ghcr.io/mealie-recipes/mealie:latest
+    container_name: mealie
+    ports:
+        - 9925:9000 
+    deploy:
+      resources:
+        limits:
+          memory: 1000M
+    volumes:
+      - /home/matt/mealie:/app/data/
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mealie.rule=Host(`mealie.tehmatt.com`)
+      - traefik.http.routers.mealie.entrypoints=websecure
+      - traefik.http.routers.mealie.tls.certresolver=letsencrypt
+    environment:
+      - ALLOW_SIGNUP=true
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+      - MAX_WORKERS=1
+      - WEB_CONCURRENCY=1
+      - BASE_URL=https://mealie.tehmatt.com
+    restart: always
+
+  calibre:
+    image: ghcr.io/linuxserver/calibre
+    container_name: calibre
+    environment:
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - /home/matt/calibre:/config
+      - book-uploads:/uploads
+      - book-plugins:/plugins
+    ports:
+      - 8383:8080
+      - 8283:8081
+    restart: unless-stopped
+
+  calibre-web:
+    image: lscr.io/linuxserver/calibre-web:latest
+    container_name: calibre-web
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - DOCKER_MODS=linuxserver/mods:universal-calibre #optional
+      - OAUTHLIB_RELAX_TOKEN_SCOPE=1 #optional
+    volumes:
+      - /home/matt/calibre:/config
+      - books:/books
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.calibre.rule=Host(`calibre.tehmatt.com`)
+      - traefik.http.routers.calibre.entrypoints=websecure
+      - traefik.http.routers.calibre.tls.certresolver=letsencrypt
+    ports:
+      - 8083:8083
+    restart: unless-stopped
+
 volumes: 
   tv:
     external: true
@@ -329,6 +391,10 @@ volumes:
   comics:
     external: true
   books:
+    external: true
+  book-uploads:
+    external: true
+  book-plugins:
     external: true
   nzb-dls:
     external: true
