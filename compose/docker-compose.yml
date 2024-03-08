@@ -127,6 +127,24 @@ services:
       - 8787:8787
     restart: unless-stopped
 
+  overseerr:
+    image: lscr.io/linuxserver/overseerr:latest
+    container_name: overseerr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - /home/matt/overseerr:/config
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.overseerr.rule=Host(`request.tehmatt.com`)
+      - traefik.http.routers.overseerr.entrypoints=websecure
+      - traefik.http.routers.overseerr.tls.certresolver=letsencrypt
+    ports:
+      - 5055:5055
+    restart: unless-stopped
+
   nzbget:
     image: lscr.io/linuxserver/nzbget:latest
     container_name: nzbget
