@@ -88,6 +88,24 @@ services:
       - traefik.http.routers.radarr.entrypoints=websecure
       - traefik.http.routers.radarr.tls.certresolver=letsencrypt
     restart: unless-stopped
+  
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - /home/matt/prowlarr:/config
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.prowlarr.rule=Host(`prowlarr.tehmatt.com`)
+      - traefik.http.routers.prowlarr.entrypoints=websecure
+      - traefik.http.routers.prowlarr.tls.certresolver=letsencrypt
+    ports:
+      - 9696:9696
+    restart: unless-stopped
 
   readarr:
     image: lscr.io/linuxserver/readarr:nightly
@@ -109,6 +127,24 @@ services:
       - 8787:8787
     restart: unless-stopped
 
+  overseerr:
+    image: lscr.io/linuxserver/overseerr:latest
+    container_name: overseerr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - /home/matt/overseerr:/config
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.overseerr.rule=Host(`request.tehmatt.com`)
+      - traefik.http.routers.overseerr.entrypoints=websecure
+      - traefik.http.routers.overseerr.tls.certresolver=letsencrypt
+    ports:
+      - 5055:5055
+    restart: unless-stopped
+
   nzbget:
     image: lscr.io/linuxserver/nzbget:latest
     container_name: nzbget
@@ -126,6 +162,27 @@ services:
       - traefik.http.routers.nzbget.tls.certresolver=letsencrypt
     ports:
       - 6789:6789
+    restart: unless-stopped
+
+  sabnzbd:
+    image: lscr.io/linuxserver/sabnzbd:latest
+    container_name: sabnzbd
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - HAS_IPV6=false
+    volumes:
+      - /home/matt/sabnzbd:/config
+      - nzb-dls:/downloads
+      - nzb-dls:/incomplete-downloads
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.sabnzbd.rule=Host(`sab.tehmatt.com`)
+      - traefik.http.routers.sabnzbd.entrypoints=websecure
+      - traefik.http.routers.sabnzbd.tls.certresolver=letsencrypt
+    ports:
+      - 8585:8585
     restart: unless-stopped
 
   audiobookshelf:
@@ -233,6 +290,117 @@ services:
       - 5005:5000
     restart: unless-stopped
 
+  netbootxyz:
+    image: lscr.io/linuxserver/netbootxyz:latest
+    container_name: netbootxyz
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - MENU_VERSION=1.9.9
+      - PORT_RANGE=30000:30010
+      - SUBFOLDER=/ 
+    volumes:
+      - /home/matt/netboot:/config
+      - netboot:/assets
+    ports:
+      - 3000:3000
+      - 69:69/udp
+      - 8880:80
+    restart: unless-stopped
+
+  homebridge:
+    image: homebridge/homebridge:latest
+    container_name: homebridge
+    restart: always
+    network_mode: host
+    volumes:
+      - /home/matt/homebridge:/homebridge
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '1'
+    healthcheck:
+      test: curl --fail localhost:8581 || exit 1
+      interval: 60s
+      retries: 5
+      start_period: 300s
+      timeout: 2s
+
+  homeassistant:
+    container_name: homeassistant
+    image: "ghcr.io/home-assistant/home-assistant:stable"
+    volumes:
+      - /home/matt/homeassistant:/config
+      - /etc/localtime:/etc/localtime:ro
+      - /run/dbus:/run/dbus:ro
+    ports:
+     - "8123:8123"
+    restart: unless-stopped
+
+  mealie:
+    image: ghcr.io/mealie-recipes/mealie:latest
+    container_name: mealie
+    ports:
+        - 9925:9000 
+    deploy:
+      resources:
+        limits:
+          memory: 1000M
+    volumes:
+      - /home/matt/mealie:/app/data/
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mealie.rule=Host(`mealie.tehmatt.com`)
+      - traefik.http.routers.mealie.entrypoints=websecure
+      - traefik.http.routers.mealie.tls.certresolver=letsencrypt
+    environment:
+      - ALLOW_SIGNUP=true
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+      - MAX_WORKERS=1
+      - WEB_CONCURRENCY=1
+      - BASE_URL=https://mealie.tehmatt.com
+    restart: always
+
+  calibre:
+    image: ghcr.io/linuxserver/calibre
+    container_name: calibre
+    environment:
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - /home/matt/calibre:/config
+      - book-uploads:/uploads
+      - book-plugins:/plugins
+    ports:
+      - 8383:8080
+      - 8283:8081
+    restart: unless-stopped
+
+  calibre-web:
+    image: lscr.io/linuxserver/calibre-web:latest
+    container_name: calibre-web
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - DOCKER_MODS=linuxserver/mods:universal-calibre #optional
+      - OAUTHLIB_RELAX_TOKEN_SCOPE=1 #optional
+    volumes:
+      - /home/matt/calibre:/config
+      - books:/books
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.calibre.rule=Host(`calibre.tehmatt.com`)
+      - traefik.http.routers.calibre.entrypoints=websecure
+      - traefik.http.routers.calibre.tls.certresolver=letsencrypt
+    ports:
+      - 8083:8083
+    restart: unless-stopped
+
 volumes: 
   tv:
     external: true
@@ -241,6 +409,10 @@ volumes:
   comics:
     external: true
   books:
+    external: true
+  book-uploads:
+    external: true
+  book-plugins:
     external: true
   nzb-dls:
     external: true
@@ -253,4 +425,6 @@ volumes:
   podcasts:
     external: true
   handbrake:
+    external: true
+  netboot:
     external: true
