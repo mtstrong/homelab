@@ -1,0 +1,51 @@
+---
+- name: Wake Up Computers
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+  - name: Send a magic Wake-on-LAN packet
+    community.general.wakeonlan:
+      mac: 3c:7c:3f:28:99:6a
+
+- name: Update all Windows Computers
+  hosts: win11
+  tasks:
+  - name: Install Windows Updates
+    ansible.windows.win_updates:
+      category_names:
+        - Application
+        - Connectors
+        - CriticalUpdates
+        - DefinitionUpdates
+        - DeveloperKits
+        - FeaturePacks
+        - Guidance
+        - SecurityUpdates
+        - ServicePacks
+        - Tools
+        - UpdateRollups
+        - Updates
+      reboot: true
+      reboot_timeout: 10000
+    register: windows_updates
+
+- name: Sleep Computers
+  hosts: win11
+  tasks:
+  - name: Sleep Computer
+    ansible.windows.win_powershell:
+      script: |
+        # load assembly System.Windows.Forms which will be used
+        Add-Type -AssemblyName System.Windows.Forms
+
+        # set powerstate to suspend (sleep mode)
+        $PowerState = [System.Windows.Forms.PowerState]::Suspend;
+
+        # do not force putting Windows to sleep
+        $Force = $false;
+
+        # so you can wake up your computer from sleep
+        $DisableWake = $false;
+
+        # do it! Set computer to sleep
+        [System.Windows.Forms.Application]::SetSuspendState($PowerState, $Force, $DisableWake);
