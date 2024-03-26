@@ -49,7 +49,7 @@ services:
       - traefik.http.routers.thisproxytls.service=api@internal
       - traefik.http.routers.thisproxytls.middlewares=admin
       - traefik.http.routers.thisproxytls.tls.certresolver=letsencrypt
-    restart: always
+    restart: unless-stopped
 
   sonarr:
     image: lscr.io/linuxserver/sonarr:latest
@@ -200,6 +200,7 @@ services:
       - traefik.http.routers.audiobookshelf.rule=Host(`abs.tehmatt.com`)
       - traefik.http.routers.audiobookshelf.entrypoints=websecure
       - traefik.http.routers.audiobookshelf.tls.certresolver=letsencrypt
+    restart: unless-stopped
 
   homepage:
     image: ghcr.io/gethomepage/homepage:latest
@@ -272,6 +273,7 @@ services:
       - handbrake:/storage 
       - handbrake:/watch
       - handbrake:/output
+    restart: unless-stopped
 
   kavita:
     image: jvmilazz0/kavita:latest
@@ -326,7 +328,8 @@ services:
       interval: 60s
       retries: 5
       start_period: 300s
-      timeout: 2s (Get-WmiObject –query 'select * from SoftwareLicensingService').OA3xOriginalProductKey
+      timeout: 2s
+    restart: unless-stopped
 
   homeassistant:
     container_name: homeassistant
@@ -362,7 +365,7 @@ services:
       - MAX_WORKERS=1
       - WEB_CONCURRENCY=1
       - BASE_URL=https://mealie.tehmatt.com
-    restart: always
+    restart: unless-stopped
 
   calibre:
     image: ghcr.io/linuxserver/calibre
