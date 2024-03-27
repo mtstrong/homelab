@@ -314,7 +314,6 @@ services:
   homebridge:
     image: homebridge/homebridge:latest
     container_name: homebridge
-    restart: always
     network_mode: host
     volumes:
       - /home/matt/homebridge:/homebridge
@@ -401,6 +400,15 @@ services:
       - traefik.http.routers.calibre.tls.certresolver=letsencrypt
     ports:
       - 8083:8083
+    restart: unless-stopped
+
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+        #- /root/.docker/config.json:/config.json
+    command: --interval 30
     restart: unless-stopped
 
 volumes: 
