@@ -49,3 +49,5 @@
 
         # do it! Set computer to sleep
         [System.Windows.Forms.Application]::SetSuspendState($PowerState, $Force, $DisableWake);
+    async: 10
+    poll: 0
