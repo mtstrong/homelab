@@ -424,7 +424,43 @@ services:
     command: --interval 30
     restart: unless-stopped
 
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    hostname: mysql
+    restart: unless-stopped
+    volumes:
+      - /home/matt/semaphore-mysql:/var/lib/mysql
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+      MYSQL_DATABASE: semaphore
+      MYSQL_USER: semaphore
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+
+  semaphore:
+    image: semaphoreui/semaphore:latest
+    container_name: ansible-semaphore
+    restart: unless-stopped
+    ports:
+      - 3333:3000
+    environment:
+      SEMAPHORE_DB_USER: semaphore
+      SEMAPHORE_DB_PASS: ${MYSQL_PASSWORD}
+      SEMAPHORE_DB_HOST: mysql # for postgres, change to: postgres
+      SEMAPHORE_DB_PORT: 3306 # change to 5432 for postgres
+      SEMAPHORE_DB_DIALECT: mysql # for postgres, change to: postgres
+      SEMAPHORE_DB: semaphore
+      SEMAPHORE_PLAYBOOK_PATH: /tmp/semaphore/
+      SEMAPHORE_ADMIN_PASSWORD: ${SEMAPHORE_ADMIN_PASSWORD}
+      SEMAPHORE_ADMIN_NAME: admin
+      SEMAPHORE_ADMIN_EMAIL: admin@localhost
+      SEMAPHORE_ADMIN: admin
+      SEMAPHORE_ACCESS_KEY_ENCRYPTION: ${SEMAPHORE_ACCESS_KEY_ENCRYPTION}
+    depends_on:
+      - mysql
+  
 volumes: 
+  semaphore-mysql:
   tv:
     external: true
   movies:
