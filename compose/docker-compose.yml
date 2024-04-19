@@ -446,9 +446,9 @@ services:
     environment:
       SEMAPHORE_DB_USER: semaphore
       SEMAPHORE_DB_PASS: ${MYSQL_PASSWORD}
-      SEMAPHORE_DB_HOST: mysql # for postgres, change to: postgres
-      SEMAPHORE_DB_PORT: 3306 # change to 5432 for postgres
-      SEMAPHORE_DB_DIALECT: mysql # for postgres, change to: postgres
+      SEMAPHORE_DB_HOST: mysql
+      SEMAPHORE_DB_PORT: 3306
+      SEMAPHORE_DB_DIALECT: mysql
       SEMAPHORE_DB: semaphore
       SEMAPHORE_PLAYBOOK_PATH: /tmp/semaphore/
       SEMAPHORE_ADMIN_PASSWORD: ${SEMAPHORE_ADMIN_PASSWORD}
@@ -459,6 +459,26 @@ services:
     depends_on:
       - mysql
   
+  diun:
+    image: crazymax/diun:latest
+    container_name: diun
+    command: serve
+    volumes:
+      - "/home/matt/diun:/data"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    environment:
+      - "TZ=America/Chicago"
+      - "LOG_LEVEL=info"
+      - "LOG_JSON=false"
+      - "DIUN_WATCH_WORKERS=20"
+      - "DIUN_WATCH_SCHEDULE=0 */6 * * *"
+      - "DIUN_WATCH_JITTER=30s"
+      - "DIUN_PROVIDERS_DOCKER=true"
+      - "DIUN_PROVIDERS_DOCKER_WATCHBYDEFAULT=true"
+      - "DIUN_NOTIF_PUSHOVER_TOKEN=${PUSHOVER_TOKEN}"
+      - "DIUN_NOTIF_PUSHOVER_RECIPIENT=${PUSHOVER_RECIPIENT}"
+    restart: always
+
 volumes: 
   semaphore-mysql:
   tv:
