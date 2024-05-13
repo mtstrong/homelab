@@ -1,0 +1,6 @@
+---
+- hosts: mister
+  become: true
+  tasks:
+    - name: Run Update All Script
+      command: sh /media/fat/Scripts/update_all.sh
