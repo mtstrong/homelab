@@ -1,5 +1,4 @@
-SOLID Principles + Bonus Principles
-============
+### SOLID Principles
 Based on decades of academic and developer experience
 Purpose is to avoid software rot that leads to rigid and fragile code
 
@@ -33,14 +32,25 @@ Purpose is to avoid software rot that leads to rigid and fragile code
   * Reduces coupling
   * Increases testability
 
+### Other Principles
 **DRY Principle**
   * "Don't Repeat Yourself"
   * Every piece of knowledge must have a single, unambiguous, authoritative representation in a system
 
 **YAGNI**
+  * You Ain't Gonna Need It
   * You cannot accurately predict the future
   * Stick to single responsibility
   * Do not increase complexity in an attempt to help future you
 
 **KISS**
   * "Keep it simple, stupid"
+  * Simple means a better user experience
+
+**The Boy Scout Rule**
+  * Leave your code better than when you found it
+
+**Principle of Least Surprise**
+  * Every component should behave in a way that most users expect it to behave
+  * Consumers should trust their intuition
+  * Obvious behaviors should be implemented
