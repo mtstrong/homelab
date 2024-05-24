@@ -108,7 +108,7 @@ services:
     restart: unless-stopped
 
   readarr:
-    image: lscr.io/linuxserver/readarr:0.3.23-develop
+    image: lscr.io/linuxserver/readarr:0.3.28-nightly
     container_name: readarr
     environment:
       - PUID=1000
@@ -117,7 +117,7 @@ services:
     volumes:
       - /home/matt/readarr:/config
       - books:/books
-      - b-dls:/downloads
+      - nzb-dls:/downloads
     labels:
       - traefik.enable=true
       - traefik.http.routers.readarr.rule=Host(`readarr.tehmatt.com`)
