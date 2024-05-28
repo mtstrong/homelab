@@ -524,6 +524,11 @@ services:
       - 3001:3001
     volumes:
       - /home/matt/uptimekuma:/app/data
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.uptime.rule=Host(`uptime.tehmatt.com`)
+      - traefik.http.routers.uptime.entrypoints=websecure
+      - traefik.http.routers.uptime.tls.certresolver=letsencrypt
     restart: unless-stopped
 
 volumes: 
