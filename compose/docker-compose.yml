@@ -531,6 +531,18 @@ services:
       - traefik.http.routers.uptime.tls.certresolver=letsencrypt
     restart: unless-stopped
 
+  starcraft:
+    image: docker.io/ageo24/sc-bw-vnc:1.0
+    container_name: starcraft
+    ports:
+      - 7070:8080
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.starcraft.rule=Host(`starcraft.tehmatt.com`)
+      - traefik.http.routers.starcraft.entrypoints=websecure
+      - traefik.http.routers.starcraft.tls.certresolver=letsencrypt
+    restart: unless-stopped
+
 volumes: 
   semaphore-mysql:
   tv:
