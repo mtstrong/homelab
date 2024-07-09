@@ -543,6 +543,20 @@ services:
       - traefik.http.routers.starcraft.tls.certresolver=letsencrypt
     restart: unless-stopped
 
+  mattodo-api:
+    image: ghcr.io/mtstrong/mattodo.api:v1.0.0
+    container_name: mattodo-api
+    ports:
+      - 7260:7260
+    volumes:
+      - /home/matt/mattodo-api:/config
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mattodo-api.rule=Host(`mattodo.tehmatt.com`)
+      - traefik.http.routers.mattodo-api.entrypoints=websecure
+      - traefik.http.routers.mattodo-api.tls.certresolver=letsencrypt
+    restart: unless-stopped
+
 volumes: 
   semaphore-mysql:
   tv:
