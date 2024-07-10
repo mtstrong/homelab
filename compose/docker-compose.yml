@@ -557,6 +557,30 @@ services:
       - traefik.http.routers.mattodo-api.tls.certresolver=letsencrypt
     restart: unless-stopped
 
+  gitlab:
+    image: gitlab/gitlab-ee:<version>-ee.0
+    container_name: gitlab
+    restart: always
+    hostname: 'gitlab.tehmatt.com'
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        # Add any other gitlab.rb configuration here, each on its own line
+        external_url 'https://gitlab.tehmatt.com'
+    ports:
+      - '80:80'
+      - '443:443'
+      - '22:22'
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mattodo-api.rule=Host(`gitlab.tehmatt.com`)
+      - traefik.http.routers.mattodo-api.entrypoints=websecure
+      - traefik.http.routers.mattodo-api.tls.certresolver=letsencrypt
+    volumes:
+      - '/home/matt/gitlab/config:/etc/gitlab'
+      - '/home/matt/gitlab/logs:/var/log/gitlab'
+      - '/home/matt/gitlab/data:/var/opt/gitlab'
+    shm_size: '256m'
+
 volumes: 
   semaphore-mysql:
   tv:
