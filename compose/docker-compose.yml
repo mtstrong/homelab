@@ -145,6 +145,24 @@ services:
       - 5055:5055
     restart: unless-stopped
 
+  overseerr2:
+    image: lscr.io/linuxserver/overseerr:1.33.2
+    container_name: overseerr2
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - /home/matt/overseerr2:/config
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.overseerr2.rule=Host(`leslie.tehmatt.com`)
+      - traefik.http.routers.overseerr2.entrypoints=websecure
+      - traefik.http.routers.overseerr2.tls.certresolver=letsencrypt
+    ports:
+      - 5056:5055
+    restart: unless-stopped
+
   sabnzbd:
     image: lscr.io/linuxserver/sabnzbd:4.3.2
     container_name: sabnzbd
