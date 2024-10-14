@@ -2,7 +2,7 @@ version: '3.9'
 services:
   traefik:
     container_name: traefik
-    image: traefik:v3.0 
+    image: traefik:v3.2
     ports:
       - 80:80
       - 443:443
@@ -71,7 +71,7 @@ services:
     restart: unless-stopped
 
   radarr:
-    image: lscr.io/linuxserver/radarr:5.9.1
+    image: lscr.io/linuxserver/radarr:5.12.2
     container_name: radarr
     environment:
       - PUID=1000
@@ -90,7 +90,7 @@ services:
     restart: unless-stopped
   
   prowlarr:
-    image: lscr.io/linuxserver/prowlarr:1.23.1
+    image: lscr.io/linuxserver/prowlarr:1.24.3
     container_name: prowlarr
     environment:
       - PUID=1000
@@ -108,7 +108,7 @@ services:
     restart: unless-stopped
 
   readarr:
-    image: lscr.io/linuxserver/readarr:0.4.0-nightly
+    image: lscr.io/linuxserver/readarr:0.4.1-nightly
     container_name: readarr
     environment:
       - PUID=1000
@@ -164,7 +164,7 @@ services:
     restart: unless-stopped
 
   sabnzbd:
-    image: lscr.io/linuxserver/sabnzbd:4.3.2
+    image: lscr.io/linuxserver/sabnzbd:4.3.3
     container_name: sabnzbd
     environment:
       - PUID=1000
@@ -185,7 +185,7 @@ services:
     restart: unless-stopped
 
   audiobookshelf:
-    image: ghcr.io/advplyr/audiobookshelf:2.13.2
+    image: ghcr.io/advplyr/audiobookshelf:2.15.0
     container_name: audiobookshelf
     ports:
       - 13378:80
@@ -202,7 +202,7 @@ services:
     restart: unless-stopped
 
   homepage:
-    image: ghcr.io/gethomepage/homepage:v0.9.5
+    image: ghcr.io/gethomepage/homepage:v0.9.10
     container_name: homepage
     environment:
       PUID: 1000
@@ -239,7 +239,7 @@ services:
     restart: unless-stopped
 
   qbittorrent:
-    image: linuxserver/qbittorrent:4.6.5
+    image: linuxserver/qbittorrent:5.0.0
     network_mode: service:nordlynx
     container_name: qbittorrent
     depends_on:
@@ -275,7 +275,7 @@ services:
     restart: unless-stopped
 
   kavita:
-    image: jvmilazz0/kavita:0.8.2
+    image: jvmilazz0/kavita:0.8.3
     container_name: kavita
     volumes:
       - comics:/comics
@@ -340,7 +340,7 @@ services:
     restart: unless-stopped
 
   mealie:
-    image: ghcr.io/mealie-recipes/mealie:v1.5.1
+    image: ghcr.io/mealie-recipes/mealie:v1.12.0
     container_name: mealie
     ports:
         - 9925:9000 
@@ -402,7 +402,7 @@ services:
     restart: unless-stopped
 
   tautulli:
-    image: lscr.io/linuxserver/tautulli:2.13.4
+    image: lscr.io/linuxserver/tautulli:2.14.6
     container_name: tautulli
     environment:
       - PUID=1000
