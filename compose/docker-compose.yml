@@ -575,6 +575,23 @@ services:
       - traefik.http.routers.mattodo-api.tls.certresolver=letsencrypt
     restart: unless-stopped
 
+  project-zomboid:
+    image: afey/zomboid
+    container_name: zomboid_server
+    restart: unless-stopped
+    environment:
+      SERVER_NAME: ${ZOMBOID_SERVER_NAME}
+      ADMIN_PASSWORD: ${ZOMBOID_PASSWORD}
+    ports:
+      - "8766:8766/udp"
+      - "8767:8767/udp"
+      - "16261:16261/udp"
+      - "16262-16272:16262-16272"
+      - "27015:27015"
+    volumes:
+      - /home/matt/zomboid/server-data:/server-data
+      - /home/matt/zomboid/server-files:/server-files
+
 volumes: 
   semaphore-mysql:
   tv:
