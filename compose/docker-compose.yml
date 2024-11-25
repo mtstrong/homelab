@@ -577,10 +577,11 @@ services:
 
   project-zomboid:
     image: afey/zomboid
+    container_name: zomboid_server
     restart: unless-stopped
     environment:
-      SERVER_NAME: "pzserver"
-      ADMIN_PASSWORD: "pzserver-password"
+      SERVER_NAME: ${ZOMBOID_SERVER_NAME}
+      ADMIN_PASSWORD: ${ZOMBOID_PASSWORD}
     ports:
       - "8766:8766/udp"
       - "8767:8767/udp"
