@@ -577,8 +577,7 @@ services:
 
   project-zomboid:
     image: afey/zomboid
-    container_name: zomboid_server
-    restart: unless-stopped
+    container_name: zomboid-server
     environment:
       SERVER_NAME: ${ZOMBOID_SERVER_NAME}
       ADMIN_PASSWORD: ${ZOMBOID_PASSWORD}
@@ -591,6 +590,12 @@ services:
     volumes:
       - /home/matt/zomboid/server-data:/server-data
       - /home/matt/zomboid/server-files:/server-files
+    labels:
+      - traefik.enable=true
+      - traefik.http.routerszomboid-server.rule=Host(`zomboid.tehmatt.com`)
+      - traefik.http.routers.zomboid-server.entrypoints=websecure
+      - traefik.http.routers.zomboid-server.tls.certresolver=letsencrypt
+    restart: unless-stopped
 
 volumes: 
   semaphore-mysql:
