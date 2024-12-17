@@ -20,7 +20,7 @@ docker volume create tv --driver local --opt type=nfs --opt o=addr=192.168.1.38,
 docker volume create audiobooks --driver local --opt type=nfs --opt o=addr=192.168.1.38,rw --opt device=:"/mnt/TrueNAS/audiobooks"
 docker volume create podcasts --driver local --opt type=nfs --opt o=addr=192.168.1.38,rw --opt device=:"/mnt/TrueNAS/podcasts"
 docker volume create torrent-dls --driver local --opt type=nfs --opt o=addr=192.168.1.38,rw --opt device=:"/mnt/TrueNAS/torrent-dls"
-docker volume create nzb-dls --driver local --opt type=nfs --opt o=addr=192.168.1.38,rw --opt device=:"/mnt/TrueNAS/nzb-dls"
+docker volume create nzb-dls --driver local --opt type=nfs --opt o=addr=192.168.1.38,rw --opt device=:"/mnt/OneTbs/nzb-dls"
 docker volume create handbrake --driver local --opt type=nfs --opt o=addr=192.168.1.38,rw --opt device=:"/mnt/TrueNAS/handbrake"
 docker volume create comics --driver local --opt type=nfs --opt o=addr=192.168.1.38,rw --opt device=:"/mnt/TrueNAS/comics"
 docker volume create books --driver local --opt type=nfs --opt o=addr=192.168.1.38,rw --opt device=:"/mnt/TrueNAS/books"
