@@ -561,6 +561,18 @@ services:
       - traefik.http.routers.starcraft.tls.certresolver=letsencrypt
     restart: unless-stopped
 
+  it-tools:
+    container_name: it-tools
+    ports:
+        - 4567:80
+    image: corentinth/it-tools:latest
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.it-tools.rule=Host(`tools.tehmatt.com`)
+      - traefik.http.routers.it-tools.entrypoints=websecure
+      - traefik.http.routers.it-tools.tls.certresolver=letsencrypt
+    restart: unless-stopped
+
   mattodo-api:
     image: ghcr.io/mtstrong/mattodo.api:v1.0.0
     container_name: mattodo-api
