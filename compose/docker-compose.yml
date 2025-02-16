@@ -192,6 +192,7 @@ services:
     volumes:
       - audiobooks:/audiobooks
       - podcasts:/podcasts
+      - audiobook-uploads:/uploads
       - /home/matt/audiobookshelf:/config
       - /home/matt/audiobookshelf:/metadata
     labels:
@@ -199,6 +200,17 @@ services:
       - traefik.http.routers.audiobookshelf.rule=Host(`abs.tehmatt.com`)
       - traefik.http.routers.audiobookshelf.entrypoints=websecure
       - traefik.http.routers.audiobookshelf.tls.certresolver=letsencrypt
+    restart: unless-stopped
+
+  openaudible:
+    image: openaudible/openaudible:latest
+    container_name: openaudible
+    ports:
+      - 13380:80
+      - 3033:3000
+    volumes:
+      - audiobook-uploads:/uploads
+      - /home/matt/oa-matt:/config
     restart: unless-stopped
 
   homepage:
@@ -625,6 +637,8 @@ volumes:
   b-dls:
     external: true
   audiobooks:
+    external: true
+  audiobook-uploads:
     external: true
   podcasts:
     external: true
