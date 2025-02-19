@@ -163,6 +163,18 @@ services:
       - 5056:5055
     restart: unless-stopped
 
+  notifiarr:
+    container_name: notifiarr
+    hostname: notifiarr
+    image: golift/notifiarr:0.8.3
+    restart: unless-stopped
+    ports:
+      - "5454:5454"
+    volumes:
+      - /home/matt/notifiarr:/config
+      - /var/run/utmp:/var/run/utmp
+      - /etc/machine-id:/etc/machine-id
+
   sabnzbd:
     image: lscr.io/linuxserver/sabnzbd:4.4.1
     container_name: sabnzbd
