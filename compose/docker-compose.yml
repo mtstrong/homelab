@@ -57,7 +57,7 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
-      - TZ=UTC
+      - TZ=America/Chicago
       - UMASK_SET=022 #optional
     volumes:
       - /home/matt/sonarr:/config
@@ -76,7 +76,7 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
-      - TZ=UTC
+      - TZ=America/Chicago
       - UMASK_SET=022
     volumes:
       - /home/matt/radarr:/config
@@ -95,7 +95,7 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
-      - TZ=Etc/UTC
+      - TZ=America/Chicago
     volumes:
       - /home/matt/prowlarr:/config
     labels:
@@ -113,7 +113,7 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
-      - TZ=Europe/London
+      - TZ=America/Chicago
     volumes:
       - /home/matt/readarr:/config
       - books:/books
@@ -133,11 +133,11 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
-      - TZ=Etc/UTC
+      - TZ=America/Chicago
     volumes:
       - /home/matt/mylar3/:/config
       - comics:/comics
-      - /home/matt/mylar3/downloads:/downloads
+      - torrent-dls:/downloads
     labels:
       - traefik.enable=true
       - traefik.http.routers.mylar3.rule=Host(`comics.tehmatt.com`)
@@ -153,7 +153,7 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
-      - TZ=Etc/UTC
+      - TZ=America/Chicago
     volumes:
       - /home/matt/overseerr:/config
     labels:
@@ -171,7 +171,7 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
-      - TZ=Etc/UTC
+      - TZ=America/Chicago
     volumes:
       - /home/matt/overseerr2:/config
     labels:
@@ -201,7 +201,7 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
-      - TZ=Etc/UTC
+      - TZ=America/Chicago
       - HAS_IPV6=false
     volumes:
       - /home/matt/sabnzbd:/config
@@ -306,6 +306,24 @@ services:
       - traefik.http.routers.qbittorrent.tls.certresolver=letsencrypt
     restart: unless-stopped
 
+  qbittorrentnovpn:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrentnovpn
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+      - WEBUI_PORT=8484
+      - TORRENTING_PORT=6881
+    volumes:
+      - /home/matt/qbittorrentnovpn:/config
+      - torrent-dls:/downloads
+    ports:
+      - 8484:8484
+      - 6881:6881
+      - 6881:6881/udp
+    restart: unless-stopped
+
   handbrake:
     image: jlesage/handbrake:v24.03.1
     container_name: handbrake
@@ -341,7 +359,7 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
-      - TZ=Etc/UTC
+      - TZ=America/Chicago
       - MENU_VERSION=1.9.9
       - PORT_RANGE=30000:30010
       - SUBFOLDER=/ 
@@ -430,7 +448,7 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
-      - TZ=Etc/UTC
+      - TZ=America/Chicago
       - DOCKER_MODS=linuxserver/mods:universal-calibre #optional
       - OAUTHLIB_RELAX_TOKEN_SCOPE=1 #optional
     volumes:
@@ -451,7 +469,7 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
-      - TZ=Etc/UTC
+      - TZ=America/Chicago
     volumes:
       - /home/matt/tautulli:/config
     ports:
