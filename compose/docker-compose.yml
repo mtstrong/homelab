@@ -355,7 +355,7 @@ services:
 
   homeassistant:
     container_name: homeassistant
-    image: ghcr.io/home-assistant/home-assistant:2024.12
+    image: ghcr.io/home-assistant/home-assistant:2025.2.4
     volumes:
       - /home/matt/homeassistant:/config
       - /etc/localtime:/etc/localtime:ro
@@ -364,7 +364,7 @@ services:
     restart: unless-stopped
 
   mealie:
-    image: ghcr.io/mealie-recipes/mealie:v2.3.0
+    image: ghcr.io/mealie-recipes/mealie:v2.6.0
     container_name: mealie
     ports:
         - 9925:9000 
@@ -426,7 +426,7 @@ services:
     restart: unless-stopped
 
   tautulli:
-    image: lscr.io/linuxserver/tautulli:2.15.0
+    image: lscr.io/linuxserver/tautulli:2.15.1
     container_name: tautulli
     environment:
       - PUID=1000
@@ -452,7 +452,7 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
 
   semaphore:
-    image: semaphoreui/semaphore:v2.9.70
+    image: semaphoreui/semaphore:v2.12.14
     container_name: ansible-semaphore
     restart: unless-stopped
     ports:
