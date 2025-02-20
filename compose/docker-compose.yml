@@ -127,6 +127,26 @@ services:
       - 8787:8787
     restart: unless-stopped
 
+  mylar3:
+    image: lscr.io/linuxserver/mylar3:latest
+    container_name: mylar3
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - /home/matt/mylar3/:/config
+      - comics:/comics
+      - /home/matt/mylar3/downloads:/downloads
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mylar3.rule=Host(`comics.tehmatt.com`)
+      - traefik.http.routers.mylar3.entrypoints=websecure
+      - traefik.http.routers.mylar3.tls.certresolver=letsencrypt
+    ports:
+      - 8090:8090
+    restart: unless-stopped
+
   overseerr:
     image: lscr.io/linuxserver/overseerr:1.33.2
     container_name: overseerr
