@@ -2,7 +2,7 @@ version: '3.9'
 services:
   traefik:
     container_name: traefik
-    image: traefik:v3.3.3
+    image: traefik:v3.3.4
     ports:
       - 80:80
       - 443:443
@@ -11,11 +11,9 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /home/matt/traefik/acme:/acme
       - /home/matt/traefik/logs:/logs
-
     environment:
       - CF_API_EMAIL=${CF_EMAIL}
       - CF_API_KEY=${CF_API_KEY}
-
     command:            
       - --api=true
       - --global.checkNewVersion=true
@@ -52,7 +50,7 @@ services:
     restart: unless-stopped
 
   sonarr:
-    image: lscr.io/linuxserver/sonarr:4.0.13
+    image: lscr.io/linuxserver/sonarr:4.0.14
     container_name: sonarr
     environment:
       - PUID=1000
@@ -71,7 +69,7 @@ services:
     restart: unless-stopped
 
   radarr:
-    image: lscr.io/linuxserver/radarr:5.18.4
+    image: lscr.io/linuxserver/radarr:5.19.3
     container_name: radarr
     environment:
       - PUID=1000
@@ -217,7 +215,7 @@ services:
     restart: unless-stopped
 
   audiobookshelf:
-    image: ghcr.io/advplyr/audiobookshelf:2.19.2
+    image: ghcr.io/advplyr/audiobookshelf:2.20.0
     container_name: audiobookshelf
     ports:
       - 13378:80
@@ -246,7 +244,7 @@ services:
     restart: unless-stopped
 
   homepage:
-    image: ghcr.io/gethomepage/homepage:v0.10.9
+    image: ghcr.io/gethomepage/homepage:v1.0.4
     container_name: homepage
     environment:
       PUID: 1000
@@ -283,7 +281,7 @@ services:
     restart: unless-stopped
 
   qbittorrent:
-    image: linuxserver/qbittorrent:5.0.2
+    image: linuxserver/qbittorrent:5.0.4
     network_mode: service:nordlynx
     container_name: qbittorrent
     depends_on:
@@ -307,7 +305,7 @@ services:
     restart: unless-stopped
 
   qbittorrentnovpn:
-    image: lscr.io/linuxserver/qbittorrent:latest
+    image: lscr.io/linuxserver/qbittorrent:5.0.4
     container_name: qbittorrentnovpn
     environment:
       - PUID=1000
@@ -337,7 +335,7 @@ services:
     restart: unless-stopped
 
   kavita:
-    image: jvmilazz0/kavita:0.8.4
+    image: jvmilazz0/kavita:0.8.5
     container_name: kavita
     volumes:
       - comics:/comics
@@ -402,7 +400,7 @@ services:
     restart: unless-stopped
 
   mealie:
-    image: ghcr.io/mealie-recipes/mealie:v2.6.0
+    image: ghcr.io/mealie-recipes/mealie:v2.7.1
     container_name: mealie
     ports:
         - 9925:9000 
@@ -598,7 +596,7 @@ services:
     restart: unless-stopped
 
   uptimekuma:
-    image: docker.io/louislam/uptime-kuma:1.23.15
+    image: docker.io/louislam/uptime-kuma:1.23.16
     container_name: uptimekuma
     ports:
       - 3001:3001
