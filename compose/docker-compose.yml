@@ -664,6 +664,17 @@ services:
       - /home/matt/zomboid/server-data:/server-data
       - /home/matt/zomboid/server-files:/server-files
 
+  ddclient:
+    image: lscr.io/linuxserver/ddclient:latest
+    container_name: ddclient
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - /home/matt/ddclient:/config
+    restart: unless-stopped
+
 volumes: 
   semaphore-mysql:
   tv:
