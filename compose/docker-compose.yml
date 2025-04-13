@@ -66,6 +66,7 @@ services:
       - traefik.http.routers.sonarr.rule=Host(`sonarr.tehmatt.com`)
       - traefik.http.routers.sonarr.entrypoints=websecure
       - traefik.http.routers.sonarr.tls.certresolver=letsencrypt
+      #- traefik.http.routers.sonarr.middlewares=tinyauth
     restart: unless-stopped
 
   radarr:
@@ -673,6 +674,25 @@ services:
       - TZ=Etc/UTC
     volumes:
       - /home/matt/ddclient:/config
+    restart: unless-stopped
+
+  tinyauth:
+    container_name: tinyauth
+    image: ghcr.io/steveiliop56/tinyauth:v3
+    environment:
+      - SECRET=${TINYAUTH_SECRET}
+      - APP_URL=https://tinyauth.tehmatt.com
+      - LOG_LEVEL=0
+      - USERS=${USERS}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - OAUTH_WHITELIST=swevo24@gmail.com,myswtghst@gmail.com,leslie.r.strong@gmail.com
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.tinyauth.rule=Host(`tinyauth.tehmatt.com`)
+      - traefik.http.routers.tinyauth.entrypoints=websecure
+      - traefik.http.routers.tinyauth.tls.certresolver=letsencrypt
+      - traefik.http.middlewares.tinyauth.forwardauth.address=http://tinyauth:3000/api/auth/traefik
     restart: unless-stopped
 
 volumes: 
