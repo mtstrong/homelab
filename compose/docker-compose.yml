@@ -654,22 +654,22 @@ services:
       - traefik.http.routers.mattodo-api.tls.certresolver=letsencrypt
     restart: unless-stopped
 
-  project-zomboid:
-    image: afey/zomboid
-    container_name: zomboid_server
-    restart: unless-stopped
-    environment:
-      SERVER_NAME: ${ZOMBOID_SERVER_NAME}
-      ADMIN_PASSWORD: ${ZOMBOID_PASSWORD}
-    ports:
-      - "8766:8766/udp"
-      - "8767:8767/udp"
-      - "16261:16261/udp"
-      - "16262-16272:16262-16272"
-      - "27015:27015"
-    volumes:
-      - /home/matt/zomboid/server-data:/server-data
-      - /home/matt/zomboid/server-files:/server-files
+ # project-zomboid:
+ #   image: afey/zomboid
+ #   container_name: zomboid_server
+ #   restart: unless-stopped
+ #   environment:
+ #     SERVER_NAME: ${ZOMBOID_SERVER_NAME}
+ #     ADMIN_PASSWORD: ${ZOMBOID_PASSWORD}
+ #   ports:
+ #     - "8766:8766/udp"
+ #     - "8767:8767/udp"
+ #     - "16261:16261/udp"
+ #     - "16262-16272:16262-16272"
+ #     - "27015:27015"
+ #   volumes:
+ #     - /home/matt/zomboid/server-data:/server-data
+ #     - /home/matt/zomboid/server-files:/server-files
 
   ddclient:
     image: lscr.io/linuxserver/ddclient:latest
@@ -699,6 +699,22 @@ services:
       - traefik.http.routers.tinyauth.entrypoints=websecure
       - traefik.http.routers.tinyauth.tls.certresolver=letsencrypt
       - traefik.http.middlewares.tinyauth.forwardauth.address=http://tinyauth:3000/api/auth/traefik
+    restart: unless-stopped
+
+  checkmk:
+    image: checkmk/check-mk-raw:2.4.0-latest
+    container_name: checkmk-server
+    ports:
+      - "5000:5000"
+      - "5001:5001"
+      - "6556:6556"
+    volumes:
+      - /home/matt/checkmk:/omd/sites
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.checkmk.rule=Host(`checkmk.tehmatt.com`)
+      - traefik.http.routers.checkmk.entrypoints=websecure
+      - traefik.http.routers.checkmk.tls.certresolver=letsencrypt
     restart: unless-stopped
 
 volumes: 
