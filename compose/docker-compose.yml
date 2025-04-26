@@ -724,9 +724,9 @@ services:
       - "8384:80"
     labels:
       - traefik.enable=true
-      - traefik.http.routers.omni.rule=Host(`omni.tehmatt.com`)
-      - traefik.http.routers.omni.entrypoints=websecure
-      - traefik.http.routers.omni.tls.certresolver=letsencrypt
+      - traefik.http.routers.omni-tools.rule=Host(`omni.tehmatt.com`)
+      - traefik.http.routers.omni-tools.entrypoints=websecure
+      - traefik.http.routers.omni-tools.tls.certresolver=letsencrypt
     restart: unless-stopped
 
 volumes: 
