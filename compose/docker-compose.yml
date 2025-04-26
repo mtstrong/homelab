@@ -717,6 +717,18 @@ services:
       - traefik.http.routers.checkmk.tls.certresolver=letsencrypt
     restart: unless-stopped
 
+  omni-tools:
+    image: iib0011/omni-tools:0.3.0
+    container_name: omni-tools
+    ports:
+      - "8384:80"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.omni.rule=Host(`omni.tehmatt.com`)
+      - traefik.http.routers.omni.entrypoints=websecure
+      - traefik.http.routers.omni.tls.certresolver=letsencrypt
+    restart: unless-stopped
+
 volumes: 
   semaphore-mysql:
   tv:
