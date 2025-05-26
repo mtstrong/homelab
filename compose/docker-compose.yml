@@ -729,6 +729,21 @@ services:
       - traefik.http.routers.omni-tools.tls.certresolver=letsencrypt
     restart: unless-stopped
 
+  dozzle:
+    container_name: dozzle
+    image: amir20/dozzle:v8
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "8385:8080"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.dozzle.rule=Host(`logs.tehmatt.com`)
+      - traefik.http.routers.dozzle.entrypoints=websecure
+      - traefik.http.routers.dozzle.tls.certresolver=letsencrypt
+      - traefik.http.routers.dozzle.middlewares=tinyauth
+    restart: unless-stopped
+
 volumes: 
   semaphore-mysql:
   tv:
