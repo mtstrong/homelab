@@ -743,7 +743,69 @@ services:
       - traefik.http.routers.dozzle.tls.certresolver=letsencrypt
       - traefik.http.routers.dozzle.middlewares=tinyauth
     restart: unless-stopped
+    
+  ollama:
+    image: ollama/ollama:0.9.5
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - /home/matt/ollama:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+    restart: always
 
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:cuda
+    container_name: open-webui
+    ports:
+      - "3008:8080"
+    environment:
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    volumes:
+      - /home/matt/open-webui:/app/backend/data
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.openwebui.rule=Host(`ollama.tehmatt.com`)
+      - traefik.http.routers.openwebui.entrypoints=websecure
+      - traefik.http.routers.openwebui.tls.certresolver=letsencrypt
+      #- traefik.http.routers.openwebui.middlewares=tinyauth
+    restart: always
+
+  gitlab:
+    image: gitlab/gitlab-ce:18.0.3-ce.0
+    container_name: gitlab
+    restart: always
+    #hostname: 'gitlab.tehmatt.com'
+    #environment:
+    #  GITLAB_OMNIBUS_CONFIG: |
+    #    #Add any other gitlab.rb configuration here, each on its own line
+    #    external_url 'https://gitlab.tehmatt.com'
+    ports:
+      - '8005:80'
+    volumes:
+      - '$GITLAB_HOME/config:/etc/gitlab'
+      - '$GITLAB_HOME/logs:/var/log/gitlab'
+      - '$GITLAB_HOME/data:/var/opt/gitlab'
+    #labels:
+    #  - traefik.enable=true
+    #  - traefik.http.routers.gitlab.rule=Host(`gitlab.tehmatt.com`)
+    #  - traefik.http.routers.gitlab.entrypoints=websecure
+    #  - traefik.http.routers.gitlab.tls.certresolver=letsencrypt
+      #- traefik.http.routers.gitlab.middlewares=tinyauth
+    shm_size: '256m'
+    
+=======
 volumes: 
   semaphore-mysql:
   tv:
