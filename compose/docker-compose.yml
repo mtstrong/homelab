@@ -743,7 +743,7 @@ services:
       - traefik.http.routers.dozzle.tls.certresolver=letsencrypt
       - traefik.http.routers.dozzle.middlewares=tinyauth
     restart: unless-stopped
-
+    
   ollama:
     image: ollama/ollama:0.9.5
     container_name: ollama
@@ -805,6 +805,7 @@ services:
       #- traefik.http.routers.gitlab.middlewares=tinyauth
     shm_size: '256m'
     
+=======
 volumes: 
   semaphore-mysql:
   tv:
