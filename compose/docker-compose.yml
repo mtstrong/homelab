@@ -805,7 +805,6 @@ services:
       #- traefik.http.routers.gitlab.middlewares=tinyauth
     shm_size: '256m'
     
-=======
 volumes: 
   semaphore-mysql:
   tv:
