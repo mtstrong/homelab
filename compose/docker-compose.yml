@@ -359,7 +359,7 @@ services:
     restart: unless-stopped
 
   netbootxyz:
-    image: lscr.io/linuxserver/netbootxyz:0.7.6
+    image: lscr.io/linuxserver/netbootxyz:2.0.53
     container_name: netbootxyz
     environment:
       - PUID=1000
