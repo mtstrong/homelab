@@ -786,23 +786,24 @@ services:
     image: gitlab/gitlab-ce:18.0.3-ce.0
     container_name: gitlab
     restart: always
-    #hostname: 'gitlab.tehmatt.com'
-    #environment:
-    #  GITLAB_OMNIBUS_CONFIG: |
-    #    #Add any other gitlab.rb configuration here, each on its own line
-    #    external_url 'https://gitlab.tehmatt.com'
+    hostname: 'gitlab.tehmatt.com'
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        #Add any other gitlab.rb configuration here, each on its own line
+        external_url 'https://gitlab.tehmatt.com:80'
     ports:
       - '8005:80'
     volumes:
       - '$GITLAB_HOME/config:/etc/gitlab'
       - '$GITLAB_HOME/logs:/var/log/gitlab'
       - '$GITLAB_HOME/data:/var/opt/gitlab'
-    #labels:
-    #  - traefik.enable=true
-    #  - traefik.http.routers.gitlab.rule=Host(`gitlab.tehmatt.com`)
-    #  - traefik.http.routers.gitlab.entrypoints=websecure
-    #  - traefik.http.routers.gitlab.tls.certresolver=letsencrypt
-      #- traefik.http.routers.gitlab.middlewares=tinyauth
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.gitlab.rule=Host(`gitlab.tehmatt.com`)
+      - traefik.http.routers.gitlab.entrypoints=websecure
+      - traefik.http.routers.gitlab.tls=true
+      - traefik.http.routers.gitlab.tls.certresolver=letsencrypt
+      - traefik.http.routers.gitlab.middlewares=tinyauth
     shm_size: '256m'
     
 volumes: 
