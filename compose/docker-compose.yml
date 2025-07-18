@@ -72,7 +72,7 @@ services:
     restart: unless-stopped
 
   radarr:
-    image: lscr.io/linuxserver/radarr:5.21.1
+    image: lscr.io/linuxserver/radarr:5.26.2
     container_name: radarr
     environment:
       - PUID=1000
