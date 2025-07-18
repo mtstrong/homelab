@@ -94,7 +94,7 @@ services:
     restart: unless-stopped
   
   prowlarr:
-    image: lscr.io/linuxserver/prowlarr:1.34.1-nightly
+    image: lscr.io/linuxserver/prowlarr:1.38.0-nightly
     container_name: prowlarr
     environment:
       - PUID=1000
