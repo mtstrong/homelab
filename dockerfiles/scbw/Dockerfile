@@ -1,4 +1,4 @@
-FROM ubuntu:focal
+FROM ubuntu:noble
 
 ENV HOME /root
 ENV DEBIAN_FRONTEND noninteractive
