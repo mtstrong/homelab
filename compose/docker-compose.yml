@@ -407,7 +407,7 @@ services:
     restart: unless-stopped
 
   mealie:
-    image: ghcr.io/mealie-recipes/mealie:v2.7.1
+    image: ghcr.io/mealie-recipes/mealie:v3.0.1
     container_name: mealie
     ports:
         - 9925:9000 
