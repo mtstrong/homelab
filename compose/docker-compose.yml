@@ -200,7 +200,7 @@ services:
       - /etc/machine-id:/etc/machine-id
 
   sabnzbd:
-    image: lscr.io/linuxserver/sabnzbd:4.4.1
+    image: lscr.io/linuxserver/sabnzbd:4.5.2
     container_name: sabnzbd
     environment:
       - PUID=1000
