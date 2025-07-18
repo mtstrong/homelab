@@ -724,7 +724,7 @@ services:
     restart: unless-stopped
 
   omni-tools:
-    image: iib0011/omni-tools:0.3.0
+    image: iib0011/omni-tools:0.5.0
     container_name: omni-tools
     ports:
       - "8384:80"
