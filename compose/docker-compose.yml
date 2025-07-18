@@ -495,8 +495,8 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
 
   semaphore:
-    image: semaphoreui/semaphore:v2.12.14
-    container_name: ansible-semaphore
+    image: semaphoreui/semaphore:v2.15.0
+    container_name: semaphore
     restart: unless-stopped
     ports:
       - 3333:3000
@@ -513,6 +513,12 @@ services:
       SEMAPHORE_ADMIN_EMAIL: admin@localhost
       SEMAPHORE_ADMIN: admin
       SEMAPHORE_ACCESS_KEY_ENCRYPTION: ${SEMAPHORE_ACCESS_KEY_ENCRYPTION}
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.semaphore.rule=Host(`semaphore.tehmatt.com`)
+      - traefik.http.routers.semaphore.entrypoints=websecure
+      - traefik.http.routers.semaphore.tls.certresolver=letsencrypt
+      - traefik.http.routers.semaphore.middlewares=tinyauth
     depends_on:
       - mysql
   
@@ -786,23 +792,24 @@ services:
     image: gitlab/gitlab-ce:18.0.3-ce.0
     container_name: gitlab
     restart: always
-    #hostname: 'gitlab.tehmatt.com'
-    #environment:
-    #  GITLAB_OMNIBUS_CONFIG: |
-    #    #Add any other gitlab.rb configuration here, each on its own line
-    #    external_url 'https://gitlab.tehmatt.com'
+    hostname: 'gitlab.tehmatt.com'
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        #Add any other gitlab.rb configuration here, each on its own line
+        external_url 'https://gitlab.tehmatt.com:80'
     ports:
       - '8005:80'
     volumes:
       - '$GITLAB_HOME/config:/etc/gitlab'
       - '$GITLAB_HOME/logs:/var/log/gitlab'
       - '$GITLAB_HOME/data:/var/opt/gitlab'
-    #labels:
-    #  - traefik.enable=true
-    #  - traefik.http.routers.gitlab.rule=Host(`gitlab.tehmatt.com`)
-    #  - traefik.http.routers.gitlab.entrypoints=websecure
-    #  - traefik.http.routers.gitlab.tls.certresolver=letsencrypt
-      #- traefik.http.routers.gitlab.middlewares=tinyauth
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.gitlab.rule=Host(`gitlab.tehmatt.com`)
+      - traefik.http.routers.gitlab.entrypoints=websecure
+      - traefik.http.routers.gitlab.tls=true
+      - traefik.http.routers.gitlab.tls.certresolver=letsencrypt
+      - traefik.http.routers.gitlab.middlewares=tinyauth
     shm_size: '256m'
     
 volumes: 
