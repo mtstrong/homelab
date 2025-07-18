@@ -647,7 +647,7 @@ services:
     restart: unless-stopped
 
   mattodo-api:
-    image: ghcr.io/mtstrong/mattodo.api:v1.0.0
+    image: ghcr.io/mtstrong/mattodo.api:v1.0.5
     container_name: mattodo-api
     ports:
       - 7260:7260
