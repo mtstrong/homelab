@@ -342,7 +342,7 @@ services:
     restart: unless-stopped
 
   kavita:
-    image: jvmilazz0/kavita:0.8.5
+    image: jvmilazz0/kavita:0.8.7
     container_name: kavita
     volumes:
       - comics:/comics
