@@ -269,7 +269,7 @@ services:
     restart: unless-stopped
 
   nordlynx:
-    image: ghcr.io/bubuntux/nordlynx:2023-05-01
+    image: ghcr.io/bubuntux/nordlynx:2025-05-01
     container_name: nordlynx
     cap_add:
       - NET_ADMIN                             # required
