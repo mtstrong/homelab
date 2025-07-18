@@ -152,7 +152,7 @@ services:
     restart: unless-stopped
 
   overseerr:
-    image: lscr.io/linuxserver/overseerr:1.33.2
+    image: lscr.io/linuxserver/overseerr:1.34.0
     container_name: overseerr
     environment:
       - PUID=1000
@@ -170,7 +170,7 @@ services:
     restart: unless-stopped
 
   overseerr2:
-    image: lscr.io/linuxserver/overseerr:1.33.2
+    image: lscr.io/linuxserver/overseerr:1.34.0
     container_name: overseerr2
     environment:
       - PUID=1000
