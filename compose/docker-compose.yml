@@ -330,7 +330,7 @@ services:
     restart: unless-stopped
 
   handbrake:
-    image: jlesage/handbrake:v25.07.1
+    image: jlesage/handbrake:v25.07.2
     container_name: handbrake
     ports:
       - 5800:5800
