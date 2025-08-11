@@ -482,7 +482,7 @@ services:
     restart: unless-stopped
 
   mysql:
-    image: mysql:9.3
+    image: mysql:9.4
     container_name: mysql
     hostname: mysql
     restart: unless-stopped
