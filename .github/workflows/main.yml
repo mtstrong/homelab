@@ -13,8 +13,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Display system info
+      - name: Git Pull
         run: |
-          echo "Current directory: $(pwd)"
-          echo "User: $(whoami)"
-          uname -a
+          git pull
+      - name: Run Docker Compose
+        run: |
+          docker-compose -f compose/docker-compose.yml up -d
