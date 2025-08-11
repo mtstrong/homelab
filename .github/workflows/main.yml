@@ -1,0 +1,20 @@
+name: Linux Command Workflow
+
+on:
+  push:
+    paths:
+      - 'compose/docker-compose.yml' # Triggers if this specific file changes
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Display system info
+        run: |
+          echo "Current directory: $(pwd)"
+          echo "User: $(whoami)"
+          uname -a
