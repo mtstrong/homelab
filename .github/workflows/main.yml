@@ -21,4 +21,4 @@ jobs:
           git pull
       - name: Run Docker Compose
         run: |
-          docker compose -f compose/docker-compose.yml up -d > /dev/null
+          docker compose -f compose/docker-compose.yml up --quiet-pull -d
