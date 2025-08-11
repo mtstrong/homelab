@@ -13,12 +13,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Git Checkout Main
-        run: |
-          git checkout main
-      - name: Git Pull
-        run: |
-          git pull
       - name: Run Docker Compose
         run: |
           docker compose -f compose/docker-compose.yml up --quiet-pull -d
