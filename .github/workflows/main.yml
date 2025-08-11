@@ -13,11 +13,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      #- name: Run Docker Compose
-      #  run: |
-      #    docker compose -f compose/docker-compose.yml up --quiet-pull -d
-      - name: Update code
+      - name: Run Docker Compose
         run: |
-          cd /home/matt/code/homelab
-          git checkout main
-          git pull
+          docker compose -f compose/docker-compose.yml up --quiet-pull --pull missing -d
