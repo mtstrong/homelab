@@ -18,4 +18,4 @@ jobs:
           git pull
       - name: Run Docker Compose
         run: |
-          docker-compose -f compose/docker-compose.yml up -d
+          docker compose -f compose/docker-compose.yml up -d
