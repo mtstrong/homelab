@@ -811,6 +811,22 @@ services:
       - traefik.http.routers.gitlab.tls.certresolver=letsencrypt
       - traefik.http.routers.gitlab.middlewares=tinyauth
     shm_size: '256m'
+
+  #streamlink-recorder:
+  #  image: kjake/streamlink-recorder:latest
+  #  container_name: streamlink-secorder
+  #  restart: unless-stopped
+  #  volumes:
+  #    - podcasts:/home/download
+  #  environment:
+  #    - streamName=bubbel
+  #    - streamLink=twitch.tv/bubbel
+  #    - streamQuality=best
+  #    - streamOptions=--twitch-disable-hosting --twitch-disable-ads
+  #    - streamPoll=60
+  #    - uid=9001
+  #    - gid=9001
+  #    - TZ=America/Chicago
     
 volumes: 
   semaphore-mysql:
