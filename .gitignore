@@ -8,3 +8,12 @@
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+# Terraform
+*.tfvars
+*.tfstate
+*.tfstate.*
+.terraform/
+crash.log
+.tfplan
+terraform.tfvars
