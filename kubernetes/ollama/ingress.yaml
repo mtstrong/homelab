@@ -1,0 +1,26 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: ollama
+  namespace: ollama
+  annotations:
+    kubernetes.io/ingress.class: traefik-external
+spec:
+  entryPoints:
+  - websecure
+  routes:
+  - match: Host(`ollama.tehmatt.com`) # TODO: change to your domain
+    kind: Rule
+    services:
+    - name: ollama
+      port: 3008
+      passHostHeader: false # set true if backend expects the original Host header
+      # If your LAN backend is HTTPS, change the Service/Endpoints port to 443
+      # and optionally reference a ServersTransport below to skip verify or set SNI
+      # serversTransport: insecure-skipverify
+    middlewares:
+    - name: default-headers
+      namespace: ollama
+  tls:
+    secretName: tehmatt-tls # TODO: change to your cert secret name
