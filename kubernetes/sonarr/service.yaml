@@ -1,0 +1,27 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sonarr
+  namespace: sonarr
+spec:
+  # No selector: we'll define Endpoints manually to point to a LAN IP
+  ports:
+  - name: http
+    port: 30027
+    targetPort: 30027
+    protocol: TCP
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: sonarr
+  namespace: sonarr
+subsets:
+- addresses:
+  - ip: 192.168.1.38 # TODO: set to your LAN host IP
+  ports:
+  - name: http
+    port: 30027 # TODO: set to your LAN host port
+    protocol: TCP
