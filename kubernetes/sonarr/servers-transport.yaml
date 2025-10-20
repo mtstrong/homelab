@@ -1,0 +1,8 @@
+apiVersion: traefik.io/v1alpha1
+kind: ServersTransport
+metadata:
+  name: insecure-skipverify
+  namespace: sonarr
+spec:
+  # Set to true only if your LAN backend uses a self-signed certificate
+  insecureSkipVerify: true
