@@ -61,12 +61,6 @@ services:
       - /home/matt/sonarr:/config
       - tv:/tv
       - nzb-dls:/downloads
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.sonarr.rule=Host(`sonarr.tehmatt.com`)
-      - traefik.http.routers.sonarr.entrypoints=websecure
-      - traefik.http.routers.sonarr.tls.certresolver=letsencrypt
-      - traefik.http.routers.sonarr.middlewares=tinyauth
     ports:
       - 8989:8989
     restart: unless-stopped
@@ -231,11 +225,6 @@ services:
       - audiobook-uploads:/uploads
       - /home/matt/audiobookshelf:/config
       - /home/matt/audiobookshelf:/metadata
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.audiobookshelf.rule=Host(`abs.tehmatt.com`)
-      - traefik.http.routers.audiobookshelf.entrypoints=websecure
-      - traefik.http.routers.audiobookshelf.tls.certresolver=letsencrypt
     restart: unless-stopped
 
   openaudible:
