@@ -1,0 +1,23 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: prometheus
+  namespace: prometheus
+  annotations:
+    kubernetes.io/ingress.class: traefik-external
+spec:
+  entryPoints:
+  - websecure
+  routes:
+  - match: Host(`prometheus.tehmatt.com`)
+    kind: Rule
+    services:
+    - name: prometheus
+      port: 9090
+      passHostHeader: false
+    middlewares:
+    - name: default-headers
+      namespace: prometheus
+  tls:
+    secretName: tehmatt-tls
