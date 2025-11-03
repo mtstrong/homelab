@@ -1,0 +1,35 @@
+global:
+  tlsDisable: true
+
+server:
+  image:
+    repository: hashicorp/vault
+    tag: "1.18.1"
+  dataStorage:
+    enabled: true
+    size: 10Gi
+  # Use integrated storage (Raft) for simplicity.
+  ha:
+    enabled: false
+  standalone:
+    enabled: true
+    config: |
+      ui = true
+      disable_mlock = true
+      storage "raft" {
+        path = "/vault/data"
+      }
+      listener "tcp" {
+        address     = "0.0.0.0:8200"
+        tls_disable = 1
+      }
+      # Advertise the cluster over the Kubernetes service DNS
+      api_addr = "http://vault.vault.svc.cluster.local:8200"
+
+  service:
+    enabled: true
+    type: ClusterIP
+    port: 8200
+
+ui:
+  enabled: true

@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: argocd
+
+# Pin to a specific Argo CD version
+resources:
+- https://raw.githubusercontent.com/argoproj/argo-cd/v3.1.9/manifests/install.yaml
+- avp-plugin.yaml
+- ingress.yaml
+
+patchesStrategicMerge:
+- patch-repo-server-avp.yaml
