@@ -15,12 +15,19 @@ data:
     metadata:
       name: avp
     spec:
-      version: v1.0
+      version: v1.1
       discover:
         find:
           command: ["sh", "-c", "ls -1 *.avp.yaml *.avp.yml 2>/dev/null || ls -1 *avp*.yaml 2>/dev/null || true"]
       generate:
         command: ["sh", "-c", "argocd-vault-plugin generate ."]
-  # Parameters consumed by the avp sidecar
   vaultAddr: https://vault.tehmatt.com
   kubernetesRole: argocd
+  # AVP static config file mounted into the sidecar
+  avp-config.yaml: |
+    type: vault
+    auth_type: kubernetes
+    address: https://vault.tehmatt.com
+    kubernetes_role: argocd
+    kubernetes_token_path: /var/run/secrets/tokens/vault-token
+    log_level: info
