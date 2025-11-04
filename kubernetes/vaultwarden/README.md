@@ -19,10 +19,18 @@ Deploy via Argo CD
 - Ensure your Argo CD Application includes this `kubernetes/vaultwarden` directory.
 - AVP will detect `secret.avp.yaml` and replace placeholders with the Vault values at sync.
 
+Argo CD Application
+- This repo includes an Application manifest at `kubernetes/argocd/apps/vaultwarden.yaml`.
+- To apply it alongside Argo CD, run your existing Argo CD kustomization apply, or apply the file directly:
+   - `kubectl apply -f kubernetes/argocd/apps/vaultwarden.yaml -n argocd`
+   - Or: `kubectl apply -k kubernetes/argocd`
+   - It deploys to the `vaultwarden` namespace and will create it if missing (CreateNamespace=true).
+
 Notes
 - If your Vault KV v2 mount is named `secret`, change the annotation to `secret/data/apps/vaultwarden` in `secret.avp.yaml`.
 - In-cluster clients should use the Service `vaultwarden.vaultwarden.svc`.
 - External access is provided via Traefik IngressRoute at `vw.tehmatt.com`.
+ - The WebSocket route for notifications is `/notifications/hub` and must be on the same host.
 Vaultwarden on Kubernetes
 
 This folder contains manifests to run Vaultwarden in the cluster. It follows the same patterns as other app folders here: namespace, PVC + Deployment, Service, Traefik IngressRoute, and a default security headers middleware.
