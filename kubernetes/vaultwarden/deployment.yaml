@@ -18,6 +18,10 @@ metadata:
     app: vaultwarden
   name: vaultwarden
   namespace: vaultwarden
+  annotations:
+    # AVP annotations at the resource level so placeholders within this resource are processed
+    avp.kubernetes.io/kv-version: "2"
+    avp.kubernetes.io/path: kv/data/apps/vaultwarden
 spec:
   strategy:
     type: Recreate
@@ -30,9 +34,6 @@ spec:
       labels:
         app: vaultwarden
       annotations:
-        # Make AVP render here too so we can drive rollouts off a non-sensitive REV key in Vault
-        avp.kubernetes.io/kv-version: "2"
-        avp.kubernetes.io/path: kv/data/apps/vaultwarden
         # Changing this value triggers a new ReplicaSet rollout automatically
         rollme: <REV>
     spec:
