@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cmp-avp
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: argocd-cmp-avp
+    app.kubernetes.io/part-of: argocd
+    argocd.argoproj.io/cmp-plugin: "avp"
+data:
+  # CMP v2 plugin definition for Argo CD Vault Plugin
+  plugin.yaml: |
+    apiVersion: argoproj.io/v1alpha1
+    kind: ConfigManagementPlugin
+    metadata:
+      name: avp
+    spec:
+      version: v1.0
+      discover:
+        find:
+          command: ["sh", "-c", "ls -1 *.avp.yaml *.avp.yml 2>/dev/null || ls -1 *avp*.yaml 2>/dev/null || true"]
+      generate:
+        command: ["sh", "-c", "argocd-vault-plugin generate ."]
+  # Parameters consumed by the avp sidecar
+  vaultAddr: https://vault.tehmatt.com
+  kubernetesRole: argocd
