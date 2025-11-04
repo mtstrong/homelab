@@ -29,6 +29,12 @@ spec:
     metadata:
       labels:
         app: vaultwarden
+      annotations:
+        # Make AVP render here too so we can drive rollouts off a non-sensitive REV key in Vault
+        avp.kubernetes.io/kv-version: "2"
+        avp.kubernetes.io/path: kv/data/apps/vaultwarden
+        # Changing this value triggers a new ReplicaSet rollout automatically
+        rollme: <REV>
     spec:
       securityContext:
         runAsUser: 1000
