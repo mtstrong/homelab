@@ -40,11 +40,14 @@ spec:
         image: alpine:3.20
         imagePullPolicy: IfNotPresent
         command: [ "/var/run/argocd/argocd-cmp-server" ]
+        securityContext:
+          runAsUser: 999
+          runAsGroup: 999
         env:
         - name: AVP_TYPE
           value: vault
         - name: AVP_AUTH_TYPE
-          value: kubernetes
+          value: k8s
         - name: VAULT_ADDR
           valueFrom:
             configMapKeyRef:
@@ -55,7 +58,14 @@ spec:
             configMapKeyRef:
               name: argocd-cmp-avp
               key: kubernetesRole
+        - name: AVP_K8S_ROLE
+          valueFrom:
+            configMapKeyRef:
+              name: argocd-cmp-avp
+              key: kubernetesRole
         - name: AVP_KUBERNETES_TOKEN_PATH
+          value: /var/run/secrets/tokens/vault-token
+        - name: AVP_K8S_TOKEN_PATH
           value: /var/run/secrets/tokens/vault-token
         - name: AVP_LOG_LEVEL
           value: info
