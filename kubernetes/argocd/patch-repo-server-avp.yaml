@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argocd-repo-server
+spec:
+  template:
+    spec:
+      imagePullSecrets:
+      - name: ghcr-cred
+      volumes:
+      - name: k8s-sa-token
+        projected:
+          sources:
+          - serviceAccountToken:
+              audience: vault
+              path: vault-token
+              expirationSeconds: 7200
+      - name: cmp-avp
+        configMap:
+          name: argocd-cmp-avp
+      containers:
+      - name: avp
+        image: flybits/argocd-vault-plugin:latest
+        imagePullPolicy: IfNotPresent
+        command: [ "/var/run/argocd/argocd-cmp-server" ]
+        env:
+        - name: AVP_AUTH_TYPE
+          value: kubernetes
+        - name: VAULT_ADDR
+          valueFrom:
+            configMapKeyRef:
+              name: argocd-cmp-avp
+              key: vaultAddr
+        - name: AVP_KUBERNETES_ROLE
+          valueFrom:
+            configMapKeyRef:
+              name: argocd-cmp-avp
+              key: kubernetesRole
+        - name: AVP_LOG_LEVEL
+          value: info
+        volumeMounts:
+        - name: var-files
+          mountPath: /var/run/argocd
+        - name: plugins
+          mountPath: /home/argocd/cmp-server/plugins
+        - name: k8s-sa-token
+          mountPath: /var/run/secrets/tokens
+        - name: cmp-avp
+          mountPath: /home/argocd/cmp-server/config
+          readOnly: true
