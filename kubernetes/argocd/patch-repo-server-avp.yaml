@@ -5,9 +5,12 @@ metadata:
 spec:
   template:
     spec:
+      automountServiceAccountToken: true
       imagePullSecrets:
       - name: ghcr-cred
       volumes:
+      - name: custom-tools
+        emptyDir: {}
       - name: k8s-sa-token
         projected:
           sources:
@@ -18,12 +21,28 @@ spec:
       - name: cmp-avp
         configMap:
           name: argocd-cmp-avp
+      initContainers:
+      - name: download-avp
+        image: curlimages/curl:8.10.1
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: AVP_VERSION
+          value: "1.13.1"
+        command: [ "sh", "-lc" ]
+        args:
+        - >-
+          curl -L "https://github.com/argoproj-labs/argocd-vault-plugin/releases/download/v${AVP_VERSION}/argocd-vault-plugin_${AVP_VERSION}_linux_amd64" -o /custom-tools/argocd-vault-plugin && chmod +x /custom-tools/argocd-vault-plugin
+        volumeMounts:
+        - name: custom-tools
+          mountPath: /custom-tools
       containers:
       - name: avp
-        image: flybits/argocd-vault-plugin:latest
+        image: alpine:3.20
         imagePullPolicy: IfNotPresent
         command: [ "/var/run/argocd/argocd-cmp-server" ]
         env:
+        - name: AVP_TYPE
+          value: vault
         - name: AVP_AUTH_TYPE
           value: kubernetes
         - name: VAULT_ADDR
@@ -36,6 +55,8 @@ spec:
             configMapKeyRef:
               name: argocd-cmp-avp
               key: kubernetesRole
+        - name: AVP_KUBERNETES_TOKEN_PATH
+          value: /var/run/secrets/tokens/vault-token
         - name: AVP_LOG_LEVEL
           value: info
         volumeMounts:
@@ -48,3 +69,6 @@ spec:
         - name: cmp-avp
           mountPath: /home/argocd/cmp-server/config
           readOnly: true
+        - name: custom-tools
+          mountPath: /usr/local/bin/argocd-vault-plugin
+          subPath: argocd-vault-plugin
