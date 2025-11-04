@@ -1,4 +1,46 @@
-Vaultwarden with Argo CD Vault Plugin (AVP)
+# Vaultwarden on Kubernetes — Auto-Rollout on Secret Changes
+
+This deployment uses Argo CD + Argo CD Vault Plugin (AVP) to render secrets from Vault at deploy time. To roll pods automatically when secret values change, we render a non-sensitive revision value from Vault into the pod template annotation.
+
+- Annotation in `deployment.yaml`:
+  - `rollme: <REV>`
+- REV is stored in Vault at `kv/apps/vaultwarden` alongside other app secrets.
+- When REV changes, the Deployment template changes, and Kubernetes creates a new ReplicaSet (automatic rollout). No manual restart needed.
+
+## How it works
+
+- AVP is configured for this app via annotations and CMP v2.
+- On every Argo CD sync, AVP reads `kv/apps/vaultwarden` (KV v2) and replaces placeholders like `<REV>`.
+- The Deployment’s pod template includes `rollme: <REV>`; changing REV triggers a rollout.
+
+## Bump the rollout (update REV)
+
+You can set REV to any new string/number (timestamp, counter, etc.). Examples:
+
+- Set to a specific value:
+  - `vault kv patch kv/apps/vaultwarden REV="2"`
+- Set to current epoch seconds:
+  - `vault kv patch kv/apps/vaultwarden REV="$(date +%s)"`
+
+Argo CD is set to auto-sync. If you want an immediate re-render, trigger a hard refresh of the Application.
+
+## Verify
+
+- Check the rendered annotation value:
+  - `kubectl -n vaultwarden get deploy vaultwarden -o jsonpath='{.spec.template.metadata.annotations.rollme}'`
+- Watch rollout status:
+  - `kubectl -n vaultwarden rollout status deploy/vaultwarden`
+
+## Notes
+
+- REV is non-sensitive on purpose; do not put secret values in annotations.
+- Updating secret data alone does not restart pods automatically for env vars. Bump REV when you update secrets that should force a restart.
+- Current Vault keys used by this app include: `ADMIN_TOKEN`, `DOMAIN`, `SMTP_*`, and `REV`.
+
+## Troubleshooting
+
+- If `rollme` doesn’t render and shows `<REV>` literally, ensure the AVP annotations are present on the Deployment (resource metadata) and that Vault contains a `REV` key under `kv/apps/vaultwarden`.
+- To see current Vault values (in-cluster), run a one-off job that executes `vault kv get kv/apps/vaultwarden`.Vaultwarden with Argo CD Vault Plugin (AVP)
 
 Overview
 - `secret.avp.yaml` is processed by AVP at sync time to generate the `vaultwarden-secrets` Secret.
