@@ -1,0 +1,270 @@
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: romm-db
+  namespace: romm
+  labels:
+    app: romm-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: romm-db
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: romm-db
+    spec:
+      containers:
+      - name: mariadb
+        image: mariadb:11
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: MARIADB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: romm-db-secrets
+              key: MARIADB_ROOT_PASSWORD
+        - name: MARIADB_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: romm-db-secrets
+              key: MARIADB_DATABASE
+        - name: MARIADB_USER
+          valueFrom:
+            secretKeyRef:
+              name: romm-db-secrets
+              key: MARIADB_USER
+        - name: MARIADB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: romm-db-secrets
+              key: MARIADB_PASSWORD
+        ports:
+        - containerPort: 3306
+          name: mysql
+          protocol: TCP
+        volumeMounts:
+        - name: mysql-data
+          mountPath: /var/lib/mysql
+        livenessProbe:
+          tcpSocket:
+            port: 3306
+          initialDelaySeconds: 30
+          periodSeconds: 20
+          timeoutSeconds: 5
+          failureThreshold: 6
+        readinessProbe:
+          tcpSocket:
+            port: 3306
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          timeoutSeconds: 2
+          failureThreshold: 6
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 1000m
+            memory: 2Gi
+      volumes:
+      - name: mysql-data
+        persistentVolumeClaim:
+          claimName: romm-mysql-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: romm-mysql-pvc
+  namespace: romm
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+---
+# (romm-db) Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: romm-db
+  namespace: romm
+spec:
+  selector:
+    app: romm-db
+  ports:
+  - name: mysql
+    port: 3306
+    targetPort: mysql
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: romm
+  namespace: romm
+  labels:
+    app: romm
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: romm
+  template:
+    metadata:
+      labels:
+        app: romm
+    spec:
+      enableServiceLinks: false
+      containers:
+      - name: romm
+        image: rommapp/romm:4.3.2
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: ROMM_PORT
+          value: "8080"
+        - name: DB_HOST
+          value: romm-db
+        - name: DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: romm-secrets
+              key: DB_NAME
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: romm-secrets
+              key: DB_USER
+        - name: DB_PASSWD
+          valueFrom:
+            secretKeyRef:
+              name: romm-secrets
+              key: DB_PASSWD
+        - name: ROMM_AUTH_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: romm-secrets
+              key: ROMM_AUTH_SECRET_KEY
+        # Optional metadata providers
+        - name: IGDB_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: romm-secrets
+              key: IGDB_CLIENT_ID
+              optional: true
+        - name: IGDB_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: romm-secrets
+              key: IGDB_CLIENT_SECRET
+              optional: true
+        - name: SCREENSCRAPER_USER
+          valueFrom:
+            secretKeyRef:
+              name: romm-secrets
+              key: SCREENSCRAPER_USER
+              optional: true
+        - name: SCREENSCRAPER_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: romm-secrets
+              key: SCREENSCRAPER_PASSWORD
+              optional: true
+        - name: RETROACHIEVEMENTS_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: romm-secrets
+              key: RETROACHIEVEMENTS_API_KEY
+              optional: true
+        - name: MOBYGAMES_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: romm-secrets
+              key: MOBYGAMES_API_KEY
+              optional: true
+        - name: STEAMGRIDDB_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: romm-secrets
+              key: STEAMGRIDDB_API_KEY
+              optional: true
+        - name: PLAYMATCH_API_ENABLED
+          valueFrom:
+            secretKeyRef:
+              name: romm-secrets
+              key: PLAYMATCH_API_ENABLED
+              optional: true
+        - name: HASHEOUS_API_ENABLED
+          valueFrom:
+            secretKeyRef:
+              name: romm-secrets
+              key: HASHEOUS_API_ENABLED
+              optional: true
+        - name: LAUNCHBOX_API_ENABLED
+          valueFrom:
+            secretKeyRef:
+              name: romm-secrets
+              key: LAUNCHBOX_API_ENABLED
+              optional: true
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 15
+          timeoutSeconds: 3
+          failureThreshold: 6
+        livenessProbe:
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 20
+          timeoutSeconds: 3
+          failureThreshold: 6
+        resources:
+          requests:
+            cpu: 100m
+            memory: 512Mi
+          limits:
+            cpu: 2000m
+            memory: 4Gi
+        volumeMounts:
+        - name: romm-resources
+          mountPath: /romm/resources
+        - name: romm-redis
+          mountPath: /redis-data
+        - name: romm-library
+          mountPath: /romm/library
+        - name: romm-assets
+          mountPath: /romm/assets
+        - name: romm-config
+          mountPath: /romm/config
+      volumes:
+      - name: romm-resources
+        persistentVolumeClaim:
+          claimName: romm-resources-pvc
+      - name: romm-redis
+        persistentVolumeClaim:
+          claimName: romm-redis-pvc
+      - name: romm-library
+        persistentVolumeClaim:
+          claimName: romm-library-pvc
+      - name: romm-assets
+        persistentVolumeClaim:
+          claimName: romm-assets-pvc
+      - name: romm-config
+        persistentVolumeClaim:
+          claimName: romm-config-pvc
