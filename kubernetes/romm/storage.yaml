@@ -1,0 +1,113 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: romm-library-pv
+spec:
+  capacity:
+    storage: 200Gi
+  accessModes:
+  - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  mountOptions:
+  - nfsvers=4.1
+  - hard
+  - timeo=600
+  - retrans=2
+  nfs:
+    server: 192.168.1.38
+    path: /mnt/TrueNAS/roms
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: romm-resources-pvc
+  namespace: romm
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: romm-redis-pvc
+  namespace: romm
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: romm-assets-pvc
+  namespace: romm
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: romm-config-pvc
+  namespace: romm
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: romm-library-pvc
+  namespace: romm
+spec:
+  # PVC bound to the static NFS PV above
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 200Gi
+  storageClassName: ""
+  volumeName: romm-library-pv2
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: romm-library-pv2
+spec:
+  capacity:
+    storage: 200Gi
+  accessModes:
+  - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  mountOptions:
+  - nfsvers=4.1
+  - hard
+  - timeo=600
+  - retrans=2
+  nfs:
+    server: 192.168.1.38
+    path: /mnt/TrueNAS/roms
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: romm-mysql-pvc
+  namespace: romm
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
