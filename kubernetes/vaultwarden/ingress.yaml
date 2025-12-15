@@ -5,7 +5,6 @@ metadata:
   name: vaultwarden
   namespace: vaultwarden
   annotations:
-    kubernetes.io/ingress.class: traefik-external
 spec:
   entryPoints:
   - websecure
