@@ -16,5 +16,4 @@ spec:
       port: 3000
     middlewares:
     - name: default-headers
-  tls:
-    secretName: tehmatt-tls
+  tls: {}

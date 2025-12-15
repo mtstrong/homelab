@@ -16,5 +16,4 @@ spec:
       namespace: vault
       port: 8200
       passHostHeader: true
-  tls:
-    secretName: tehmatt-tls
+  tls: {}

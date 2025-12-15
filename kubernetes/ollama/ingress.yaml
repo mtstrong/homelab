@@ -21,5 +21,4 @@ spec:
     middlewares:
     - name: default-headers
       namespace: ollama
-  tls:
-    secretName: tehmatt-tls # TODO: change to your cert secret name
+  tls: {}
