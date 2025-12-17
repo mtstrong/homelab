@@ -5,7 +5,6 @@ metadata:
   name: romm
   namespace: romm
   annotations:
-    kubernetes.io/ingress.class: traefik-external
 spec:
   entryPoints:
   - websecure
@@ -19,5 +18,4 @@ spec:
     middlewares:
     - name: default-headers
       namespace: romm
-  tls:
-    secretName: tehmatt-tls # TODO: change if needed
+  tls: {}

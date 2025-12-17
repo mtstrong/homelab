@@ -4,8 +4,6 @@ kind: IngressRoute
 metadata:
   name: audiobookshelf
   namespace: audiobookshelf
-  annotations:
-    kubernetes.io/ingress.class: traefik-external
 spec:
   entryPoints:
   - websecure
@@ -15,12 +13,4 @@ spec:
     services:
     - name: audiobookshelf
       port: 13378
-      passHostHeader: false # set true if backend expects the original Host header
-      # If your LAN backend is HTTPS, change the Service/Endpoints port to 443
-      # and optionally reference a ServersTransport below to skip verify or set SNI
-      # serversTransport: insecure-skipverify
-    middlewares:
-    - name: default-headers
-      namespace: audiobookshelf
-  tls:
-    secretName: tehmatt-tls # TODO: change to your cert secret name
+  tls: {}
