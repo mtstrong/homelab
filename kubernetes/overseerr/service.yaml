@@ -17,6 +17,6 @@ metadata:
   namespace: overseerr
 subsets:
 - addresses:
-  - ip: 192.168.1.158 # Docker host IP
+  - ip: 192.168.1.37 # Docker host IP
   ports:
   - port: 5055

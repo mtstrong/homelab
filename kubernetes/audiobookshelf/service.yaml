@@ -20,7 +20,7 @@ metadata:
   namespace: audiobookshelf
 subsets:
 - addresses:
-  - ip: 192.168.1.158 # TODO: set to your LAN host IP
+  - ip: 192.168.1.37 # TODO: set to your LAN host IP
   ports:
   - name: http
     port: 13378 # TODO: set to your LAN host port
