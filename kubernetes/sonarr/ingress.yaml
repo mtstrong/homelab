@@ -4,8 +4,6 @@ kind: IngressRoute
 metadata:
   name: sonarr
   namespace: sonarr
-  annotations:
-    kubernetes.io/ingress.class: traefik-external
 spec:
   entryPoints:
   - websecure
@@ -17,5 +15,4 @@ spec:
       port: 8989
     middlewares:
     - name: default-headers
-  tls:
-    secretName: tehmatt-tls
+  tls: {}
