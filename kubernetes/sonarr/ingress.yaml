@@ -17,6 +17,5 @@ spec:
       port: 8989
     middlewares:
     - name: default-headers
-      namespace: sonarr
   tls:
     secretName: tehmatt-tls
