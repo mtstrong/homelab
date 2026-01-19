@@ -76,9 +76,9 @@ spec:
           claimName: radarr
       - name: movies
         nfs:
-          server: 192.168.1.38 # Your TrueNAS IP
-          path: /mnt/storage/media/movies # Adjust this path to your NFS export
+          server: 192.168.1.38
+          path: /mnt/TrueNAS/movies
       - name: downloads
         nfs:
-          server: 192.168.1.38 # Your TrueNAS IP
-          path: /mnt/storage/downloads # Adjust this path to your NFS export
+          server: 192.168.1.38
+          path: /mnt/OneTbs/nzb-dls
