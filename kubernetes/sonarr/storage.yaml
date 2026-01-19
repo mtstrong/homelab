@@ -5,9 +5,9 @@ metadata:
   name: sonarr
   namespace: sonarr
 spec:
-  storageClassName: longhorn-static
+  storageClassName: longhorn
   accessModes:
   - ReadWriteOnce
   resources:
     requests:
-      storage: 10Gi
+      storage: 3Gi
