@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: sonarr
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: homelab
+    app.kubernetes.io/name: sonarr
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/mtstrong/homelab.git
+    path: kubernetes/sonarr
+    targetRevision: HEAD
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: sonarr
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true

@@ -1,54 +1,5 @@
 version: '3.9'
 services:
-  traefik:
-    container_name: traefik
-    image: traefik:v3.4.4
-    ports:
-      - 80:80
-      - 443:443
-      - 8080:8080
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /home/matt/traefik/acme:/acme
-      - /home/matt/traefik/logs:/logs
-    environment:
-      - CF_API_EMAIL=${CF_EMAIL}
-      - CF_API_KEY=${CF_API_KEY}
-    command:            
-      - --api=true
-      - --global.checkNewVersion=true
-      - --log.level=DEBUG.
-      - --log.filePath=/logs/traefik.log
-      - --accessLog.filePath=/logs/access.log
-      - --accessLog.bufferingSize=100                                     
-      - --providers.docker=true
-      - --providers.docker.exposedbydefault=false
-      - --providers.docker.endpoint=unix:///var/run/docker.sock
-      - --entryPoints.console.address=:8080
-      - --entryPoints.web.address=:80
-      - --entrypoints.websecure.address=:443
-      - --entryPoints.web.http.redirections.entryPoint.to=websecure
-      - --entryPoints.web.http.redirections.entryPoint.scheme=https
-      - --entryPoints.web.http.redirections.entrypoint.permanent=true
-      - --certificatesResolvers.letsencrypt.acme.email=${ACME_EMAIL}
-      - --certificatesResolvers.letsencrypt.acme.storage=acme/acme.json
-      - --certificatesResolvers.letsencrypt.acme.dnsChallenge=true
-      - --certificatesResolvers.letsencrypt.acme.dnsChallenge.provider=cloudflare
-    labels:
-      - traefik.enable=true
-      - traefik.http.middlewares.admin.basicauth.users=${TRAEFIK_USERS}
-      - traefik.http.routers.thisproxylocal.rule=Host(${TRAEFIK_IP})
-      - traefik.http.routers.thisproxylocal.entryPoints=console
-      - traefik.http.routers.thisproxylocal.service=api@internal
-      - traefik.http.routers.thisproxylocal.middlewares=admin
-      - traefik.http.services.thisproxytls.loadbalancer.server.port=8080
-      - traefik.http.routers.thisproxytls.rule=Host(`traefik.tehmatt.com`)
-      - traefik.http.routers.thisproxytls.entrypoints=websecure
-      - traefik.http.routers.thisproxytls.service=api@internal
-      - traefik.http.routers.thisproxytls.middlewares=admin
-      - traefik.http.routers.thisproxytls.tls.certresolver=letsencrypt
-    restart: unless-stopped
-
   sonarr:
     image: lscr.io/linuxserver/sonarr:4.0.15
     container_name: sonarr
@@ -61,12 +12,6 @@ services:
       - /home/matt/sonarr:/config
       - tv:/tv
       - nzb-dls:/downloads
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.sonarr.rule=Host(`sonarr.tehmatt.com`)
-      - traefik.http.routers.sonarr.entrypoints=websecure
-      - traefik.http.routers.sonarr.tls.certresolver=letsencrypt
-      - traefik.http.routers.sonarr.middlewares=tinyauth
     ports:
       - 8989:8989
     restart: unless-stopped
@@ -83,12 +28,6 @@ services:
       - /home/matt/radarr:/config
       - movies:/movies
       - nzb-dls:/downloads
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.radarr.rule=Host(`radarr.tehmatt.com`)
-      - traefik.http.routers.radarr.entrypoints=websecure
-      - traefik.http.routers.radarr.tls.certresolver=letsencrypt
-      - traefik.http.routers.radarr.middlewares=tinyauth
     ports:
       - 7878:7878
     restart: unless-stopped
@@ -102,11 +41,6 @@ services:
       - TZ=America/Chicago
     volumes:
       - /home/matt/prowlarr:/config
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.prowlarr.rule=Host(`prowlarr.tehmatt.com`)
-      - traefik.http.routers.prowlarr.entrypoints=websecure
-      - traefik.http.routers.prowlarr.tls.certresolver=letsencrypt
     ports:
       - 9696:9696
     restart: unless-stopped
@@ -122,11 +56,6 @@ services:
       - /home/matt/readarr:/config
       - books:/books
       - nzb-dls:/downloads
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.readarr.rule=Host(`readarr.tehmatt.com`)
-      - traefik.http.routers.readarr.entrypoints=websecure
-      - traefik.http.routers.readarr.tls.certresolver=letsencrypt
     ports:
       - 8787:8787
     restart: unless-stopped
@@ -142,11 +71,6 @@ services:
       - /home/matt/mylar3/:/config
       - comics:/comics
       - torrent-dls:/downloads
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.mylar3.rule=Host(`comics.tehmatt.com`)
-      - traefik.http.routers.mylar3.entrypoints=websecure
-      - traefik.http.routers.mylar3.tls.certresolver=letsencrypt
     ports:
       - 8090:8090
     restart: unless-stopped
@@ -178,11 +102,6 @@ services:
       - TZ=America/Chicago
     volumes:
       - /home/matt/overseerr2:/config
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.overseerr2.rule=Host(`leslie.tehmatt.com`)
-      - traefik.http.routers.overseerr2.entrypoints=websecure
-      - traefik.http.routers.overseerr2.tls.certresolver=letsencrypt
     ports:
       - 5056:5055
     restart: unless-stopped
@@ -211,11 +130,6 @@ services:
       - /home/matt/sabnzbd:/config
       - nzb-dls:/downloads
       - nzb-dls:/incomplete-downloads
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.sabnzbd.rule=Host(`sab.tehmatt.com`)
-      - traefik.http.routers.sabnzbd.entrypoints=websecure
-      - traefik.http.routers.sabnzbd.tls.certresolver=letsencrypt
     ports:
       - 8585:8585
     restart: unless-stopped
@@ -231,11 +145,6 @@ services:
       - audiobook-uploads:/uploads
       - /home/matt/audiobookshelf:/config
       - /home/matt/audiobookshelf:/metadata
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.audiobookshelf.rule=Host(`abs.tehmatt.com`)
-      - traefik.http.routers.audiobookshelf.entrypoints=websecure
-      - traefik.http.routers.audiobookshelf.tls.certresolver=letsencrypt
     restart: unless-stopped
 
   openaudible:
@@ -261,11 +170,6 @@ services:
     volumes:
       - /home/matt/homepage:/app/config
       - /var/run/docker.sock:/var/run/docker.sock:ro
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.homepage.rule=Host(`homepage.tehmatt.com`)
-      - traefik.http.routers.homepage.entrypoints=websecure
-      - traefik.http.routers.homepage.tls.certresolver=letsencrypt
     restart: unless-stopped
 
   nordlynx:
@@ -304,11 +208,6 @@ services:
     volumes:
       - /home/matt/qbittorrent:/config
       - torrent-dls:/downloads
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.qbittorrent.rule=Host(`qt.tehmatt.com`)
-      - traefik.http.routers.qbittorrent.entrypoints=websecure
-      - traefik.http.routers.qbittorrent.tls.certresolver=letsencrypt
     restart: unless-stopped
 
   qbittorrentnovpn:
@@ -347,11 +246,6 @@ services:
     volumes:
       - comics:/comics
       - /home/matt/kavita:/kavita/config
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.kavita.rule=Host(`kavita.tehmatt.com`)
-      - traefik.http.routers.kavita.entrypoints=websecure
-      - traefik.http.routers.kavita.tls.certresolver=letsencrypt
     environment:
       - TZ=America/Chicago
     ports:
@@ -417,11 +311,6 @@ services:
           memory: 1000M
     volumes:
       - /home/matt/mealie:/app/data/
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.mealie.rule=Host(`mealie.tehmatt.com`)
-      - traefik.http.routers.mealie.entrypoints=websecure
-      - traefik.http.routers.mealie.tls.certresolver=letsencrypt
     environment:
       - ALLOW_SIGNUP=true
       - PUID=1000
@@ -459,11 +348,6 @@ services:
     volumes:
       - /home/matt/calibre:/config
       - books:/books
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.calibre.rule=Host(`calibre.tehmatt.com`)
-      - traefik.http.routers.calibre.entrypoints=websecure
-      - traefik.http.routers.calibre.tls.certresolver=letsencrypt
     ports:
       - 8083:8083
     restart: unless-stopped
@@ -513,12 +397,6 @@ services:
       SEMAPHORE_ADMIN_EMAIL: admin@localhost
       SEMAPHORE_ADMIN: admin
       SEMAPHORE_ACCESS_KEY_ENCRYPTION: ${SEMAPHORE_ACCESS_KEY_ENCRYPTION}
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.semaphore.rule=Host(`semaphore.tehmatt.com`)
-      - traefik.http.routers.semaphore.entrypoints=websecure
-      - traefik.http.routers.semaphore.tls.certresolver=letsencrypt
-      - traefik.http.routers.semaphore.middlewares=tinyauth
     depends_on:
       - mysql
   
@@ -615,11 +493,6 @@ services:
       - 3001:3001
     volumes:
       - /home/matt/uptimekuma:/app/data
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.uptime.rule=Host(`uptime.tehmatt.com`)
-      - traefik.http.routers.uptime.entrypoints=websecure
-      - traefik.http.routers.uptime.tls.certresolver=letsencrypt
     restart: unless-stopped
 
   starcraft:
@@ -627,11 +500,6 @@ services:
     container_name: starcraft
     ports:
       - 7070:8080
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.starcraft.rule=Host(`starcraft.tehmatt.com`)
-      - traefik.http.routers.starcraft.entrypoints=websecure
-      - traefik.http.routers.starcraft.tls.certresolver=letsencrypt
     restart: unless-stopped
 
   it-tools:
@@ -639,11 +507,6 @@ services:
     ports:
         - 4567:80
     image: corentinth/it-tools:latest
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.it-tools.rule=Host(`tools.tehmatt.com`)
-      - traefik.http.routers.it-tools.entrypoints=websecure
-      - traefik.http.routers.it-tools.tls.certresolver=letsencrypt
     restart: unless-stopped
 
   mattodo-api:
@@ -653,29 +516,7 @@ services:
       - 7260:7260
     volumes:
       - /home/matt/mattodo-api:/config
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.mattodo-api.rule=Host(`mattodo.tehmatt.com`)
-      - traefik.http.routers.mattodo-api.entrypoints=websecure
-      - traefik.http.routers.mattodo-api.tls.certresolver=letsencrypt
     restart: unless-stopped
-
- # project-zomboid:
- #   image: afey/zomboid
- #   container_name: zomboid_server
- #   restart: unless-stopped
- #   environment:
- #     SERVER_NAME: ${ZOMBOID_SERVER_NAME}
- #     ADMIN_PASSWORD: ${ZOMBOID_PASSWORD}
- #   ports:
- #     - "8766:8766/udp"
- #     - "8767:8767/udp"
- #     - "16261:16261/udp"
- #     - "16262-16272:16262-16272"
- #     - "27015:27015"
- #   volumes:
- #     - /home/matt/zomboid/server-data:/server-data
- #     - /home/matt/zomboid/server-files:/server-files
 
   ddclient:
     image: lscr.io/linuxserver/ddclient:latest
@@ -699,12 +540,6 @@ services:
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
       - OAUTH_WHITELIST=swevo24@gmail.com,myswtghst@gmail.com,leslie.r.strong@gmail.com
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.tinyauth.rule=Host(`tinyauth.tehmatt.com`)
-      - traefik.http.routers.tinyauth.entrypoints=websecure
-      - traefik.http.routers.tinyauth.tls.certresolver=letsencrypt
-      - traefik.http.middlewares.tinyauth.forwardauth.address=http://tinyauth:3000/api/auth/traefik
     restart: unless-stopped
 
   checkmk:
@@ -716,11 +551,6 @@ services:
       - "6556:6556"
     volumes:
       - /home/matt/checkmk:/omd/sites
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.checkmk.rule=Host(`checkmk.tehmatt.com`)
-      - traefik.http.routers.checkmk.entrypoints=websecure
-      - traefik.http.routers.checkmk.tls.certresolver=letsencrypt
     restart: unless-stopped
 
   omni-tools:
@@ -728,11 +558,6 @@ services:
     container_name: omni-tools
     ports:
       - "8384:80"
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.omni-tools.rule=Host(`omni.tehmatt.com`)
-      - traefik.http.routers.omni-tools.entrypoints=websecure
-      - traefik.http.routers.omni-tools.tls.certresolver=letsencrypt
     restart: unless-stopped
 
   dozzle:
@@ -742,12 +567,6 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - "8385:8080"
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.dozzle.rule=Host(`logs.tehmatt.com`)
-      - traefik.http.routers.dozzle.entrypoints=websecure
-      - traefik.http.routers.dozzle.tls.certresolver=letsencrypt
-      - traefik.http.routers.dozzle.middlewares=tinyauth
     restart: unless-stopped
     
   ollama:
@@ -787,30 +606,6 @@ services:
       - traefik.http.routers.openwebui.tls.certresolver=letsencrypt
       #- traefik.http.routers.openwebui.middlewares=tinyauth
     restart: always
-
-  gitlab:
-    image: gitlab/gitlab-ce:18.2.1-ce.0
-    container_name: gitlab
-    restart: always
-    hostname: 'gitlab.tehmatt.com'
-    environment:
-      GITLAB_OMNIBUS_CONFIG: |
-        #Add any other gitlab.rb configuration here, each on its own line
-        external_url 'https://gitlab.tehmatt.com:80'
-    ports:
-      - '8005:80'
-    volumes:
-      - '$GITLAB_HOME/config:/etc/gitlab'
-      - '$GITLAB_HOME/logs:/var/log/gitlab'
-      - '$GITLAB_HOME/data:/var/opt/gitlab'
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.gitlab.rule=Host(`gitlab.tehmatt.com`)
-      - traefik.http.routers.gitlab.entrypoints=websecure
-      - traefik.http.routers.gitlab.tls=true
-      - traefik.http.routers.gitlab.tls.certresolver=letsencrypt
-      - traefik.http.routers.gitlab.middlewares=tinyauth
-    shm_size: '256m'
 
   #streamlink-recorder:
   #  image: kjake/streamlink-recorder:latest
