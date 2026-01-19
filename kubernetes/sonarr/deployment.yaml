@@ -76,9 +76,9 @@ spec:
           claimName: sonarr
       - name: tv
         nfs:
-          server: 192.168.1.38 # Your TrueNAS IP
-          path: /mnt/storage/media/tv # Adjust this path to your NFS export
+          server: 192.168.1.38
+          path: /mnt/TrueNAS/tv
       - name: downloads
         nfs:
-          server: 192.168.1.38 # Your TrueNAS IP
-          path: /mnt/storage/downloads # Adjust this path to your NFS export
+          server: 192.168.1.38
+          path: /mnt/OneTbs/nzb-dls
