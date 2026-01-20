@@ -369,7 +369,7 @@ services:
       - mysql
   
   diun:
-    image: crazymax/diun:4.29
+    image: crazymax/diun:4.31
     container_name: diun
     command: serve
     volumes:
