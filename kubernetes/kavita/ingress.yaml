@@ -1,0 +1,19 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: kavita
+  namespace: kavita
+spec:
+  entryPoints:
+  - websecure
+  routes:
+  - match: Host(`kavita.tehmatt.com`)
+    kind: Rule
+    services:
+    - name: kavita
+      port: 5000
+    middlewares:
+    - name: default-headers
+      namespace: kavita
+  tls: {}
