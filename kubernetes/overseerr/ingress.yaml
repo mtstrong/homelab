@@ -1,0 +1,16 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: overseerr
+  namespace: overseerr
+spec:
+  entryPoints:
+  - websecure
+  routes:
+  - kind: Rule
+    match: Host(`request.tehmatt.com`)
+    services:
+    - name: overseerr
+      port: 5055
+  tls: {}
