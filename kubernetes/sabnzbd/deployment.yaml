@@ -36,6 +36,8 @@ spec:
           value: "1000"
         - name: TZ
           value: "America/Chicago"
+        - name: SABNZBD_HOST_WHITELIST
+          value: "sab.tehmatt.com"
         ports:
         - containerPort: 8080
           name: http
