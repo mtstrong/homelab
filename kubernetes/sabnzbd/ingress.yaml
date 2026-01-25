@@ -12,7 +12,7 @@ spec:
     kind: Rule
     services:
     - name: sabnzbd
-      port: 8585
+      port: 8080
     middlewares:
     - name: default-headers
   tls: {}
