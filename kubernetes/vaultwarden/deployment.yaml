@@ -30,6 +30,8 @@ spec:
       labels:
         app: vaultwarden
     spec:
+      nodeSelector:
+        worker: "true"
       securityContext:
         runAsUser: 1000
         runAsGroup: 1000
