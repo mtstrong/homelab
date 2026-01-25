@@ -4,6 +4,8 @@ kind: Service
 metadata:
   name: sabnzbd
   namespace: sabnzbd
+  annotations:
+    kube-vip.io/loadbalancerIPs: "192.168.2.132"
 spec:
   selector:
     app: sabnzbd
@@ -12,4 +14,4 @@ spec:
     port: 8080
     targetPort: 8080
     protocol: TCP
-  type: ClusterIP
+  type: LoadBalancer
