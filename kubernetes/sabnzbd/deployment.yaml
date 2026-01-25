@@ -39,13 +39,13 @@ spec:
         - name: SABNZBD_HOST_WHITELIST
           value: "sab.tehmatt.com"
         ports:
-        - containerPort: 8080
+        - containerPort: 8585
           name: http
           protocol: TCP
         readinessProbe:
           httpGet:
             path: /
-            port: 8080
+            port: 8585
           initialDelaySeconds: 30
           periodSeconds: 15
           timeoutSeconds: 5
@@ -53,7 +53,7 @@ spec:
         livenessProbe:
           httpGet:
             path: /
-            port: 8080
+            port: 8585
           initialDelaySeconds: 60
           periodSeconds: 30
           timeoutSeconds: 5
