@@ -43,24 +43,6 @@ services:
       - 8090:8090
     restart: unless-stopped
 
-  overseerr:
-    image: lscr.io/linuxserver/overseerr:2021.12.12
-    container_name: overseerr
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=America/Chicago
-    volumes:
-      - /home/matt/overseerr:/config
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.overseerr.rule=Host(`request.tehmatt.com`)
-      - traefik.http.routers.overseerr.entrypoints=websecure
-      - traefik.http.routers.overseerr.tls.certresolver=letsencrypt
-    ports:
-      - 5055:5055
-    restart: unless-stopped
-
   overseerr2:
     image: lscr.io/linuxserver/overseerr:2021.12.12
     container_name: overseerr2
@@ -86,35 +68,6 @@ services:
       - /var/run/utmp:/var/run/utmp
       - /etc/machine-id:/etc/machine-id
 
-  sabnzbd:
-    image: lscr.io/linuxserver/sabnzbd:4.5.2
-    container_name: sabnzbd
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=America/Chicago
-      - HAS_IPV6=false
-    volumes:
-      - /home/matt/sabnzbd:/config
-      - nzb-dls:/downloads
-      - nzb-dls:/incomplete-downloads
-    ports:
-      - 8585:8585
-    restart: unless-stopped
-
-  audiobookshelf:
-    image: ghcr.io/advplyr/audiobookshelf:2.28.0
-    container_name: audiobookshelf
-    ports:
-      - 13378:80
-    volumes:
-      - audiobooks:/audiobooks
-      - podcasts:/podcasts
-      - audiobook-uploads:/uploads
-      - /home/matt/audiobookshelf:/config
-      - /home/matt/audiobookshelf:/metadata
-    restart: unless-stopped
-
   openaudible:
     image: openaudible/openaudible:latest
     container_name: openaudible
@@ -124,20 +77,6 @@ services:
     volumes:
       - audiobook-uploads:/uploads
       - /home/matt/oa-matt:/config
-    restart: unless-stopped
-
-  homepage:
-    image: ghcr.io/gethomepage/homepage:v1.4.4
-    container_name: homepage
-    environment:
-      PUID: 1000
-      PGID: 1000
-      HOMEPAGE_ALLOWED_HOSTS: homepage.tehmatt.com, 73.74.64.221:3003
-    ports:
-      - 3003:3000
-    volumes:
-      - /home/matt/homepage:/app/config
-      - /var/run/docker.sock:/var/run/docker.sock:ro
     restart: unless-stopped
 
   nordlynx:
@@ -206,18 +145,6 @@ services:
       - handbrake:/storage 
       - handbrake:/watch
       - handbrake:/output
-    restart: unless-stopped
-
-  kavita:
-    image: jvmilazz0/kavita:0.8.7
-    container_name: kavita
-    volumes:
-      - comics:/comics
-      - /home/matt/kavita:/kavita/config
-    environment:
-      - TZ=America/Chicago
-    ports:
-      - 5005:5000
     restart: unless-stopped
 
   netbootxyz:
@@ -318,19 +245,6 @@ services:
       - books:/books
     ports:
       - 8083:8083
-    restart: unless-stopped
-
-  tautulli:
-    image: lscr.io/linuxserver/tautulli:2.15.3
-    container_name: tautulli
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=America/Chicago
-    volumes:
-      - /home/matt/tautulli:/config
-    ports:
-      - 8181:8181
     restart: unless-stopped
 
   mysql:
