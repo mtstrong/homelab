@@ -27,6 +27,8 @@ spec:
       labels:
         app: grafana
     spec:
+      nodeSelector:
+        worker: "true"
       securityContext:
         fsGroup: 472
         supplementalGroups:

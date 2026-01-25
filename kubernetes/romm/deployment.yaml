@@ -19,6 +19,8 @@ spec:
       labels:
         app: romm-db
     spec:
+      nodeSelector:
+        worker: "true"
       containers:
       - name: mariadb
         image: mariadb:11
@@ -139,6 +141,8 @@ spec:
       labels:
         app: romm
     spec:
+      nodeSelector:
+        worker: "true"
       enableServiceLinks: false
       containers:
       - name: romm

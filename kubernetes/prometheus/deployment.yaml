@@ -17,6 +17,8 @@ spec:
       labels:
         app: prometheus
     spec:
+      nodeSelector:
+        worker: "true"
       securityContext:
         runAsUser: 65534
         runAsGroup: 65534

@@ -12,6 +12,8 @@ spec:
       labels:
         app: dozzle
     spec:
+      nodeSelector:
+        worker: "true"
       serviceAccountName: pod-viewer
       containers:
       - name: dozzle
