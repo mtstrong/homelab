@@ -18,7 +18,7 @@ spec:
         worker: "true"
       containers:
       - name: kavita
-        image: jvmilazz0/kavita:0.8.9.1
+        image: jvmilazz0/kavita:0.8.7
         env:
         - name: TZ
           value: "America/Chicago"
