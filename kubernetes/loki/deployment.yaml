@@ -24,7 +24,7 @@ spec:
         fsGroupChangePolicy: OnRootMismatch
       containers:
       - name: loki
-        image: grafana/loki:2.9.8
+        image: grafana/loki:3.6.4
         args:
         - -config.file=/etc/loki/config.yaml
         - -config.expand-env=true
