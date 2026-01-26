@@ -27,7 +27,7 @@ spec:
         fsGroupChangePolicy: OnRootMismatch
       containers:
       - name: tautulli
-        image: lscr.io/linuxserver/tautulli:2.15.3
+        image: lscr.io/linuxserver/tautulli:2.16.0
         imagePullPolicy: IfNotPresent
         env:
         - name: PUID
