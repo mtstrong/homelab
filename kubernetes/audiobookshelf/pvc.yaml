@@ -28,32 +28,6 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: audiobookshelf-audiobooks
-  namespace: audiobookshelf
-spec:
-  accessModes:
-    - ReadWriteMany
-  storageClassName: longhorn
-  resources:
-    requests:
-      storage: 500Gi
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: audiobookshelf-podcasts
-  namespace: audiobookshelf
-spec:
-  accessModes:
-    - ReadWriteMany
-  storageClassName: longhorn
-  resources:
-    requests:
-      storage: 100Gi
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
   name: audiobookshelf-uploads
   namespace: audiobookshelf
 spec:

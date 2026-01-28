@@ -50,11 +50,13 @@ spec:
         persistentVolumeClaim:
           claimName: audiobookshelf-metadata
       - name: audiobooks
-        persistentVolumeClaim:
-          claimName: audiobookshelf-audiobooks
+        nfs:
+          server: 192.168.1.38
+          path: /mnt/TrueNAS/audiobooks
       - name: podcasts
-        persistentVolumeClaim:
-          claimName: audiobookshelf-podcasts
+        nfs:
+          server: 192.168.1.38
+          path: /mnt/TrueNAS/podcasts
       - name: uploads
         persistentVolumeClaim:
           claimName: audiobookshelf-uploads

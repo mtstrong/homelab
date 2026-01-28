@@ -21,13 +21,13 @@ All manifests are in: `code/homelab/kubernetes/audiobookshelf/`
 
 ### Resources
 1. **namespace.yaml** - Creates `audiobookshelf` namespace
-2. **pvc.yaml** - 5 PersistentVolumeClaims (Longhorn):
+2. **pvc.yaml** - 3 PersistentVolumeClaims (Longhorn):
    - `audiobookshelf-config` (5Gi)
    - `audiobookshelf-metadata` (10Gi)
-   - `audiobookshelf-audiobooks` (500Gi, RWX)
-   - `audiobookshelf-podcasts` (100Gi, RWX)
    - `audiobookshelf-uploads` (10Gi)
-3. **deployment.yaml** - Deployment with all volume mounts
+3. **deployment.yaml** - Deployment with PVC and NFS mounts:
+   - PVCs: config, metadata, uploads
+   - NFS Mounts: audiobooks (`/mnt/TrueNAS/audiobooks`), podcasts (`/mnt/TrueNAS/podcasts`)
 4. **service.yaml** - ClusterIP service on port 80
 5. **ingress.yaml** - Traefik IngressRoute for `abs.tehmatt.com`
 6. **argocd/apps/audiobookshelf.yaml** - ArgoCD Application
@@ -58,27 +58,48 @@ Branch: `feature/audiobookshelf-k8s-migration`
 
 ### Phase 2: Data Migration (Following Jim's Garage Method)
 
-4. **Identify which node has the Longhorn volumes**:
+4. **Ensure TrueNAS NFS shares exist**:
+   - Verify `/mnt/TrueNAS/audiobooks` and `/mnt/TrueNAS/podcasts` exist on TrueNAS (192.168.1.38)
+   - If they don't exist, create them on TrueNAS and configure NFS exports
+
+5. **Copy audiobooks and podcasts to TrueNAS** (if not already there):
+   ```bash
+   # From Docker host, copy to TrueNAS shares
+   rsync -avxHAX /var/lib/docker/volumes/audiobooks/_data/ /path/to/truenas/mount/audiobooks/
+   rsync -avxHAX /var/lib/docker/volumes/podcasts/_data/ /path/to/truenas/mount/podcasts/
+   ```
+   
+   Or mount TrueNAS shares directly and copy:
+   ```bash
+   sudo mkdir -p /mnt/temp/audiobooks /mnt/temp/podcasts
+   sudo mount -t nfs 192.168.1.38:/mnt/TrueNAS/audiobooks /mnt/temp/audiobooks
+   sudo mount -t nfs 192.168.1.38:/mnt/TrueNAS/podcasts /mnt/temp/podcasts
+   sudo rsync -avxHAX /var/lib/docker/volumes/audiobooks/_data/ /mnt/temp/audiobooks/
+   sudo rsync -avxHAX /var/lib/docker/volumes/podcasts/_data/ /mnt/temp/podcasts/
+   sudo umount /mnt/temp/audiobooks /mnt/temp/podcasts
+   ```
+
+6. **Identify which node has the Longhorn volumes**:
    ```bash
    kubectl get pv | grep audiobookshelf
    ```
 
-5. **Stop the Docker container** (to prevent data changes during migration):
+7. **Stop the Docker container** (to prevent data changes during migration):
    ```bash
    docker stop audiobookshelf
    ```
 
-6. **On a worker node, create a temporary mount point**:
+8. **On a worker node, create a temporary mount point**:
    ```bash
    sudo mkdir /tmp/abs-migration
    ```
 
-7. **Find the Longhorn volume devices**:
+9. **Find the Longhorn volume devices**:
    ```bash
    sudo fdisk -l | grep longhorn
    ```
 
-8. **Mount each Longhorn volume and copy data**:
+10. **Mount each Longhorn volume and copy data** (only config, metadata, uploads):
 
    For **config** volume:
    ```bash
@@ -95,65 +116,50 @@ Branch: `feature/audiobookshelf-k8s-migration`
    sudo umount /tmp/abs-migration
    ```
 
-   For **audiobooks** volume:
-   ```bash
-   sudo mount /dev/sdZ /tmp/abs-migration
-   # Copy from Docker volume location
-   sudo rsync -avxHAX /var/lib/docker/volumes/audiobooks/_data/ /tmp/abs-migration/
-   sudo umount /tmp/abs-migration
-   ```
-
-   For **podcasts** volume:
-   ```bash
-   sudo mount /dev/sdA /tmp/abs-migration
-   sudo rsync -avxHAX /var/lib/docker/volumes/podcasts/_data/ /tmp/abs-migration/
-   sudo umount /tmp/abs-migration
-   ```
-
    For **uploads** volume:
    ```bash
-   sudo mount /dev/sdB /tmp/abs-migration
+   sudo mount /dev/sdZ /tmp/abs-migration
    sudo rsync -avxHAX /var/lib/docker/volumes/audiobook-uploads/_data/ /tmp/abs-migration/
    sudo umount /tmp/abs-migration
    ```
 
 ### Phase 3: Deploy to Kubernetes
 
-9. **Apply the ArgoCD Application**:
-   ```bash
-   kubectl apply -f kubernetes/argocd/apps/audiobookshelf.yaml
-   ```
+11. **Apply the ArgoCD Application**:
+    ```bash
+    kubectl apply -f kubernetes/argocd/apps/audiobookshelf.yaml
+    ```
 
-   Or manually apply all manifests:
-   ```bash
-   kubectl apply -f kubernetes/audiobookshelf/
-   ```
+    Or manually apply all manifests:
+    ```bash
+    kubectl apply -f kubernetes/audiobookshelf/
+    ```
 
-10. **Check the deployment**:
+12. **Check the deployment**:
     ```bash
     kubectl get pods -n audiobookshelf
     kubectl logs -n audiobookshelf -l app=audiobookshelf
     ```
 
-11. **Verify the ingress**:
+13. **Verify the ingress**:
     ```bash
     kubectl get ingressroute -n audiobookshelf
     ```
 
-12. **Test the application**:
+14. **Test the application**:
     - Navigate to `https://abs.tehmatt.com`
     - Verify all your audiobooks and data are present
 
 ### Phase 4: Cleanup (After Successful Migration)
 
-13. **Remove Docker container and volumes** (ONLY after confirming K8s works):
+15. **Remove Docker container and volumes** (ONLY after confirming K8s works):
     ```bash
     docker rm audiobookshelf
     docker volume rm audiobooks podcasts audiobook-uploads
     rm -rf /home/matt/audiobookshelf
     ```
 
-14. **Merge the feature branch**:
+16. **Merge the feature branch**:
     ```bash
     cd /home/matt/code/homelab
     git checkout main
@@ -192,8 +198,10 @@ docker start audiobookshelf
 
 ## Notes
 
+- **NFS Mounts**: Audiobooks and podcasts are stored on TrueNAS (192.168.1.38) via NFS mounts at `/mnt/TrueNAS/audiobooks` and `/mnt/TrueNAS/podcasts`
+- **PVCs**: Only config, metadata, and uploads use Longhorn persistent volumes
 - The migration preserves all data: library, metadata, users, settings
-- Downtime required: Stop Docker → Migrate Data → Start K8s (estimate: 30-60 min depending on data size)
+- Downtime required: Stop Docker → Migrate Data → Start K8s (estimate: 15-30 min for PVC data only)
 - The Longhorn volumes will be automatically created when you apply the PVCs
 - ArgoCD will auto-sync changes from the git repo after initial deployment
 - Storage sizes can be adjusted in `pvc.yaml` if needed
