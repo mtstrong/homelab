@@ -27,7 +27,7 @@ spec:
         fsGroupChangePolicy: OnRootMismatch
       containers:
       - name: readarr
-        image: lscr.io/linuxserver/readarr:nightly
+        image: lscr.io/linuxserver/readarr:latest
         imagePullPolicy: IfNotPresent
         env:
         - name: PUID
