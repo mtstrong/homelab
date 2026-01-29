@@ -12,4 +12,4 @@ spec:
     port: 7878
     targetPort: 7878
     protocol: TCP
-  type: ClusterIP
+  type: LoadBalancer
