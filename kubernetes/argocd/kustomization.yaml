@@ -9,6 +9,7 @@ resources:
 - avp-plugin.yaml
 - ingress.yaml
 - apps/audiobookshelf.yaml
+- apps/mealie.yaml
 - apps/vaultwarden.yaml
 
 patchesStrategicMerge:
