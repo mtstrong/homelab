@@ -195,27 +195,6 @@ services:
     network_mode: host
     restart: unless-stopped
 
-  mealie:
-    image: ghcr.io/mealie-recipes/mealie:v3.0.2
-    container_name: mealie
-    ports:
-        - 9925:9000 
-    deploy:
-      resources:
-        limits:
-          memory: 1000M
-    volumes:
-      - /home/matt/mealie:/app/data/
-    environment:
-      - ALLOW_SIGNUP=true
-      - PUID=1000
-      - PGID=1000
-      - TZ=America/Chicago
-      - MAX_WORKERS=1
-      - WEB_CONCURRENCY=1
-      - BASE_URL=https://mealie.tehmatt.com
-    restart: unless-stopped
-
   calibre:
     image: ghcr.io/linuxserver/calibre:8.8.0
     container_name: calibre
