@@ -10,6 +10,7 @@ resources:
 - ingress.yaml
 - apps/audiobookshelf.yaml
 - apps/mealie.yaml
+- apps/notifiarr.yaml
 - apps/vaultwarden.yaml
 
 patchesStrategicMerge:
