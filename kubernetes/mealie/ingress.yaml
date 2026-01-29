@@ -14,6 +14,6 @@ spec:
           port: 9000
       middlewares:
         - name: default-headers
-          namespace: default
+          namespace: mealie
   tls:
     certResolver: letsencrypt
