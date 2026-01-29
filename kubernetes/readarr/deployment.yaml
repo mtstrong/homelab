@@ -1,0 +1,86 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: readarr
+  name: readarr
+  namespace: readarr
+spec:
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: readarr
+  template:
+    metadata:
+      labels:
+        app: readarr
+    spec:
+      nodeSelector:
+        worker: "true"
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+      containers:
+      - name: readarr
+        image: lscr.io/linuxserver/readarr:develop
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        - name: TZ
+          value: "America/Chicago"
+        - name: UMASK_SET
+          value: "022"
+        ports:
+        - containerPort: 8787
+          name: http
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /ping
+            port: 8787
+          initialDelaySeconds: 30
+          periodSeconds: 15
+          timeoutSeconds: 5
+          failureThreshold: 6
+        livenessProbe:
+          httpGet:
+            path: /ping
+            port: 8787
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 6
+        resources:
+          requests:
+            cpu: 200m
+            memory: 512Mi
+          limits:
+            cpu: 2000m
+            memory: 2Gi
+        volumeMounts:
+        - mountPath: /config
+          name: config
+        - mountPath: /books
+          name: books
+        - mountPath: /downloads
+          name: downloads
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: readarr
+      - name: books
+        nfs:
+          server: 192.168.1.38
+          path: /mnt/TrueNAS/books
+      - name: downloads
+        nfs:
+          server: 192.168.1.38
+          path: /mnt/OneTbs/nzb-dls
