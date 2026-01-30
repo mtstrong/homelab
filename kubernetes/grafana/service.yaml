@@ -12,5 +12,5 @@ spec:
     app: grafana
   sessionAffinity: None
   externalTrafficPolicy: Local
-  loadBalancerIP: 192.168.2.132
+  loadBalancerIP: 192.168.2.134
   type: LoadBalancer
