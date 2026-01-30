@@ -1,0 +1,137 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: plex-dashboard
+  namespace: grafana
+  labels:
+    grafana_dashboard: "1"
+data:
+  plex-dashboard.json: |
+    {
+      "dashboard": {
+        "title": "Plex Media Server Dashboard",
+        "tags": ["plex", "media"],
+        "timezone": "browser",
+        "panels": [
+          {
+            "id": 1,
+            "title": "Current Streams",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "tautulli_stream_count",
+                "refId": "A"
+              }
+            ],
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "thresholds"
+                },
+                "thresholds": {
+                  "steps": [
+                    {"color": "green", "value": null},
+                    {"color": "yellow", "value": 3},
+                    {"color": "red", "value": 8}
+                  ]
+                }
+              }
+            },
+            "gridPos": {"h": 8, "w": 6, "x": 0, "y": 0}
+          },
+          {
+            "id": 2,
+            "title": "Total Bandwidth",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "sum(tautulli_total_bandwidth)",
+                "refId": "A"
+              }
+            ],
+            "fieldConfig": {
+              "defaults": {
+                "unit": "bps",
+                "color": {"mode": "palette-classic"}
+              }
+            },
+            "gridPos": {"h": 8, "w": 6, "x": 6, "y": 0}
+          },
+          {
+            "id": 3,
+            "title": "Stream Count Over Time",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "tautulli_stream_count",
+                "refId": "A",
+                "legendFormat": "Active Streams"
+              }
+            ],
+            "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+          },
+          {
+            "id": 4,
+            "title": "Top Users (24h)",
+            "type": "table",
+            "targets": [
+              {
+                "expr": "topk(10, sum by (user) (increase(tautulli_watch_time_seconds[24h])))",
+                "refId": "A",
+                "format": "table"
+              }
+            ],
+            "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+          },
+          {
+            "id": 5,
+            "title": "Transcoding Sessions",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "tautulli_transcode_count",
+                "refId": "A"
+              }
+            ],
+            "fieldConfig": {
+              "defaults": {
+                "color": {"mode": "thresholds"},
+                "thresholds": {
+                  "steps": [
+                    {"color": "green", "value": null},
+                    {"color": "orange", "value": 2},
+                    {"color": "red", "value": 5}
+                  ]
+                }
+              }
+            },
+            "gridPos": {"h": 8, "w": 6, "x": 12, "y": 8}
+          },
+          {
+            "id": 6,
+            "title": "Library Item Counts",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "tautulli_library_count",
+                "refId": "A",
+                "legendFormat": "{{library_name}}"
+              }
+            ],
+            "fieldConfig": {
+              "defaults": {
+                "color": {"mode": "palette-classic"}
+              }
+            },
+            "gridPos": {"h": 8, "w": 6, "x": 18, "y": 8}
+          }
+        ],
+        "refresh": "30s",
+        "time": {
+          "from": "now-6h",
+          "to": "now"
+        },
+        "timepicker": {},
+        "version": 1
+      }
+    }
