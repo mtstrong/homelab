@@ -29,7 +29,10 @@ spec:
         - name: TAUTULLI_URI
           value: "http://tautulli.tautulli.svc.cluster.local:8181"
         - name: TAUTULLI_API_KEY
-          value: "YOUR_TAUTULLI_API_KEY"  # Replace with actual API key
+          valueFrom:
+            secretKeyRef:
+              name: tautulli-api-key
+              key: api-key
         resources:
           requests:
             memory: "64Mi"

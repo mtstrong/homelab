@@ -11,16 +11,20 @@ This deployment sets up Prometheus, Grafana, and Loki for monitoring your homela
 
 ## Post-Deployment Steps
 
-### 1. Get Tautulli API Key
+### 1. Create Tautulli API Key Secret
 
+The API key is stored as a Kubernetes Secret and not committed to git.
+
+```bash
+kubectl create secret generic tautulli-api-key \
+  --from-literal=api-key=YOUR_API_KEY_HERE \
+  -n tautulli
+```
+
+To get your API key:
 1. Navigate to http://192.168.2.118:8181
 2. Go to Settings → Web Interface → API
-3. Copy the API key
-4. Update the `tautulli-exporter` deployment:
-   ```bash
-   kubectl edit deployment tautulli-exporter -n tautulli
-   ```
-5. Replace `YOUR_TAUTULLI_API_KEY` with your actual API key
+3. Copy the API key and use it in the command above
 
 ### 2. Access Grafana
 
