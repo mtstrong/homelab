@@ -94,25 +94,6 @@ services:
       - handbrake:/output
     restart: unless-stopped
 
-  homebridge:
-    image: homebridge/homebridge:2024-12-11
-    container_name: homebridge
-    network_mode: host
-    volumes:
-      - /home/matt/homebridge:/homebridge
-    logging:
-      driver: json-file
-      options:
-        max-size: '10m'
-        max-file: '1'
-    healthcheck:
-      test: curl --fail localhost:8581 || exit 1
-      interval: 60s
-      retries: 5
-      start_period: 300s
-      timeout: 2s
-    restart: unless-stopped
-
   homeassistant:
     container_name: homeassistant
     image: ghcr.io/home-assistant/home-assistant:2025.8.1
