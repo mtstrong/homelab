@@ -43,31 +43,6 @@ services:
       - 8090:8090
     restart: unless-stopped
 
-  overseerr2:
-    image: lscr.io/linuxserver/overseerr:2021.12.12
-    container_name: overseerr2
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=America/Chicago
-    volumes:
-      - /home/matt/overseerr2:/config
-    ports:
-      - 5056:5055
-    restart: unless-stopped
-
-  notifiarr:
-    container_name: notifiarr
-    hostname: notifiarr
-    image: golift/notifiarr:0.8.3
-    restart: unless-stopped
-    ports:
-      - "5454:5454"
-    volumes:
-      - /home/matt/notifiarr:/config
-      - /var/run/utmp:/var/run/utmp
-      - /etc/machine-id:/etc/machine-id
-
   openaudible:
     image: openaudible/openaudible:latest
     container_name: openaudible
@@ -145,25 +120,6 @@ services:
       - handbrake:/storage 
       - handbrake:/watch
       - handbrake:/output
-    restart: unless-stopped
-
-  netbootxyz:
-    image: lscr.io/linuxserver/netbootxyz:2.0.53
-    container_name: netbootxyz
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=America/Chicago
-      - MENU_VERSION=1.9.9
-      - PORT_RANGE=30000:30010
-      - SUBFOLDER=/ 
-    volumes:
-      - /home/matt/netboot:/config
-      - netboot:/assets
-    ports:
-      - 3000:3000
-      - 69:69/udp
-      - 8880:80
     restart: unless-stopped
 
   homebridge:
@@ -363,13 +319,6 @@ services:
       - 7070:8080
     restart: unless-stopped
 
-  it-tools:
-    container_name: it-tools
-    ports:
-        - 4567:80
-    image: corentinth/it-tools:latest
-    restart: unless-stopped
-
   mattodo-api:
     image: ghcr.io/mtstrong/mattodo.api:v1.0.5
     container_name: mattodo-api
@@ -467,22 +416,6 @@ services:
       - traefik.http.routers.openwebui.tls.certresolver=letsencrypt
       #- traefik.http.routers.openwebui.middlewares=tinyauth
     restart: always
-
-  #streamlink-recorder:
-  #  image: kjake/streamlink-recorder:latest
-  #  container_name: streamlink-secorder
-  #  restart: unless-stopped
-  #  volumes:
-  #    - podcasts:/home/download
-  #  environment:
-  #    - streamName=bubbel
-  #    - streamLink=twitch.tv/bubbel
-  #    - streamQuality=best
-  #    - streamOptions=--twitch-disable-hosting --twitch-disable-ads
-  #    - streamPoll=60
-  #    - uid=9001
-  #    - gid=9001
-  #    - TZ=America/Chicago
     
 volumes: 
   semaphore-mysql:
