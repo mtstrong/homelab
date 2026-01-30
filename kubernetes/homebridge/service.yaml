@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: homebridge
+  namespace: homebridge
+  labels:
+    app: homebridge
+spec:
+  type: LoadBalancer
+  loadBalancerIP: 192.168.2.130
+  ports:
+  - port: 8581
+    targetPort: 8581
+    protocol: TCP
+    name: http
+  - port: 51697
+    targetPort: 51697
+    protocol: TCP
+    name: homekit
+  selector:
+    app: homebridge
