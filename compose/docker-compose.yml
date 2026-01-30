@@ -94,16 +94,6 @@ services:
       - handbrake:/output
     restart: unless-stopped
 
-  homeassistant:
-    container_name: homeassistant
-    image: ghcr.io/home-assistant/home-assistant:2025.8.1
-    volumes:
-      - /home/matt/homeassistant:/config
-      - /etc/localtime:/etc/localtime:ro
-      - /run/dbus:/run/dbus:ro
-    network_mode: host
-    restart: unless-stopped
-
   calibre:
     image: ghcr.io/linuxserver/calibre:8.8.0
     container_name: calibre
