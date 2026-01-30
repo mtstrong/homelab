@@ -17,6 +17,15 @@ spec:
     spec:
       nodeSelector:
         worker: "true"
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: NotIn
+                values:
+                - k3s-06
       securityContext:
         runAsUser: 10001
         runAsGroup: 10001
