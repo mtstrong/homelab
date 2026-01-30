@@ -1,33 +1,5 @@
 version: '3.9'
 services:
-  prowlarr:
-    image: lscr.io/linuxserver/prowlarr:2.0.4-nightly
-    container_name: prowlarr
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=America/Chicago
-    volumes:
-      - /home/matt/prowlarr:/config
-    ports:
-      - 9696:9696
-    restart: unless-stopped
-
-  readarr:
-    image: lscr.io/linuxserver/readarr:0.4.19-nightly
-    container_name: readarr
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=America/Chicago
-    volumes:
-      - /home/matt/readarr:/config
-      - books:/books
-      - nzb-dls:/downloads
-    ports:
-      - 8787:8787
-    restart: unless-stopped
-
   mylar3:
     image: lscr.io/linuxserver/mylar3:latest
     container_name: mylar3
@@ -181,41 +153,6 @@ services:
     ports:
       - 8083:8083
     restart: unless-stopped
-
-  mysql:
-    image: mysql:9.4
-    container_name: mysql
-    hostname: mysql
-    restart: unless-stopped
-    volumes:
-      - /home/matt/semaphore-mysql:/var/lib/mysql
-    environment:
-      MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
-      MYSQL_DATABASE: semaphore
-      MYSQL_USER: semaphore
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-
-  semaphore:
-    image: semaphoreui/semaphore:v2.15.0
-    container_name: semaphore
-    restart: unless-stopped
-    ports:
-      - 3333:3000
-    environment:
-      SEMAPHORE_DB_USER: semaphore
-      SEMAPHORE_DB_PASS: ${MYSQL_PASSWORD}
-      SEMAPHORE_DB_HOST: mysql
-      SEMAPHORE_DB_PORT: 3306
-      SEMAPHORE_DB_DIALECT: mysql
-      SEMAPHORE_DB: semaphore
-      SEMAPHORE_PLAYBOOK_PATH: /tmp/semaphore/
-      SEMAPHORE_ADMIN_PASSWORD: ${SEMAPHORE_ADMIN_PASSWORD}
-      SEMAPHORE_ADMIN_NAME: admin
-      SEMAPHORE_ADMIN_EMAIL: admin@localhost
-      SEMAPHORE_ADMIN: admin
-      SEMAPHORE_ACCESS_KEY_ENCRYPTION: ${SEMAPHORE_ACCESS_KEY_ENCRYPTION}
-    depends_on:
-      - mysql
   
   diun:
     image: crazymax/diun:4.29
@@ -319,15 +256,6 @@ services:
       - 7070:8080
     restart: unless-stopped
 
-  mattodo-api:
-    image: ghcr.io/mtstrong/mattodo.api:v1.0.5
-    container_name: mattodo-api
-    ports:
-      - 7260:7260
-    volumes:
-      - /home/matt/mattodo-api:/config
-    restart: unless-stopped
-
   ddclient:
     image: lscr.io/linuxserver/ddclient:latest
     container_name: ddclient
@@ -337,30 +265,6 @@ services:
       - TZ=Etc/UTC
     volumes:
       - /home/matt/ddclient:/config
-    restart: unless-stopped
-
-  tinyauth:
-    container_name: tinyauth
-    image: ghcr.io/steveiliop56/tinyauth:v3
-    environment:
-      - SECRET=${TINYAUTH_SECRET}
-      - APP_URL=https://tinyauth.tehmatt.com
-      - LOG_LEVEL=0
-      - USERS=${USERS}
-      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
-      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
-      - OAUTH_WHITELIST=swevo24@gmail.com,myswtghst@gmail.com,leslie.r.strong@gmail.com
-    restart: unless-stopped
-
-  checkmk:
-    image: checkmk/check-mk-raw:2.4.0-latest
-    container_name: checkmk-server
-    ports:
-      - "5000:5000"
-      - "5001:5001"
-      - "6556:6556"
-    volumes:
-      - /home/matt/checkmk:/omd/sites
     restart: unless-stopped
 
   omni-tools:
