@@ -1,18 +1,17 @@
----
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: romm
+  name: homebridge
   namespace: argocd
 spec:
   project: default
   source:
     repoURL: https://github.com/mtstrong/homelab.git
-    targetRevision: HEAD
-    path: kubernetes/romm
+    targetRevision: main
+    path: kubernetes/homebridge
   destination:
     server: https://kubernetes.default.svc
-    namespace: romm
+    namespace: homebridge
   syncPolicy:
     automated:
       prune: true
