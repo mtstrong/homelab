@@ -11,7 +11,7 @@ spec:
     path: kubernetes/loki
   destination:
     server: https://kubernetes.default.svc
-    namespace: loki
+    namespace: loki-stack
   syncPolicy:
     automated:
       prune: true
