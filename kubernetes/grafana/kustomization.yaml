@@ -8,3 +8,5 @@ resources:
   - datasources.yaml
   - deployment.yaml
   - service.yaml
+  - dashboard-provider.yaml
+  - dashboard-plex-enhanced.yaml
