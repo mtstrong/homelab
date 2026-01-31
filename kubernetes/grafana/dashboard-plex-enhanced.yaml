@@ -9,23 +9,14 @@ data:
   plex-dashboard.json: |
     {
       "annotations": {
-        "list": [
-          {
-            "builtIn": 1,
-            "datasource": "-- Grafana --",
-            "enable": true,
-            "hide": true,
-            "iconColor": "rgba(0, 211, 255, 1)",
-            "name": "Annotations & Alerts",
-            "type": "dashboard"
-          }
-        ]
+        "list": []
       },
       "editable": true,
-      "gnetId": null,
+      "fiscalYearStartMonth": 0,
       "graphTooltip": 0,
       "id": null,
       "links": [],
+      "liveNow": false,
       "panels": [
         {
           "datasource": "Prometheus",
@@ -56,8 +47,8 @@ data:
             }
           },
           "gridPos": {
-            "h": 4,
-            "w": 4,
+            "h": 6,
+            "w": 6,
             "x": 0,
             "y": 0
           },
@@ -79,7 +70,7 @@ data:
           "pluginVersion": "9.0.0",
           "targets": [
             {
-              "expr": "tautulli_total_stream_count",
+              "expr": "tautulli_stream_count",
               "refId": "A"
             }
           ],
@@ -115,9 +106,9 @@ data:
             }
           },
           "gridPos": {
-            "h": 4,
-            "w": 4,
-            "x": 4,
+            "h": 6,
+            "w": 6,
+            "x": 6,
             "y": 0
           },
           "id": 3,
@@ -138,81 +129,12 @@ data:
           "pluginVersion": "9.0.0",
           "targets": [
             {
-              "expr": "tautulli_total_transcode_count",
+              "expr": "tautulli_stream_count_transcode",
               "refId": "A"
             }
           ],
           "title": "Transcoding",
           "type": "stat"
-        },
-        {
-          "datasource": "Prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 20,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "tooltip": false,
-                  "viz": false,
-                  "legend": false
-                },
-                "lineInterpolation": "smooth",
-                "lineWidth": 2,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "never",
-                "spanNulls": true
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  }
-                ]
-              },
-              "unit": "Bps"
-            }
-          },
-          "gridPos": {
-            "h": 4,
-            "w": 4,
-            "x": 8,
-            "y": 0
-          },
-          "id": 4,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom"
-            },
-            "tooltip": {
-              "mode": "single"
-            }
-          },
-          "pluginVersion": "9.0.0",
-          "targets": [
-            {
-              "expr": "tautulli_total_bandwidth",
-              "refId": "A",
-              "legendFormat": "Bandwidth"
-            }
-          ],
-          "title": "Total Bandwidth",
-          "type": "timeseries"
         },
         {
           "datasource": "Prometheus",
@@ -235,15 +157,15 @@ data:
             }
           },
           "gridPos": {
-            "h": 4,
-            "w": 4,
+            "h": 6,
+            "w": 6,
             "x": 12,
             "y": 0
           },
           "id": 5,
           "options": {
             "colorMode": "value",
-            "graphMode": "none",
+            "graphMode": "area",
             "justifyMode": "auto",
             "orientation": "auto",
             "reduceOptions": {
@@ -258,11 +180,11 @@ data:
           "pluginVersion": "9.0.0",
           "targets": [
             {
-              "expr": "tautulli_total_lan_bandwidth",
+              "expr": "tautulli_stream_direct_play",
               "refId": "A"
             }
           ],
-          "title": "LAN Streams",
+          "title": "Direct Play",
           "type": "stat"
         },
         {
@@ -286,15 +208,15 @@ data:
             }
           },
           "gridPos": {
-            "h": 4,
-            "w": 4,
-            "x": 16,
+            "h": 6,
+            "w": 6,
+            "x": 18,
             "y": 0
           },
           "id": 6,
           "options": {
             "colorMode": "value",
-            "graphMode": "none",
+            "graphMode": "area",
             "justifyMode": "auto",
             "orientation": "auto",
             "reduceOptions": {
@@ -309,62 +231,11 @@ data:
           "pluginVersion": "9.0.0",
           "targets": [
             {
-              "expr": "tautulli_total_wan_bandwidth",
+              "expr": "tautulli_stream_direct_stream",
               "refId": "A"
             }
           ],
-          "title": "WAN Streams",
-          "type": "stat"
-        },
-        {
-          "datasource": "Prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "text",
-                    "value": null
-                  }
-                ]
-              },
-              "unit": "none"
-            }
-          },
-          "gridPos": {
-            "h": 4,
-            "w": 4,
-            "x": 20,
-            "y": 0
-          },
-          "id": 7,
-          "options": {
-            "colorMode": "value",
-            "graphMode": "none",
-            "justifyMode": "auto",
-            "orientation": "auto",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "textMode": "auto"
-          },
-          "pluginVersion": "9.0.0",
-          "targets": [
-            {
-              "expr": "tautulli_library_movies_count",
-              "refId": "A"
-            }
-          ],
-          "title": "Movies",
+          "title": "Direct Stream",
           "type": "stat"
         },
         {
@@ -375,6 +246,8 @@ data:
                 "mode": "palette-classic"
               },
               "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
                 "axisLabel": "Streams",
                 "axisPlacement": "auto",
                 "barAlignment": 0,
@@ -393,7 +266,14 @@ data:
                   "type": "linear"
                 },
                 "showPoints": "never",
-                "spanNulls": true
+                "spanNulls": true,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               },
               "mappings": [],
               "thresholds": {
@@ -409,10 +289,10 @@ data:
             }
           },
           "gridPos": {
-            "h": 8,
-            "w": 12,
+            "h": 10,
+            "w": 24,
             "x": 0,
-            "y": 4
+            "y": 6
           },
           "id": 8,
           "options": {
@@ -423,31 +303,33 @@ data:
                 "mean"
               ],
               "displayMode": "table",
-              "placement": "bottom"
+              "placement": "bottom",
+              "showLegend": true
             },
             "tooltip": {
-              "mode": "multi"
+              "mode": "multi",
+              "sort": "none"
             }
           },
           "pluginVersion": "9.0.0",
           "targets": [
             {
-              "expr": "tautulli_total_stream_count",
+              "expr": "tautulli_stream_count",
               "refId": "A",
               "legendFormat": "Total Streams"
             },
             {
-              "expr": "tautulli_total_transcode_count",
+              "expr": "tautulli_stream_count_transcode",
               "refId": "B",
               "legendFormat": "Transcoding"
             },
             {
-              "expr": "tautulli_direct_play_count",
+              "expr": "tautulli_stream_direct_play",
               "refId": "C",
               "legendFormat": "Direct Play"
             },
             {
-              "expr": "tautulli_direct_stream_count",
+              "expr": "tautulli_stream_direct_stream",
               "refId": "D",
               "legendFormat": "Direct Stream"
             }
@@ -463,6 +345,8 @@ data:
                 "mode": "palette-classic"
               },
               "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
                 "axisLabel": "",
                 "axisPlacement": "auto",
                 "barAlignment": 0,
@@ -481,7 +365,14 @@ data:
                   "type": "linear"
                 },
                 "showPoints": "never",
-                "spanNulls": true
+                "spanNulls": true,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               },
               "mappings": [],
               "thresholds": {
@@ -497,10 +388,10 @@ data:
             }
           },
           "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 12,
-            "y": 4
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 16
           },
           "id": 9,
           "options": {
@@ -511,26 +402,28 @@ data:
                 "mean"
               ],
               "displayMode": "table",
-              "placement": "bottom"
+              "placement": "bottom",
+              "showLegend": true
             },
             "tooltip": {
-              "mode": "multi"
+              "mode": "multi",
+              "sort": "none"
             }
           },
           "pluginVersion": "9.0.0",
           "targets": [
             {
-              "expr": "tautulli_total_bandwidth",
+              "expr": "tautulli_bandwidth_total",
               "refId": "A",
               "legendFormat": "Total Bandwidth"
             },
             {
-              "expr": "tautulli_total_lan_bandwidth",
+              "expr": "tautulli_bandwidth_lan",
               "refId": "B",
               "legendFormat": "LAN Bandwidth"
             },
             {
-              "expr": "tautulli_total_wan_bandwidth",
+              "expr": "tautulli_bandwidth_wan",
               "refId": "C",
               "legendFormat": "WAN Bandwidth"
             }
@@ -543,195 +436,47 @@ data:
           "fieldConfig": {
             "defaults": {
               "color": {
-                "mode": "palette-classic"
+                "mode": "thresholds"
               },
-              "custom": {
-                "hideFrom": {
-                  "tooltip": false,
-                  "viz": false,
-                  "legend": false
+              "mappings": [
+                {
+                  "options": {
+                    "0": {
+                      "color": "red",
+                      "text": "Down"
+                    },
+                    "1": {
+                      "color": "green",
+                      "text": "Up"
+                    }
+                  },
+                  "type": "value"
                 }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "red",
+                    "value": null
+                  },
+                  {
+                    "color": "green",
+                    "value": 1
+                  }
+                ]
               },
-              "mappings": []
+              "unit": "none"
             }
           },
           "gridPos": {
-            "h": 8,
+            "h": 4,
             "w": 6,
             "x": 0,
-            "y": 12
+            "y": 26
           },
           "id": 10,
           "options": {
-            "legend": {
-              "displayMode": "table",
-              "placement": "right",
-              "values": [
-                "value"
-              ]
-            },
-            "pieType": "donut",
-            "tooltip": {
-              "mode": "single"
-            }
-          },
-          "pluginVersion": "9.0.0",
-          "targets": [
-            {
-              "expr": "tautulli_stream_by_quality",
-              "refId": "A",
-              "legendFormat": "{{quality}}"
-            }
-          ],
-          "title": "Streams by Quality",
-          "type": "piechart"
-        },
-        {
-          "datasource": "Prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "hideFrom": {
-                  "tooltip": false,
-                  "viz": false,
-                  "legend": false
-                }
-              },
-              "mappings": []
-            }
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 6,
-            "x": 6,
-            "y": 12
-          },
-          "id": 11,
-          "options": {
-            "legend": {
-              "displayMode": "table",
-              "placement": "right",
-              "values": [
-                "value"
-              ]
-            },
-            "pieType": "donut",
-            "tooltip": {
-              "mode": "single"
-            }
-          },
-          "pluginVersion": "9.0.0",
-          "targets": [
-            {
-              "expr": "tautulli_stream_by_platform",
-              "refId": "A",
-              "legendFormat": "{{platform}}"
-            }
-          ],
-          "title": "Streams by Platform",
-          "type": "piechart"
-        },
-        {
-          "datasource": "Prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "custom": {
-                "align": "auto",
-                "displayMode": "auto"
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  }
-                ]
-              }
-            }
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 12,
-            "y": 12
-          },
-          "id": 12,
-          "options": {
-            "showHeader": true,
-            "sortBy": [
-              {
-                "desc": true,
-                "displayName": "Value"
-              }
-            ]
-          },
-          "pluginVersion": "9.0.0",
-          "targets": [
-            {
-              "expr": "topk(10, tautulli_stream_by_user)",
-              "refId": "A",
-              "legendFormat": "{{user}}",
-              "format": "table",
-              "instant": true
-            }
-          ],
-          "title": "Top Active Users",
-          "transformations": [
-            {
-              "id": "organize",
-              "options": {
-                "excludeByName": {
-                  "Time": true,
-                  "__name__": true,
-                  "instance": true,
-                  "job": true
-                },
-                "indexByName": {},
-                "renameByName": {
-                  "user": "User",
-                  "Value": "Streams"
-                }
-              }
-            }
-          ],
-          "type": "table"
-        },
-        {
-          "datasource": "Prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "text",
-                    "value": null
-                  }
-                ]
-              },
-              "unit": "none"
-            }
-          },
-          "gridPos": {
-            "h": 4,
-            "w": 3,
-            "x": 0,
-            "y": 20
-          },
-          "id": 13,
-          "options": {
             "colorMode": "value",
             "graphMode": "none",
             "justifyMode": "auto",
@@ -748,169 +493,16 @@ data:
           "pluginVersion": "9.0.0",
           "targets": [
             {
-              "expr": "tautulli_library_tv_count",
+              "expr": "tautulli_up",
               "refId": "A"
             }
           ],
-          "title": "TV Shows",
-          "type": "stat"
-        },
-        {
-          "datasource": "Prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "text",
-                    "value": null
-                  }
-                ]
-              },
-              "unit": "none"
-            }
-          },
-          "gridPos": {
-            "h": 4,
-            "w": 3,
-            "x": 3,
-            "y": 20
-          },
-          "id": 14,
-          "options": {
-            "colorMode": "value",
-            "graphMode": "none",
-            "justifyMode": "auto",
-            "orientation": "auto",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "textMode": "auto"
-          },
-          "pluginVersion": "9.0.0",
-          "targets": [
-            {
-              "expr": "tautulli_library_music_count",
-              "refId": "A"
-            }
-          ],
-          "title": "Music Tracks",
-          "type": "stat"
-        },
-        {
-          "datasource": "Prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "text",
-                    "value": null
-                  }
-                ]
-              },
-              "unit": "decbytes"
-            }
-          },
-          "gridPos": {
-            "h": 4,
-            "w": 3,
-            "x": 6,
-            "y": 20
-          },
-          "id": 15,
-          "options": {
-            "colorMode": "value",
-            "graphMode": "none",
-            "justifyMode": "auto",
-            "orientation": "auto",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "textMode": "auto"
-          },
-          "pluginVersion": "9.0.0",
-          "targets": [
-            {
-              "expr": "tautulli_library_total_size",
-              "refId": "A"
-            }
-          ],
-          "title": "Total Library Size",
-          "type": "stat"
-        },
-        {
-          "datasource": "Prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "text",
-                    "value": null
-                  }
-                ]
-              },
-              "unit": "none"
-            }
-          },
-          "gridPos": {
-            "h": 4,
-            "w": 3,
-            "x": 9,
-            "y": 20
-          },
-          "id": 16,
-          "options": {
-            "colorMode": "value",
-            "graphMode": "none",
-            "justifyMode": "auto",
-            "orientation": "auto",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "textMode": "auto"
-          },
-          "pluginVersion": "9.0.0",
-          "targets": [
-            {
-              "expr": "tautulli_total_users",
-              "refId": "A"
-            }
-          ],
-          "title": "Total Users",
+          "title": "Tautulli Status",
           "type": "stat"
         }
       ],
       "refresh": "30s",
-      "schemaVersion": 36,
+      "schemaVersion": 38,
       "style": "dark",
       "tags": ["plex", "tautulli", "media"],
       "templating": {
@@ -922,7 +514,7 @@ data:
       },
       "timepicker": {},
       "timezone": "browser",
-      "title": "Plex Media Server - Enhanced",
+      "title": "Plex Media Server",
       "uid": "plex-enhanced",
       "version": 1,
       "weekStart": ""
