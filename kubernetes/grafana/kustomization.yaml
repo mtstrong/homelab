@@ -11,3 +11,4 @@ resources:
   - dashboard-provider.yaml
   - dashboard-plex-enhanced.yaml
   - dashboard-media-server.yaml
+  - dashboard-technotim-plex.yaml
