@@ -10,3 +10,4 @@ resources:
   - service.yaml
   - dashboard-provider.yaml
   - dashboard-plex-enhanced.yaml
+  - dashboard-media-server.yaml

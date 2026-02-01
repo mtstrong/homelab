@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: plex-exporter
+  namespace: prometheus
+  labels:
+    app: plex-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: plex-exporter
+  template:
+    metadata:
+      labels:
+        app: plex-exporter
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9000"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+      - name: plex-exporter
+        image: ghcr.io/timothystewart6/prometheus-plex-exporter:latest
+        ports:
+        - name: metrics
+          containerPort: 9000
+          protocol: TCP
+        env:
+        - name: PLEX_SERVER
+          valueFrom:
+            secretKeyRef:
+              name: plex-exporter-secret
+              key: PLEX_SERVER
+        - name: PLEX_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: plex-exporter-secret
+              key: PLEX_TOKEN
+        - name: LOG_LEVEL
+          value: "info"
+        - name: LIBRARY_REFRESH_INTERVAL
+          value: "15"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        livenessProbe:
+          httpGet:
+            path: /metrics
+            port: 9000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /metrics
+            port: 9000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 65534
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
