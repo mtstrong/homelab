@@ -156,7 +156,7 @@ services:
     restart: always
 
   openwebui:
-    image: ghcr.io/open-webui/open-webui:0.6.22
+    image: ghcr.io/open-webui/open-webui:0.7.2
     container_name: open-webui
     ports:
       - "3008:8080"
