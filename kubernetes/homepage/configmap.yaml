@@ -45,8 +45,8 @@ data:
     radarr.png\n        href: https://radarr.tehmatt.com\n        description: Movie
     Management\n        widget:\n            type: radarr\n            url: https://radarr.tehmatt.com\n
     \           key: {{HOMEPAGE_VAR_RADARR_KEY}}\n    - Readarr:\n        icon:
-    readarr.png\n        href: http://192.168.1.37:8787\n        description: Book
-    Management\n        widget:\n            type: readarr\n            url: http://192.168.1.37:8787\n
+    readarr.png\n        href: http://192.168.2.127:8787\n        description: Book
+    Management\n        widget:\n            type: readarr\n            url: http://192.168.2.127:8787\n
     \           key: {{HOMEPAGE_VAR_READARR_KEY}}\n    - Prowlarr:\n        icon:
     prowlarr.png\n        href: http://prowlarr.prowlarr.svc.cluster.local:9696\n
     \       description: Indexer Manager\n        widget:\n            type: prowlarr\n
