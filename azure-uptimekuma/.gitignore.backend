@@ -1,0 +1,4 @@
+# Backend configuration is stored separately for security
+# Do not commit backend-config.tfvars to version control if it contains sensitive data
+backend-config.tfvars
+backend.tf

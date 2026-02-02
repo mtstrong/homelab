@@ -23,7 +23,22 @@ Deploy Uptime Kuma to Azure Container Instances using OpenTofu for monitoring yo
 
 ## Quick Start
 
-### 1. Configure Variables
+### 1. Set Up State Backend (Recommended)
+
+First, configure Azure Storage to store your OpenTofu state:
+
+```bash
+./setup-backend.sh
+```
+
+This will:
+- Create a resource group for state storage
+- Create a storage account (globally unique name)
+- Create a blob container for state files
+- Generate `backend-config.tfvars` with connection details
+- Cost: ~$0.02/month
+
+### 2. Configure Variables
 
 Copy the example file and customize:
 ```bash
@@ -34,13 +49,19 @@ Edit `terraform.tfvars` and change these **REQUIRED** values to be globally uniq
 - `storage_account_name` (3-24 lowercase alphanumeric chars)
 - `dns_name_label` (your preferred subdomain)
 
-### 2. Initialize OpenTofu
+### 3. Initialize OpenTofu
 
+**With backend (recommended):**
+```bash
+tofu init -backend-config=backend-config.tfvars
+```
+
+**Without backend (local state only):**
 ```bash
 tofu init
 ```
 
-### 3. Plan the Deployment
+### 4. Plan the Deployment
 
 ```bash
 tofu plan
@@ -48,7 +69,7 @@ tofu plan
 
 Review the planned changes to ensure everything looks correct.
 
-### 4. Deploy
+### 5. Deploy
 
 ```bash
 tofu apply
@@ -56,7 +77,7 @@ tofu apply
 
 Type `yes` when prompted to confirm.
 
-### 5. Access Uptime Kuma
+### 6. Access Uptime Kuma
 
 After deployment completes, OpenTofu will output the URL:
 ```
@@ -85,6 +106,16 @@ location = "eastus"  # Options: eastus, westus2, centralus, etc.
 ## Data Persistence
 
 Uptime Kuma data is stored in Azure Files and persists across container restarts. Your monitors, settings, and history are preserved.
+
+## State Management
+
+OpenTofu state is stored in Azure Blob Storage (if you ran `setup-backend.sh`), providing:
+- **State locking** - Prevents concurrent modifications
+- **Versioning** - Automatic history of state changes
+- **Backup** - Azure handles redundancy
+- **Collaboration** - Team members can share state
+
+The state file tracks all your Azure resources and is critical for updates and deletions.
 
 ## Monitoring Your Homelab
 

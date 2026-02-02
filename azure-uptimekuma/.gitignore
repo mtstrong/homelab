@@ -25,3 +25,7 @@ terraform.rc
 
 # Lock file (optional - some prefer to commit this)
 .terraform.lock.hcl
+
+# Backend configuration (contains storage account details)
+backend-config.tfvars
+backend.tf
