@@ -1,0 +1,187 @@
+apiVersion: v1
+data:
+  bookmarks.yaml: |
+    - Developer:
+        - Github:
+            - abbr: GH
+              href: https://github.com/mtstrong/
+  custom.css: ""
+  custom.js: ""
+  docker.yaml: ""
+  kubernetes.yaml: |
+    mode: cluster
+  services.yaml: "- Desktops:\n    - Proxmox:\n        icon: proxmox.svg\n        href:
+    https://192.168.1.195:8006\n        description: bd790i\n        widget:\n            type:
+    proxmox\n            url: https://192.168.1.195:8006\n            username:  api@pam!homepage\n
+    \           password:  {{HOMEPAGE_VAR_PROXMOX_PASSWORD}}\n            node:
+    bd790i\n    - Proxmox:\n        icon: proxmox.svg\n        href: https://192.168.1.106:8006\n
+    \       description: bd795m\n        widget:\n            type: proxmox\n            url:
+    https://192.168.1.106:8006\n            username:  api@pam!homepage\n            password:
+    \ {{HOMEPAGE_VAR_PROXMOX_PASSWORD}}\n            node: bd795m\n- MiniPCs:\n
+    \   - Proxmox:\n    \n        icon: proxmox.svg\n        href: https://192.168.1.109:8006\n
+    \       description: um773a\n        widget:\n            type: proxmox\n            url:
+    https://192.168.1.109:8006\n            username:  api@pam!homepage\n            password:
+    \ {{HOMEPAGE_VAR_PROXMOX_PASSWORD}}\n            node: um773a\n    - Proxmox:\n
+    \       icon: proxmox.svg\n        href: https://192.168.1.107:8006\n        description:
+    um773b\n        widget:\n            type: proxmox\n            url: https://192.168.1.107:8006\n
+    \           username:  api@pam!homepage\n            password:  {{HOMEPAGE_VAR_PROXMOX_PASSWORD}}\n
+    \           node: um773b\n    - Proxmox:\n        icon: proxmox.svg\n        href:
+    https://192.168.1.105:8006\n        description: um773c\n        widget:\n            type:
+    proxmox\n            url: https://192.168.1.105:8006\n            username:  api@pam!homepage\n
+    \           password:  {{HOMEPAGE_VAR_PROXMOX_PASSWORD}}\n            node:
+    um773c\n- Storage:\n    - Synology:\n        href: http://192.168.1.70\n        icon:
+    synology.png\n        description: NAS\n        widget:\n            type: diskstation\n
+    \           url: http://192.168.1.70:5000\n            username: remote_stats\n
+    \           password: {{HOMEPAGE_VAR_SYNOLOGY_PASSWORD}}\n    - TrueNAS:\n        icon: truenas.png\n        href:
+    http://192.168.1.38\n        description: NAS\n        widget:\n            type:
+    truenas\n            url: http://192.168.1.38\n            key: {{HOMEPAGE_VAR_TRUENAS_KEY}}\n
+    \   - Proxmox Backup Server:\n        icon: proxmox.svg\n        href: https://192.168.1.117:8007\n
+    \       widget:\n            type: proxmoxbackupserver\n            url: https://192.168.1.117:8007\n
+    \           username:  root@pam!api\n            password:  {{HOMEPAGE_VAR_PROXMOX_BACKUP_PASSWORD}}\n
+    \           datastore: backup-local\n- Media Management:\n    - Sonarr:\n        icon:
+    sonarr.png\n        href: https://sonarr.tehmatt.com\n        description: TV
+    Show Management\n        widget:\n            type: sonarr\n            url: https://sonarr.tehmatt.com\n
+    \           key: {{HOMEPAGE_VAR_SONARR_KEY}}\n    - Radarr:\n        icon:
+    radarr.png\n        href: https://radarr.tehmatt.com\n        description: Movie
+    Management\n        widget:\n            type: radarr\n            url: https://radarr.tehmatt.com\n
+    \           key: {{HOMEPAGE_VAR_RADARR_KEY}}\n    - Readarr:\n        icon:
+    readarr.png\n        href: http://192.168.1.37:8787\n        description: Book
+    Management\n        widget:\n            type: readarr\n            url: http://192.168.1.37:8787\n
+    \           key: {{HOMEPAGE_VAR_READARR_KEY}}\n    - Prowlarr:\n        icon:
+    prowlarr.png\n        href: http://prowlarr.prowlarr.svc.cluster.local:9696\n
+    \       description: Indexer Manager\n        widget:\n            type: prowlarr\n
+    \           url: http://prowlarr.prowlarr.svc.cluster.local:9696\n            key:
+    {{HOMEPAGE_VAR_PROWLARR_KEY}}\n- Media:\n    - Plex:\n        href: https://app.plex.tv/desktop\n
+    \       icon: plex.png\n        description: Media Server\n        widget:\n            type:
+    plex\n            url: http://192.168.1.38:32400\n            key: {{HOMEPAGE_VAR_PLEX_KEY}}\n
+    \   - Audiobookshelf:\n        icon: audiobookshelf.png\n        href: https://abs.tehmatt.com\n
+    \       description: Audiobook Server\n        widget:\n            type: audiobookshelf\n
+    \           url: https://abs.tehmatt.com\n            key: {{HOMEPAGE_VAR_AUDIOBOOKSHELF_KEY}}\n
+    \   - Kavita:\n        icon: kavita.png\n        href: https://kavita.tehmatt.com\n
+    \       description: Comic Server\n        widget:\n            type: kavita\n
+    \           url: https://kavita.tehmatt.com\n            #key: 9804e636-f42e-4d38-9bbb-66b7def5ae39\n
+    \           username: matt\n            password: {{HOMEPAGE_VAR_COMMON_PASSWORD}}\n    - Calibre-Web:\n
+    \       icon: calibre.png\n        href: http://192.168.1.37:8083\n        description:
+    eBook Server\n        widget:\n            type: calibreweb\n            url:
+    http://192.168.1.37:8083\n            username: admin\n            password: {{HOMEPAGE_VAR_CALIBRE_PASSWORD}}\n-
+    Networking:\n    - pfSense:\n        description: Firewall & Router\n        href:
+    https://192.168.1.1\n        siteMonitor: https://192.168.1.1\n        icon: pfsense.png\n
+    \       widget:\n            type: pfsense\n            url: https://192.168.1.1\n
+    \           fields: [ \"load\", \"memory\", \"wanStatus\", \"disk\" ]\n            username:
+    admin\n            headers:\n              X-API-Key: {{HOMEPAGE_VAR_PFSENSE_API_KEY}}\n
+    \           wan: igc0\n            version: 2        \n    - Traefik: \n        icon:
+    traefik.png\n        href: https://traefik.tehmatt.com\n        widget:\n            type:
+    traefik\n            url: https://traefik.tehmatt.com\n            username: matt\n
+    \           password: {{HOMEPAGE_VAR_COMMON_PASSWORD}}\n- Kubernetes Management:\n    - ArgoCD:\n        icon:
+    argocd\n        href: https://argocd.tehmatt.com\n        description: GitOps
+    CD\n        widget:\n            type: argocd\n            url: https://argocd.tehmatt.com\n
+    \           key: \"{{HOMEPAGE_VAR_ARGOCD_TOKEN}}\"\n- AI Services:\n    - Ollama:\n
+    \       icon: sh-ollama-light.png\n        description: A.I Backend\n        widget:\n
+    \         type: customapi\n          url: http://192.168.1.37:11434/api/ps\n          method:
+    GET\n          mappings:\n            - field: models[0].name\n              label:
+    \"Running Model\"\n              format: text\n            - field: models[0].size\n
+    \             label: \"Model Size\"\n              format: bytes\n            -
+    field: models[0].size_vram\n              label: \"VRAM Used\"\n              format:
+    bytes\n    - Open WebUI:\n        icon: open-webui-light.png\n        href: http://192.168.1.37:3008\n
+    \       description: A.I Frontend\n        widget:\n          type: customapi\n
+    \         url: http://192.168.1.37:3008/api/models\n          headers:\n            Authorization:
+    \"Bearer {{HOMEPAGE_VAR_OPENWEBUI_TOKEN}}\"\n
+    \         mappings:\n            - field: data\n              label: Total Models\n
+    \             format: size\n- Home Automation:\n    - Home Assistant:\n        icon:
+    home-assistant.png\n        href: http://192.168.1.37:8123\n        widget:\n
+    \           type: homeassistant\n            url: http://192.168.1.37:8123\n            key:
+    {{HOMEPAGE_VAR_HOMEASSISTANT_KEY}}\n
+    \   - Homebridge:\n        icon: homebridge.png\n        href: http://192.168.1.37:8581\n
+    \       widget:\n            type: homebridge\n            url: http://192.168.1.37:8581\n
+    \           username: matt\n            password: {{HOMEPAGE_VAR_COMMON_PASSWORD}}\n- Uptime:\n    -
+    Uptime Kuma:\n        href: http://192.168.1.37:3001\n        description: External
+    Service Monitoring\n        icon: uptime-kuma.png\n        widget:\n            type:
+    uptimekuma\n            url: http://192.168.1.37:3001\n            slug: public\n
+    \   - Uptime Kuma:\n        href: http://192.168.1.37:3001\n        description:
+    Internal Service Monitoring\n        icon: uptime-kuma.png\n        widget:\n
+    \           type: uptimekuma\n            url: http://192.168.1.37:3001\n            slug:
+    private\n            \n"
+  settings.yaml: |
+    title: Matt Strong's Homepage
+
+    providers:
+      openweathermap: openweathermapapikey
+      weatherapi: weatherapiapikey
+
+    useEqualHeights: true
+
+    layout:
+      Desktops:
+        header: true
+        style: row
+        columns: 2
+      MiniPCs:
+        header: true
+        style: row
+        columns: 3
+      Storage:
+        header: true
+        style: row
+        columns: 3
+      Networking:
+        header: true
+        style: row
+        columns: 2
+      Kubernetes Management:
+        header: true
+        style: row
+        columns: 1
+      AI Services:
+        header: true
+        style: row
+        columns: 2
+      Home Automation:
+        header: true
+        style: row
+        columns: 2
+      Media:
+        header: true
+        style: row
+        columns: 4
+      Media Management:
+        header: true
+        style: row
+        columns: 4
+      Containers:
+        header: true
+        style: row
+        columns: 3
+      Downloads:
+        header: true
+        style: row
+        columns: 2
+      Uptime:
+        header: true
+        style: row
+        columns: 2
+  widgets.yaml: |
+    - kubernetes:
+        cluster:
+          show: true
+          cpu: true
+          memory: true
+          showLabel: true
+          label: "cluster"
+        nodes:
+          show: true
+          cpu: true
+          memory: true
+          showLabel: true
+kind: ConfigMap
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","data":{"bookmarks.yaml":"- Developer:\n    - Github:\n        - abbr: GH\n          href: https://github.com/mtstrong/\n","custom.css":"","custom.js":"","docker.yaml":"","kubernetes.yaml":"mode: cluster\n","services.yaml":"- Desktops:\n    - Proxmox:\n        icon: proxmox.svg\n        href: https://192.168.1.195:8006\n        description: bd790i\n        widget:\n            type: proxmox\n            url: https://192.168.1.195:8006\n            username:  api@pam!homepage\n            password:  {{HOMEPAGE_VAR_PROXMOX_PASSWORD}}\n            node: bd790i\n    - Proxmox:\n        icon: proxmox.svg\n        href: https://192.168.1.106:8006\n        description: bd795m\n        widget:\n            type: proxmox\n            url: https://192.168.1.106:8006\n            username:  api@pam!homepage\n            password:  {{HOMEPAGE_VAR_PROXMOX_PASSWORD}}\n            node: bd795m\n- MiniPCs:\n    - Proxmox:\n    \n        icon: proxmox.svg\n        href: https://192.168.1.109:8006\n        description: um773a\n        widget:\n            type: proxmox\n            url: https://192.168.1.109:8006\n            username:  api@pam!homepage\n            password:  {{HOMEPAGE_VAR_PROXMOX_PASSWORD}}\n            node: um773a\n    - Proxmox:\n        icon: proxmox.svg\n        href: https://192.168.1.107:8006\n        description: um773b\n        widget:\n            type: proxmox\n            url: https://192.168.1.107:8006\n            username:  api@pam!homepage\n            password:  {{HOMEPAGE_VAR_PROXMOX_PASSWORD}}\n            node: um773b\n    - Proxmox:\n        icon: proxmox.svg\n        href: https://192.168.1.105:8006\n        description: um773c\n        widget:\n            type: proxmox\n            url: https://192.168.1.105:8006\n            username:  api@pam!homepage\n            password:  {{HOMEPAGE_VAR_PROXMOX_PASSWORD}}\n            node: um773c\n- Storage:\n    - Synology:\n        href: http://192.168.1.70\n        icon: synology.png\n        description: NAS\n        widget:\n            type: diskstation\n            url: http://192.168.1.70:5000\n            username: remote_stats\n            password: Cs_[\u003e~i6\n    - TrueNAS:\n        icon: truenas.png\n        href: http://192.168.1.38\n        description: NAS\n        widget:\n            type: truenas\n            url: http://192.168.1.38\n            key: {{HOMEPAGE_VAR_TRUENAS_KEY}}\n    - Proxmox Backup Server:\n        icon: proxmox.svg\n        href: https://192.168.1.117:8007\n        widget:\n            type: proxmoxbackupserver\n            url: https://192.168.1.117:8007\n            username:  root@pam!api\n            password:  {{HOMEPAGE_VAR_PROXMOX_BACKUP_PASSWORD}}\n            datastore: backup-local\n- Media Management:\n    - Sonarr:\n        icon: sonarr.png\n        href: https://sonarr.tehmatt.com\n        description: TV Show Management\n        widget:\n            type: sonarr\n            url: https://sonarr.tehmatt.com\n            key: {{HOMEPAGE_VAR_SONARR_KEY}}\n    - Radarr:\n        icon: radarr.png\n        href: https://radarr.tehmatt.com\n        description: Movie Management\n        widget:\n            type: radarr\n            url: https://radarr.tehmatt.com\n            key: {{HOMEPAGE_VAR_RADARR_KEY}}\n    - Readarr:\n        icon: readarr.png\n        href: http://192.168.1.37:8787\n        description: Book Management\n        widget:\n            type: readarr\n            url: http://192.168.1.37:8787\n            key: {{HOMEPAGE_VAR_READARR_KEY}}\n    - Prowlarr:\n        icon: prowlarr.png\n        href: http://prowlarr.prowlarr.svc.cluster.local:9696\n        description: Indexer Manager\n        widget:\n            type: prowlarr\n            url: http://prowlarr.prowlarr.svc.cluster.local:9696\n            key: {{HOMEPAGE_VAR_PROWLARR_KEY}}\n- Media:\n    - Plex:\n        href: https://app.plex.tv/desktop\n        icon: plex.png\n        description: Media Server\n        widget:\n            type: plex\n            url: http://192.168.1.38:32400\n            key: {{HOMEPAGE_VAR_PLEX_KEY}}\n    - Audiobookshelf:\n        icon: audiobookshelf.png\n        href: https://abs.tehmatt.com\n        description: Audiobook Server\n        widget:\n            type: audiobookshelf\n            url: https://abs.tehmatt.com\n            key: {{HOMEPAGE_VAR_AUDIOBOOKSHELF_KEY}}\n    - Kavita:\n        icon: kavita.png\n        href: https://kavita.tehmatt.com\n        description: Comic Server\n        widget:\n            type: kavita\n            url: https://kavita.tehmatt.com\n            #key: 9804e636-f42e-4d38-9bbb-66b7def5ae39\n            username: matt\n            password: {{HOMEPAGE_VAR_COMMON_PASSWORD}}\n    - Calibre-Web:\n        icon: calibre.png\n        href: http://192.168.1.37:8083\n        description: eBook Server\n        widget:\n            type: calibreweb\n            url: http://192.168.1.37:8083\n            username: admin\n            password: {{HOMEPAGE_VAR_CALIBRE_PASSWORD}}\n- Networking:\n    - pfSense:\n        description: Firewall \u0026 Router\n        href: https://192.168.1.1\n        siteMonitor: https://192.168.1.1\n        icon: pfsense.png\n        widget:\n            type: pfsense\n            url: https://192.168.1.1\n            fields: [ \"load\", \"memory\", \"wanStatus\", \"disk\" ]\n            username: admin\n            headers:\n              X-API-Key: {{HOMEPAGE_VAR_PFSENSE_API_KEY}}\n            wan: igc0\n            version: 2        \n    - Traefik: \n        icon: traefik.png\n        href: https://traefik.tehmatt.com\n        widget:\n            type: traefik\n            url: https://traefik.tehmatt.com\n            username: matt\n            password: {{HOMEPAGE_VAR_COMMON_PASSWORD}}\n- Kubernetes Management:\n    - ArgoCD:\n        icon: argocd\n        href: https://argocd.tehmatt.com\n        description: GitOps CD\n        widget:\n            type: argocd\n            url: https://argocd.tehmatt.com\n            key: \"{{HOMEPAGE_VAR_ARGOCD_TOKEN}}\"\n- AI Services:\n    - Ollama:\n        icon: sh-ollama-light.png\n        description: A.I Backend\n        widget:\n          type: customapi\n          url: http://192.168.1.37:11434/api/ps\n          method: GET\n          mappings:\n            - field: models[0].name\n              label: \"Running Model\"\n              format: text\n            - field: models[0].size\n              label: \"Model Size\"\n              format: bytes\n            - field: models[0].size_vram\n              label: \"VRAM Used\"\n              format: bytes\n    - Open WebUI:\n        icon: open-webui-light.png\n        href: http://192.168.1.37:3008\n        description: A.I Frontend\n        widget:\n          type: customapi\n          url: http://192.168.1.37:3008/api/models\n          headers:\n            Authorization: \"Bearer {{HOMEPAGE_VAR_OPENWEBUI_TOKEN}}\"\n          mappings:\n            - field: data\n              label: Total Models\n              format: size\n- Home Automation:\n    - Home Assistant:\n        icon: home-assistant.png\n        href: http://192.168.1.37:8123\n        widget:\n            type: homeassistant\n            url: http://192.168.1.37:8123\n            key: {{HOMEPAGE_VAR_HOMEASSISTANT_KEY}}\n    - Homebridge:\n        icon: homebridge.png\n        href: http://192.168.1.37:8581\n        widget:\n            type: homebridge\n            url: http://192.168.1.37:8581\n            username: matt\n            password: {{HOMEPAGE_VAR_COMMON_PASSWORD}}\n- Uptime:\n    - Uptime Kuma:\n        href: http://192.168.1.37:3001\n        description: External Service Monitoring\n        icon: uptime-kuma.png\n        widget:\n            type: uptimekuma\n            url: http://192.168.1.37:3001\n            slug: public\n    - Uptime Kuma:\n        href: http://192.168.1.37:3001\n        description: Internal Service Monitoring\n        icon: uptime-kuma.png\n        widget:\n            type: uptimekuma\n            url: http://192.168.1.37:3001\n            slug: private\n            \n","settings.yaml":"title: Matt Strong's Homepage\n\nproviders:\n  openweathermap: openweathermapapikey\n  weatherapi: weatherapiapikey\n\nuseEqualHeights: true\n\nlayout:\n  Desktops:\n    header: true\n    style: row\n    columns: 2\n  MiniPCs:\n    header: true\n    style: row\n    columns: 3\n  Storage:\n    header: true\n    style: row\n    columns: 3\n  Networking:\n    header: true\n    style: row\n    columns: 2\n  Kubernetes Management:\n    header: true\n    style: row\n    columns: 1\n  AI Services:\n    header: true\n    style: row\n    columns: 2\n  Home Automation:\n    header: true\n    style: row\n    columns: 2\n  Media:\n    header: true\n    style: row\n    columns: 4\n  Media Management:\n    header: true\n    style: row\n    columns: 4\n  Containers:\n    header: true\n    style: row\n    columns: 3\n  Downloads:\n    header: true\n    style: row\n    columns: 2\n  Uptime:\n    header: true\n    style: row\n    columns: 2\n","widgets.yaml":"- kubernetes:\n    cluster:\n      show: true\n      cpu: true\n      memory: true\n      showLabel: true\n      label: \"cluster\"\n    nodes:\n      show: true\n      cpu: true\n      memory: true\n      showLabel: true\n"},"kind":"ConfigMap","metadata":{"annotations":{},"labels":{"app":"homepage"},"name":"homepage","namespace":"homepage"}}
+  
+  labels:
+    app: homepage
+  name: homepage
+  namespace: homepage
+  
+  
+

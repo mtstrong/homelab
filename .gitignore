@@ -8,3 +8,9 @@
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+# Homepage secrets
+kubernetes/homepage/create-secrets.sh
+kubernetes/homepage/secrets.yaml
+**/homepage/*secret*.yaml
+!**/homepage/*secret*-template.yaml
+kubernetes/homepage/sanitize-config.py
