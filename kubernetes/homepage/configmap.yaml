@@ -31,7 +31,7 @@ data:
     \           password:  {{HOMEPAGE_VAR_PROXMOX_PASSWORD}}\n            node:
     um773c\n- Storage:\n    - Synology:\n        href: http://192.168.1.70\n        icon:
     synology.png\n        description: NAS\n        widget:\n            type: diskstation\n
-    \           url: http://192.168.1.70:5000\n            username: remote_stats\n
+    \           url: http://192.168.1.70:5000\n            username: {{HOMEPAGE_VAR_SYNOLOGY_USERNAME}}\n
     \           password: {{HOMEPAGE_VAR_SYNOLOGY_PASSWORD}}\n    - TrueNAS:\n        icon: truenas.png\n        href:
     http://192.168.1.38\n        description: NAS\n        widget:\n            type:
     truenas\n            url: http://192.168.1.38\n            key: {{HOMEPAGE_VAR_TRUENAS_KEY}}\n
