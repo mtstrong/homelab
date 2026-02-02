@@ -1,0 +1,22 @@
+# Example terraform.tfvars file
+# Copy this to terraform.tfvars and customize
+
+# REQUIRED: Change these to globally unique values
+storage_account_name = "stuptkma123"           # Must be globally unique (3-24 lowercase alphanumeric)
+dns_name_label       = "myhomelabmonitor"      # Must be globally unique in Azure region
+
+# OPTIONAL: Customize these
+resource_group_name = "rg-uptimekuma-monitoring"
+location            = "eastus"                  # eastus is typically cheapest
+
+# Cost optimization (current settings = ~$1-2/month)
+cpu_cores     = "0.5"   # Minimum 0.5
+memory_in_gb  = "1.0"   # Minimum 1.0GB
+
+# Tags
+tags = {
+  Environment = "Production"
+  Project     = "Homelab-Monitoring"
+  ManagedBy   = "OpenTofu"
+  Owner       = "Matt"
+}
