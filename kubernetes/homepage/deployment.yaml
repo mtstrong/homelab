@@ -44,6 +44,9 @@ spec:
               value: 'homepage.tehmatt.com'
             - name: NODE_TLS_REJECT_UNAUTHORIZED
               value: '0'
+          envFrom:
+            - secretRef:
+                name: homepage-secrets
           volumeMounts:
             - mountPath: /app/config/custom.js
               name: homepage-config
