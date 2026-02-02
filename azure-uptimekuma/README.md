@@ -25,18 +25,25 @@ Deploy Uptime Kuma to Azure Container Instances using OpenTofu for monitoring yo
 
 ### 1. Set Up State Backend (Recommended)
 
-First, configure Azure Storage to store your OpenTofu state:
+First, create Azure Storage to store your OpenTofu state:
 
 ```bash
-./setup-backend.sh
+cd bootstrap
+cp terraform.tfvars.example terraform.tfvars
+# Edit terraform.tfvars with a unique storage_account_name
+tofu init
+tofu apply
+cd ..
 ```
 
-This will:
-- Create a resource group for state storage
-- Create a storage account (globally unique name)
-- Create a blob container for state files
-- Generate `backend-config.tfvars` with connection details
+This creates:
+- Resource group for state storage
+- Storage account (globally unique name)
+- Blob container for state files
+- Auto-generates `backend-config.tfvars`
 - Cost: ~$0.02/month
+
+See [bootstrap/README.md](bootstrap/README.md) for details.
 
 ### 2. Configure Variables
 
