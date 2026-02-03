@@ -20,6 +20,8 @@ spec:
       labels:
         app: homepage
     spec:
+      nodeSelector:
+        worker: "true"
       serviceAccountName: homepage
       automountServiceAccountToken: true
       dnsPolicy: ClusterFirst

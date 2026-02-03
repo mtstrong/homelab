@@ -54,3 +54,17 @@ variable "tags" {
     ManagedBy   = "OpenTofu"
   }
 }
+
+variable "dockerhub_username" {
+  description = "Docker Hub username (optional, helps avoid rate limiting)"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "dockerhub_password" {
+  description = "Docker Hub password or access token (optional)"
+  type        = string
+  default     = ""
+  sensitive   = true
+}

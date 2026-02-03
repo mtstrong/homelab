@@ -11,6 +11,9 @@ terraform {
 
 provider "azurerm" {
   features {}
+  
+  # Skip automatic resource provider registration
+  skip_provider_registration = true
 }
 
 # Resource Group
@@ -47,6 +50,16 @@ resource "azurerm_container_group" "uptimekuma" {
   ip_address_type     = "Public"
   dns_name_label      = var.dns_name_label
   os_type             = "Linux"
+  
+  # Docker Hub authentication (optional, helps avoid rate limiting)
+  dynamic "image_registry_credential" {
+    for_each = var.dockerhub_username != "" ? [1] : []
+    content {
+      server   = "index.docker.io"
+      username = var.dockerhub_username
+      password = var.dockerhub_password
+    }
+  }
   
   container {
     name   = "uptimekuma"

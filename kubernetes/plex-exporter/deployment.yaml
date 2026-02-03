@@ -19,6 +19,8 @@ spec:
         prometheus.io/port: "9000"
         prometheus.io/path: "/metrics"
     spec:
+      nodeSelector:
+        worker: "true"
       containers:
       - name: plex-exporter
         image: ghcr.io/timothystewart6/prometheus-plex-exporter:latest
