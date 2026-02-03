@@ -341,17 +341,63 @@ jobs:
         run: |
           echo "📊 Azure Uptime Kuma Cost Report"
           echo "================================"
+          echo ""
           
-          # Get resource group costs for current month
+          # Get resource details for cost estimation
+          echo "🔍 Resource Inventory:"
+          echo ""
+          
+          # Container instance details
+          CONTAINER_INFO=$(az container show \
+            --resource-group rg-uptimekuma-monitoring \
+            --name uptimekuma \
+            --query "{CPU:containers[0].resources.requests.cpu, Memory:containers[0].resources.requests.memoryInGb, Region:location}" \
+            -o json 2>/dev/null || echo "{}")
+          
+          if [ "$CONTAINER_INFO" != "{}" ]; then
+            echo "Container Instance:"
+            echo "$CONTAINER_INFO" | jq -r '"  CPU: \(.CPU) cores, Memory: \(.Memory) GB, Region: \(.Region)"'
+          fi
+          
+          # Storage account details
+          STORAGE_INFO=$(az storage account list \
+            --resource-group rg-uptimekuma-monitoring \
+            --query "[0].{Name:name, Tier:sku.tier, Replication:sku.name}" \
+            -o json 2>/dev/null || echo "{}")
+          
+          if [ "$STORAGE_INFO" != "{}" ]; then
+            echo "Storage Account:"
+            echo "$STORAGE_INFO" | jq -r '"  Name: \(.Name), Tier: \(.Tier), Replication: \(.Replication)"'
+          fi
+          
+          echo ""
+          echo "💰 Cost Estimation (East US):"
+          echo "  • Container Instance (1 vCPU, 1.5GB): ~\$36/month"
+          echo "  • Storage Account (Standard LRS): ~\$0.20-2/month"
+          echo "  • Data Transfer (first 100GB free): ~\$0/month"
+          echo "  • Estimated Total: ~\$36-38/month"
+          echo ""
+          
+          # Try to get actual costs
+          echo "📈 Actual Usage (last 30 days):"
           COSTS=$(az consumption usage list \
-            --start-date $(date -u -d "$(date +%Y-%m-01)" +%Y-%m-%d) \
-            --end-date $(date -u +%Y-%m-%d) \
-            --query "[?contains(instanceId, 'rg-uptimekuma-monitoring')].{Resource:instanceName, Cost:pretaxCost, Currency:currency}" \
-            --output table 2>/dev/null || echo "Cost data not available")
+            --start-date $(date -u -d "30 days ago" +%Y-%m-%d) \
+            --end-date $(date -u +%Y-%m-%d) 2>/dev/null | \
+            jq -r '[.[] | select(.instanceId | contains("rg-uptimekuma-monitoring"))] | 
+                   if length > 0 then 
+                     group_by(.instanceName) | 
+                     map({resource: .[0].instanceName, cost: (map(.pretaxCost) | add)}) | 
+                     .[] | "  • \(.resource): $\(.cost)" 
+                   else 
+                     "  ⏳ Cost data not yet available (24-48 hour delay)" 
+                   end' 2>/dev/null || echo "  ⏳ Cost data not yet available (24-48 hour delay)")
           
           echo "$COSTS"
           echo ""
-          echo "💡 To set up budget alerts, configure Azure Budget in the Portal"
+          echo "💡 Tips:"
+          echo "  • Cost data typically available after 24-48 hours"
+          echo "  • Set up Azure Budget alerts: https://portal.azure.com/#blade/Microsoft_Azure_GTM/ModernBillingMenuBlade/BillingAccounts"
+          echo "  • Monitor at: Azure Portal → Cost Management + Billing"
 
   summary:
     name: Monitoring Summary
