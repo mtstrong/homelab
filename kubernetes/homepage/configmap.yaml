@@ -95,9 +95,9 @@ data:
     \       href: http://192.168.1.37:8581\n        widget:\n            type: homebridge\n
     \           url: http://192.168.1.37:8581\n            username: matt\n            password:
     {{HOMEPAGE_VAR_COMMON_PASSWORD}}\n- Uptime:\n    - Uptime Kuma:\n        href:
-    http://192.168.1.37:3001\n        description: External Service Monitoring\n        icon:
+    http://mthomelabmonitor.eastus.azurecontainer.io:3001\n        description: External Service Monitoring\n        icon:
     uptime-kuma.png\n        widget:\n            type: uptimekuma\n            url:
-    http://192.168.1.37:3001\n            slug: public\n    - Uptime Kuma:\n        href:
+    http://mthomelabmonitor.eastus.azurecontainer.io:3001\n            slug: public\n    - Uptime Kuma:\n        href:
     http://192.168.1.37:3001\n        description: Internal Service Monitoring\n        icon:
     uptime-kuma.png\n        widget:\n            type: uptimekuma\n            url:
     http://192.168.1.37:3001\n            slug: private\n            \n"
