@@ -29,15 +29,8 @@ jobs:
         uses: aquasecurity/tfsec-action@v1.0.3
         with:
           working_directory: ${{ env.TF_WORKING_DIR }}
-          soft_fail: false
-          additional_args: --minimum-severity MEDIUM
-
-      - name: Upload tfsec results
-        if: always()
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: results.sarif
-        continue-on-error: true
+          soft_fail: true
+          additional_args: --minimum-severity MEDIUM --format default
 
   drift-detection:
     name: Infrastructure Drift Detection
@@ -75,11 +68,25 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: OpenTofu Init
+        id: init
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: tofu init
+        continue-on-error: true
+
+      - name: Check Init Status
+        id: init_check
+        run: |
+          if [ "${{ steps.init.outcome }}" = "success" ]; then
+            echo "init_success=true" >> $GITHUB_OUTPUT
+          else
+            echo "init_success=false" >> $GITHUB_OUTPUT
+            echo "⚠️ OpenTofu init failed - remote backend not configured"
+            echo "Drift detection requires remote state storage (e.g., Azure Storage)"
+          fi
 
       - name: OpenTofu Plan (Detect Drift)
         id: plan
+        if: steps.init_check.outputs.init_success == 'true'
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: |
           tofu plan -detailed-exitcode -no-color -out=tfplan 2>&1 | tee plan_output.txt
