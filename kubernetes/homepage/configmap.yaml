@@ -62,9 +62,9 @@ data:
     \       description: Comic Server\n        widget:\n            type: kavita\n
     \           url: https://kavita.tehmatt.com\n            #key: 9804e636-f42e-4d38-9bbb-66b7def5ae39\n
     \           username: matt\n            password: {{HOMEPAGE_VAR_COMMON_PASSWORD}}\n
-    \   - Calibre-Web:\n        icon: calibre.png\n        href: http://192.168.1.37:8083\n
+    \   - Calibre-Web:\n        icon: calibre.png\n        href: https://calibre.tehmatt.com\n
     \       description: eBook Server\n        widget:\n            type: calibreweb\n
-    \           url: http://192.168.1.37:8083\n            username: admin\n            password:
+    \           url: https://calibre.tehmatt.com\n            username: admin\n            password:
     {{HOMEPAGE_VAR_CALIBRE_PASSWORD}}\n- Networking:\n    - pfSense:\n        description:
     Firewall & Router\n        href: https://192.168.1.1\n        siteMonitor: https://192.168.1.1\n
     \       icon: pfsense.png\n        widget:\n            type: pfsense\n            url:
