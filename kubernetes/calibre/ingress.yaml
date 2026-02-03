@@ -1,0 +1,19 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: calibre-web
+  namespace: calibre
+spec:
+  entryPoints:
+  - websecure
+  routes:
+  - match: Host(`calibre.tehmatt.com`)
+    kind: Rule
+    services:
+    - name: calibre-web
+      port: 8083
+    middlewares:
+    - name: default-headers
+      namespace: calibre
+  tls: {}

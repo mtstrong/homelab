@@ -1,0 +1,71 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: calibre-web
+  namespace: calibre
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: calibre-web
+  template:
+    metadata:
+      labels:
+        app: calibre-web
+    spec:
+      nodeSelector:
+        worker: "true"
+      containers:
+      - name: calibre-web
+        image: lscr.io/linuxserver/calibre-web:0.6.24
+        env:
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        - name: TZ
+          value: "America/Chicago"
+        - name: DOCKER_MODS
+          value: "linuxserver/mods:universal-calibre"
+        - name: OAUTHLIB_RELAX_TOKEN_SCOPE
+          value: "1"
+        ports:
+        - containerPort: 8083
+          name: http
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8083
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 6
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8083
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 6
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+        volumeMounts:
+        - mountPath: /config
+          name: config
+        - mountPath: /books
+          name: books
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: calibre-config
+      - name: books
+        nfs:
+          server: 192.168.1.38
+          path: /mnt/TrueNAS/books
