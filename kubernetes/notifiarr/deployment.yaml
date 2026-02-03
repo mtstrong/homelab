@@ -13,6 +13,8 @@ spec:
       labels:
         app: notifiarr
     spec:
+      nodeSelector:
+        worker: "true"
       containers:
       - name: notifiarr
         image: golift/notifiarr:0.8.3

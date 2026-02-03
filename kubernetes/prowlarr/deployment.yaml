@@ -15,6 +15,8 @@ spec:
       labels:
         app: prowlarr
     spec:
+      nodeSelector:
+        worker: "true"
       containers:
       - name: prowlarr
         image: lscr.io/linuxserver/prowlarr:2.0.4-nightly

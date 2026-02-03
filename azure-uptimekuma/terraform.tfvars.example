@@ -20,3 +20,8 @@ tags = {
   ManagedBy   = "OpenTofu"
   Owner       = "Matt"
 }
+
+# Docker Hub credentials (optional - helps avoid rate limiting)
+# Create a free account at https://hub.docker.com and get an access token
+# dockerhub_username = "your-dockerhub-username"
+# dockerhub_password = "your-dockerhub-token-or-password"

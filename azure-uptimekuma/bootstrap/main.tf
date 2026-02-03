@@ -14,6 +14,9 @@ terraform {
 
 provider "azurerm" {
   features {}
+  
+  # Skip automatic resource provider registration
+  skip_provider_registration = true
 }
 
 # Resource Group for OpenTofu state storage
