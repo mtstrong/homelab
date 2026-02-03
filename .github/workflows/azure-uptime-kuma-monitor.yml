@@ -161,14 +161,6 @@ jobs:
       id-token: write
     
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup OpenTofu
-        uses: opentofu/setup-opentofu@v1
-        with:
-          tofu_version: 1.8.8
-
       - name: Check Azure Secrets
         id: check_secrets
         run: |
@@ -187,30 +179,38 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: OpenTofu Init
-        working-directory: ${{ env.TF_WORKING_DIR }}
-        run: tofu init
-
-      - name: Get Infrastructure Outputs
-        id: outputs
-        working-directory: ${{ env.TF_WORKING_DIR }}
+      - name: Get Infrastructure Details from Azure
+        id: azure_info
+        if: steps.check_secrets.outputs.secrets_available == 'true'
         run: |
-          URL=$(tofu output -raw uptimekuma_url || echo "")
-          FQDN=$(tofu output -raw uptimekuma_fqdn || echo "")
-          echo "url=$URL" >> $GITHUB_OUTPUT
-          echo "fqdn=$FQDN" >> $GITHUB_OUTPUT
+          # Get container FQDN
+          FQDN=$(az container show \
+            --resource-group rg-uptimekuma-monitoring \
+            --name uptimekuma \
+            --query "ipAddress.fqdn" -o tsv 2>/dev/null || echo "")
+          
+          if [ -n "$FQDN" ]; then
+            URL="http://${FQDN}:3001"
+            echo "url=$URL" >> $GITHUB_OUTPUT
+            echo "fqdn=$FQDN" >> $GITHUB_OUTPUT
+            echo "Found infrastructure: $URL"
+          else
+            echo "url=" >> $GITHUB_OUTPUT
+            echo "fqdn=" >> $GITHUB_OUTPUT
+            echo "⚠️ Container not found in Azure"
+          fi
 
       - name: Test - Container Accessibility
-        if: steps.outputs.outputs.url != ''
+        if: steps.check_secrets.outputs.secrets_available == 'true' && steps.azure_info.outputs.url != ''
         run: |
-          echo "Testing: ${{ steps.outputs.outputs.url }}"
+          echo "Testing: ${{ steps.azure_info.outputs.url }}"
           
           MAX_RETRIES=5
           RETRY_DELAY=10
           
           for i in $(seq 1 $MAX_RETRIES); do
             echo "Attempt $i/$MAX_RETRIES..."
-            if curl -f -s -o /dev/null -w "%{http_code}" "${{ steps.outputs.outputs.url }}" | grep -q "200\|301\|302"; then
+            if curl -s -o /dev/null -w "%{http_code}" "${{ steps.azure_info.outputs.url }}" | grep -q "200\|301\|302"; then
               echo "✅ Container is accessible"
               exit 0
             fi
@@ -224,12 +224,12 @@ jobs:
           exit 1
 
       - name: Test - DNS Resolution
-        if: steps.outputs.outputs.fqdn != ''
+        if: steps.check_secrets.outputs.secrets_available == 'true' && steps.azure_info.outputs.fqdn != ''
         run: |
-          echo "Testing DNS for: ${{ steps.outputs.outputs.fqdn }}"
-          if nslookup "${{ steps.outputs.outputs.fqdn }}" > /dev/null 2>&1; then
+          echo "Testing DNS for: ${{ steps.azure_info.outputs.fqdn }}"
+          if nslookup "${{ steps.azure_info.outputs.fqdn }}" > /dev/null 2>&1; then
             echo "✅ DNS resolution successful"
-            IP=$(nslookup "${{ steps.outputs.outputs.fqdn }}" | grep -A1 "Name:" | tail -n1 | awk '{print $2}')
+            IP=$(nslookup "${{ steps.azure_info.outputs.fqdn }}" | grep -A1 "Name:" | tail -n1 | awk '{print $2}')
             echo "Resolved IP: $IP"
           else
             echo "❌ DNS resolution failed"
@@ -237,10 +237,10 @@ jobs:
           fi
 
       - name: Test - HTTP Response Time
-        if: steps.outputs.outputs.url != ''
+        if: steps.check_secrets.outputs.secrets_available == 'true' && steps.azure_info.outputs.url != ''
         run: |
-          echo "Testing response time for: ${{ steps.outputs.outputs.url }}"
-          RESPONSE_TIME=$(curl -o /dev/null -s -w '%{time_total}' "${{ steps.outputs.outputs.url }}" || echo "0")
+          echo "Testing response time for: ${{ steps.azure_info.outputs.url }}"
+          RESPONSE_TIME=$(curl -o /dev/null -s -w '%{time_total}' "${{ steps.azure_info.outputs.url }}" || echo "0")
           echo "Response time: ${RESPONSE_TIME}s"
           
           # Alert if response time > 3 seconds
