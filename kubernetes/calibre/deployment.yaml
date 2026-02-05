@@ -30,6 +30,14 @@ spec:
           value: "linuxserver/mods:universal-calibre"
         - name: OAUTHLIB_RELAX_TOKEN_SCOPE
           value: "1"
+        - name: SESSION_COOKIE_SAMESITE
+          value: "Lax"
+        - name: SESSION_COOKIE_SECURE
+          value: "True"
+        - name: REMEMBER_COOKIE_SAMESITE
+          value: "Lax"
+        - name: REMEMBER_COOKIE_SECURE
+          value: "True"
         ports:
         - containerPort: 8083
           name: http
