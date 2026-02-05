@@ -63,11 +63,7 @@ data:
     \           url: https://kavita.tehmatt.com\n            #key: 9804e636-f42e-4d38-9bbb-66b7def5ae39\n
     \           username: matt\n            password: {{HOMEPAGE_VAR_COMMON_PASSWORD}}\n
     \   - Calibre-Web:\n        icon: calibre.png\n        href: https://calibre.tehmatt.com\n
-    \       description: eBook Server\n        widget:\n            type: customapi\n
-    \           url: http://calibre-web.calibre.svc.cluster.local:8083/stats\n
-    \           headers:\n                X-Remote-User: admin\n            mappings:\n
-    \               - field: books\n                  label: Books\n                  format:
-    number\n- Networking:\n    - pfSense:\n        description:
+    \       description: eBook Server\n- Networking:\n    - pfSense:\n        description:
     Firewall & Router\n        href: https://192.168.1.1\n        siteMonitor: https://192.168.1.1\n
     \       icon: pfsense.png\n        widget:\n            type: pfsense\n            url:
     https://192.168.1.1\n            fields: [ \"load\", \"memory\", \"wanStatus\",
