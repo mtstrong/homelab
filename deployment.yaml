@@ -1,63 +1,77 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: notifiarr
-  namespace: notifiarr
+  name: prometheus
+  namespace: prometheus
+  labels:
+    app: prometheus
 spec:
+  strategy:
+    type: Recreate
   replicas: 1
   selector:
     matchLabels:
-      app: notifiarr
+      app: prometheus
   template:
     metadata:
       labels:
-        app: notifiarr
+        app: prometheus
     spec:
       nodeSelector:
         worker: "true"
+      securityContext:
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
+        fsGroupChangePolicy: OnRootMismatch
+      serviceAccountName: prometheus
+      automountServiceAccountToken: true
       containers:
-      - name: notifiarr
-        image: golift/notifiarr:0.9.2
+      - name: prometheus
+        image: prom/prometheus:v3.9.1
+        imagePullPolicy: IfNotPresent
+        args:
+        - --config.file=/etc/prometheus/prometheus.yml
+        - --storage.tsdb.path=/prometheus
+        - --web.enable-lifecycle
         ports:
-        - containerPort: 5454
-          name: http
-        volumeMounts:
-        - name: config
-          mountPath: /config
-        - name: machine-id
-          mountPath: /etc/machine-id
-          readOnly: true
-        - name: utmp
-          mountPath: /var/run/utmp
-          readOnly: true
-        resources:
-          requests:
-            memory: "128Mi"
-            cpu: "50m"
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 5454
-          initialDelaySeconds: 30
-          periodSeconds: 10
+        - name: http
+          containerPort: 9090
         readinessProbe:
           httpGet:
-            path: /
-            port: 5454
+            path: /-/ready
+            port: 9090
           initialDelaySeconds: 10
-          periodSeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 2
+          failureThreshold: 6
+        livenessProbe:
+          httpGet:
+            path: /-/healthy
+            port: 9090
+          initialDelaySeconds: 30
+          periodSeconds: 20
+          timeoutSeconds: 2
+          failureThreshold: 6
+        resources:
+          requests:
+            cpu: 250m
+            memory: 512Mi
+          limits:
+            cpu: 1000m
+            memory: 2Gi
+        volumeMounts:
+        - name: config
+          mountPath: /etc/prometheus
+        - name: data
+          mountPath: /prometheus
       volumes:
       - name: config
+        configMap:
+          name: prometheus-config
+          items:
+          - key: prometheus.yml
+            path: prometheus.yml
+      - name: data
         persistentVolumeClaim:
-          claimName: notifiarr-config
-      - name: machine-id
-        hostPath:
-          path: /etc/machine-id
-          type: File
-      - name: utmp
-        hostPath:
-          path: /var/run/utmp
-          type: File
+          claimName: prometheus-pvc
