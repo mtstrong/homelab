@@ -1,94 +1,63 @@
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: grafana-pvc
-  namespace: grafana
-spec:
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  labels:
-    app: grafana
-  name: grafana
-  namespace: grafana
+  name: kavita
+  namespace: kavita
 spec:
+  replicas: 1
   selector:
     matchLabels:
-      app: grafana
+      app: kavita
   template:
     metadata:
       labels:
-        app: grafana
+        app: kavita
     spec:
       nodeSelector:
         worker: "true"
-      securityContext:
-        fsGroup: 472
-        supplementalGroups:
-        - 0
       containers:
-      - name: grafana
-        image: grafana/grafana:12.4.0-19877932531
-        imagePullPolicy: IfNotPresent
+      - name: kavita
+        image: jvmilazz0/kavita:0.8.9
+        env:
+        - name: TZ
+          value: "America/Chicago"
         ports:
-        - containerPort: 3000
-          name: http-grafana
-          protocol: TCP
+        - containerPort: 5000
+          name: http
         readinessProbe:
-          failureThreshold: 3
           httpGet:
-            path: /robots.txt
-            port: 3000
-            scheme: HTTP
-          initialDelaySeconds: 10
-          periodSeconds: 30
-          successThreshold: 1
-          timeoutSeconds: 2
-        livenessProbe:
-          failureThreshold: 3
+            path: /
+            port: 5000
           initialDelaySeconds: 30
           periodSeconds: 10
-          successThreshold: 1
-          tcpSocket:
-            port: 3000
-          timeoutSeconds: 1
+          timeoutSeconds: 5
+          failureThreshold: 6
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 5000
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 6
         resources:
           requests:
-            cpu: 250m
-            memory: 750Mi
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 1000m
+            memory: 1Gi
         volumeMounts:
-        - mountPath: /var/lib/grafana
-          name: grafana-pv
-        - mountPath: /etc/grafana/provisioning/datasources
-          name: datasources
-        - mountPath: /etc/grafana/provisioning/dashboards
-          name: dashboard-provider
-        - mountPath: /var/lib/grafana/dashboards/plex-enhanced.json
-          name: dashboard-plex-enhanced
-          subPath: plex-enhanced.json
-        - mountPath: /var/lib/grafana/dashboards/technotim-plex.json
-          name: dashboard-technotim-plex
-          subPath: technotim-plex.json
+        - mountPath: /kavita/config
+          name: config
+        - mountPath: /comics
+          name: comics
       volumes:
-      - name: grafana-pv
+      - name: config
         persistentVolumeClaim:
-          claimName: grafana-pvc
-      - name: datasources
-        configMap:
-          name: grafana-datasources
-      - name: dashboard-provider
-        configMap:
-          name: grafana-dashboard-provider
-      - name: dashboard-plex-enhanced
-        configMap:
-          name: plex-dashboard-enhanced
-      - name: dashboard-technotim-plex
-        configMap:
-          name: dashboard-technotim-plex
+          claimName: kavita
+      - name: comics
+        nfs:
+          server: 192.168.1.38
+          path: /mnt/TrueNAS/comics
