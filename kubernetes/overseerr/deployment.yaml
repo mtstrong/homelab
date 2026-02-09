@@ -37,5 +37,6 @@ spec:
           mountPath: /config
       volumes:
       - name: overseerr
-        persistentVolumeClaim:
-          claimName: overseerr
+        nfs:
+          server: 192.168.1.38
+          path: /mnt/TrueNAS/proxmox/config/overseerr
