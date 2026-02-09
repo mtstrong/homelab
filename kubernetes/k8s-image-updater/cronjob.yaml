@@ -1,0 +1,66 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: k8s-image-updater
+  namespace: image-updater
+spec:
+  # Run every Monday at 9:00 AM UTC
+  schedule: "0 9 * * 1"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: k8s-image-updater
+        spec:
+          serviceAccountName: k8s-image-updater
+          restartPolicy: OnFailure
+          initContainers:
+          - name: clone-repo
+            image: alpine/git:latest
+            command:
+            - /bin/sh
+            - -c
+            - |
+              git clone https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_OWNER}/${GITHUB_REPO}.git /workspace
+            env:
+            - name: GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: github-token
+                  key: token
+            - name: GITHUB_OWNER
+              value: "mtstrong"
+            - name: GITHUB_REPO
+              value: "homelab"
+            volumeMounts:
+            - name: workspace
+              mountPath: /workspace
+          containers:
+          - name: updater
+            image: ghcr.io/mtstrong/k8s-image-updater:latest
+            imagePullPolicy: Always
+            env:
+            - name: GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: github-token
+                  key: token
+            - name: GITHUB_OWNER
+              value: "mtstrong"
+            - name: GITHUB_REPO
+              value: "homelab"
+            volumeMounts:
+            - name: config
+              mountPath: /config
+            - name: workspace
+              mountPath: /workspace
+          volumes:
+          - name: workspace
+            emptyDir: {}
+          - name: config
+            configMap:
+              name: image-updater-config
