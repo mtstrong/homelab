@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: image-updater-config
+  namespace: image-updater
+data:
+  config.yaml: |
+    github:
+      owner: "mtstrong"
+      repo: "homelab"
+      base_branch: "main"
+      branch_prefix: "image-updates"
+    
+    kubernetes:
+      namespaces: []
+      manifest_paths:
+        - "/workspace/kubernetes/"
+      deployment_patterns:
+        - "**/deployment.yaml"
+        - "**/*-deployment.yaml"
+    
+    registries:
+      dockerhub:
+        enabled: true
+        api_url: "https://registry.hub.docker.com/v2"
+      lscr:
+        enabled: true
+        api_url: "https://lscr.io/v2"
+      ghcr:
+        enabled: true
+        api_url: "https://ghcr.io/v2"
+    
+    update_policy:
+      allow_major: false
+      allow_minor: true
+      allow_patch: true
+      ignore_images:
+        - ".*:latest"
+        - ".*:dev"
+    
+    ai:
+      enabled: false
+      model: "gpt-4o-mini"
+    
+    reporting:
+      detailed_changelog: true
+      max_updates_per_pr: 0
