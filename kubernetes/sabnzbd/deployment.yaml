@@ -65,8 +65,9 @@ spec:
           mountPath: /downloads
       volumes:
       - name: config
-        persistentVolumeClaim:
-          claimName: sabnzbd
+        nfs:
+          server: 192.168.1.38
+          path: /mnt/TrueNAS/proxmox/config/sabnzbd
       - name: downloads
         nfs:
           server: 192.168.1.38

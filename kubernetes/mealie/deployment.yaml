@@ -60,5 +60,6 @@ spec:
           periodSeconds: 5
       volumes:
       - name: data
-        persistentVolumeClaim:
-          claimName: mealie-data
+        nfs:
+          server: 192.168.1.38
+          path: /mnt/TrueNAS/proxmox/config/mealie
