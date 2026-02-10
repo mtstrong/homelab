@@ -4,8 +4,6 @@ kind: IngressRoute
 metadata:
   name: prometheus
   namespace: prometheus
-  annotations:
-    kubernetes.io/ingress.class: traefik-external
 spec:
   entryPoints:
   - websecure
@@ -18,6 +16,4 @@ spec:
       passHostHeader: false
     middlewares:
     - name: default-headers
-      namespace: prometheus
-  tls:
-    secretName: tehmatt-tls
+  tls: {}
