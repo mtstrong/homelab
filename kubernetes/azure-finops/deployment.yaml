@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: azure-finops-exporter
+  namespace: azure-finops
+  labels:
+    app: azure-finops-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: azure-finops-exporter
+  template:
+    metadata:
+      labels:
+        app: azure-finops-exporter
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      nodeSelector:
+        worker: "true"
+      containers:
+        - name: exporter
+          image: ghcr.io/mtstrong/azure-finops-exporter:latest
+          ports:
+            - containerPort: 8080
+              name: http-metrics
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: azure-finops-config
+            - secretRef:
+                name: azure-finops-credentials
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
