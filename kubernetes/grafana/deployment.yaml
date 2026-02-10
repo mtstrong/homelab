@@ -76,6 +76,9 @@ spec:
         - mountPath: /var/lib/grafana/dashboards/technotim-plex.json
           name: dashboard-technotim-plex
           subPath: technotim-plex.json
+        - mountPath: /var/lib/grafana/dashboards/azure-finops.json
+          name: dashboard-finops
+          subPath: azure-finops.json
       volumes:
       - name: grafana-pv
         persistentVolumeClaim:
@@ -92,3 +95,6 @@ spec:
       - name: dashboard-technotim-plex
         configMap:
           name: dashboard-technotim-plex
+      - name: dashboard-finops
+        configMap:
+          name: grafana-dashboard-finops
