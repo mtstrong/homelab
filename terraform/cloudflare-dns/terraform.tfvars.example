@@ -1,0 +1,20 @@
+# Cloudflare credentials
+cloudflare_api_token = "your-cloudflare-api-token"
+
+# Zone
+zone_id = "92658e3b20f15a19ca4aabe7244e6c4f"
+
+# Your public IP (WAN IP that port-forwards to Traefik)
+public_ip = "73.36.175.114"
+
+# --------------------------------------------------------------------------
+# TXT records (ACME challenges are typically managed by cert-manager,
+# but you can pin them here if needed)
+# --------------------------------------------------------------------------
+# txt_records = [
+#   {
+#     name  = "_acme-challenge"
+#     value = "your-acme-challenge-token"
+#     ttl   = 120
+#   },
+# ]
