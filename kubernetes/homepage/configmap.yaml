@@ -98,7 +98,7 @@ data:
     http://mthomelabmonitor.eastus.azurecontainer.io:3001\n            slug: public\n    - Uptime Kuma:\n        href:
     http://192.168.1.37:3001\n        description: Internal Service Monitoring\n        icon:
     uptime-kuma.png\n        widget:\n            type: uptimekuma\n            url:
-    http://192.168.1.37:3001\n            slug: private\n            \n"
+    http://192.168.1.37:3001\n            slug: private\n- Monitoring:\n    - Grafana:\n        icon: grafana.png\n        href: https://grafana.tehmatt.com\n        description: Dashboards & Visualization\n        widget:\n            type: grafana\n            url: http://grafana.grafana.svc.cluster.local:3000\n            username: admin\n            password: {{HOMEPAGE_VAR_GRAFANA_PASSWORD}}\n    - Prometheus:\n        icon: prometheus.png\n        href: https://prometheus.tehmatt.com\n        description: Metrics Collection\n        widget:\n            type: prometheus\n            url: http://prometheus.prometheus.svc.cluster.local:9090\n    - Tautulli:\n        icon: tautulli.png\n        href: https://tautulli.tehmatt.com\n        description: Plex Monitoring\n        widget:\n            type: tautulli\n            url: http://tautulli.tautulli.svc.cluster.local:8181\n            key: {{HOMEPAGE_VAR_TAUTULLI_KEY}}\n    - Loki:\n        icon: loki\n        href: https://loki.tehmatt.com\n        description: Log Aggregation\n        siteMonitor: http://loki.loki-stack.svc.cluster.local:3100/ready\n"
   settings.yaml: |
     title: Matt Strong's Homepage
 
@@ -157,6 +157,10 @@ data:
         header: true
         style: row
         columns: 2
+      Monitoring:
+        header: true
+        style: row
+        columns: 4
   widgets.yaml: |
     - kubernetes:
         cluster:

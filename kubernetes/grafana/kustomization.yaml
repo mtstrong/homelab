@@ -8,6 +8,8 @@ resources:
   - datasources.yaml
   - deployment.yaml
   - service.yaml
+  - ingress.yaml
+  - default-headers.yaml
   - dashboard-provider.yaml
   - dashboard-plex-enhanced.yaml
   - dashboard-technotim-plex.yaml
