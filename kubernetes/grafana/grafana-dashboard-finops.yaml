@@ -1,0 +1,451 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-finops
+  namespace: grafana
+  labels:
+    grafana_dashboard: "1"
+data:
+  azure-finops.json: |
+    {
+      "annotations": { "list": [] },
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 1,
+      "id": null,
+      "links": [],
+      "panels": [
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+          "id": 100,
+          "title": "💰 Budget Overview",
+          "type": "row"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "#EAB839", "value": 30 },
+                  { "color": "red", "value": 45 }
+                ]
+              },
+              "unit": "currencyUSD",
+              "decimals": 2
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 5, "w": 5, "x": 0, "y": 1 },
+          "id": 1,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "textMode": "auto"
+          },
+          "title": "Month-to-Date Cost",
+          "type": "stat",
+          "targets": [
+            {
+              "expr": "azure_cost_mtd_usd",
+              "legendFormat": "MTD Cost",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "fixedColor": "blue", "mode": "fixed" },
+              "unit": "currencyUSD",
+              "decimals": 2
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 5, "w": 4, "x": 5, "y": 1 },
+          "id": 2,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "textMode": "auto"
+          },
+          "title": "Monthly Budget",
+          "type": "stat",
+          "targets": [
+            {
+              "expr": "azure_cost_monthly_budget_usd",
+              "legendFormat": "Budget",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "#EAB839", "value": 30 },
+                  { "color": "orange", "value": 40 },
+                  { "color": "red", "value": 50 }
+                ]
+              },
+              "unit": "currencyUSD",
+              "decimals": 2
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 5, "w": 5, "x": 9, "y": 1 },
+          "id": 3,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "textMode": "auto"
+          },
+          "title": "Projected Monthly Cost",
+          "type": "stat",
+          "targets": [
+            {
+              "expr": "azure_cost_projected_monthly_usd",
+              "legendFormat": "Projected",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "max": 1.5,
+              "min": 0,
+              "thresholds": {
+                "mode": "percentage",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "#EAB839", "value": 60 },
+                  { "color": "orange", "value": 80 },
+                  { "color": "red", "value": 100 }
+                ]
+              },
+              "unit": "percentunit",
+              "decimals": 1
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 5, "w": 5, "x": 14, "y": 1 },
+          "id": 4,
+          "options": {
+            "minVizHeight": 75,
+            "minVizWidth": 75,
+            "orientation": "auto",
+            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true,
+            "sizing": "auto"
+          },
+          "title": "Budget Utilisation",
+          "type": "gauge",
+          "targets": [
+            {
+              "expr": "azure_cost_budget_utilisation_ratio",
+              "legendFormat": "Utilisation",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "red", "value": 1 }
+                ]
+              },
+              "unit": "short",
+              "noValue": "0"
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 5, "w": 5, "x": 19, "y": 1 },
+          "id": 5,
+          "options": {
+            "colorMode": "background",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "textMode": "auto"
+          },
+          "title": "Collection Errors",
+          "type": "stat",
+          "targets": [
+            {
+              "expr": "azure_finops_collection_errors_total",
+              "legendFormat": "Errors",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 6 },
+          "id": 101,
+          "title": "📈 Cost Trends",
+          "type": "row"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisLabel": "Cost (USD)",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "bars",
+                "fillOpacity": 80,
+                "gradientMode": "hue",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "showPoints": "auto",
+                "stacking": { "group": "A", "mode": "normal" }
+              },
+              "unit": "currencyUSD",
+              "decimals": 2
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 9, "w": 16, "x": 0, "y": 7 },
+          "id": 6,
+          "options": {
+            "legend": { "calcs": ["sum", "mean"], "displayMode": "table", "placement": "bottom" },
+            "tooltip": { "mode": "multi", "sort": "desc" }
+          },
+          "title": "Daily Cost by Service",
+          "type": "timeseries",
+          "targets": [
+            {
+              "expr": "azure_cost_daily_usd",
+              "legendFormat": "{{date}}",
+              "refId": "A",
+              "instant": true
+            }
+          ]
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "unit": "currencyUSD",
+              "decimals": 2
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 9, "w": 8, "x": 16, "y": 7 },
+          "id": 7,
+          "options": {
+            "legend": { "displayMode": "table", "placement": "bottom", "values": ["value"] },
+            "pieType": "donut",
+            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "tooltip": { "mode": "single", "sort": "none" }
+          },
+          "title": "Cost by Service (MTD)",
+          "type": "piechart",
+          "targets": [
+            {
+              "expr": "azure_cost_by_service_usd",
+              "legendFormat": "{{service_name}}",
+              "refId": "A",
+              "instant": true
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 16 },
+          "id": 102,
+          "title": "🔍 Resource Breakdown",
+          "type": "row"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "custom": {
+                "align": "auto",
+                "cellOptions": { "type": "auto" },
+                "inspect": false
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "yellow", "value": 5 },
+                  { "color": "orange", "value": 15 },
+                  { "color": "red", "value": 30 }
+                ]
+              },
+              "unit": "currencyUSD",
+              "decimals": 2
+            },
+            "overrides": [
+              {
+                "matcher": { "id": "byName", "options": "resource_name" },
+                "properties": [{ "id": "custom.width", "value": 250 }]
+              },
+              {
+                "matcher": { "id": "byName", "options": "resource_type" },
+                "properties": [{ "id": "custom.width", "value": 200 }]
+              },
+              {
+                "matcher": { "id": "byName", "options": "resource_group" },
+                "properties": [{ "id": "custom.width", "value": 250 }]
+              }
+            ]
+          },
+          "gridPos": { "h": 8, "w": 24, "x": 0, "y": 17 },
+          "id": 8,
+          "options": {
+            "cellHeight": "sm",
+            "footer": { "countRows": false, "enablePagination": true, "fields": "", "reducer": ["sum"], "show": true },
+            "showHeader": true,
+            "sortBy": [{ "desc": true, "displayName": "Value" }]
+          },
+          "title": "Cost by Resource (MTD)",
+          "type": "table",
+          "targets": [
+            {
+              "expr": "azure_cost_by_resource_usd",
+              "format": "table",
+              "instant": true,
+              "refId": "A"
+            }
+          ],
+          "transformations": [
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": { "Time": true, "__name__": true, "instance": true, "job": true },
+                "renameByName": {
+                  "Value": "Cost (USD)",
+                  "resource_name": "Resource",
+                  "resource_group": "Resource Group",
+                  "resource_type": "Type"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 25 },
+          "id": 103,
+          "title": "⚙️ Exporter Health",
+          "type": "row"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "fixedColor": "text", "mode": "fixed" },
+              "unit": "dateTimeFromNow"
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 4, "w": 6, "x": 0, "y": 26 },
+          "id": 9,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "textMode": "auto"
+          },
+          "title": "Last Data Collection",
+          "type": "stat",
+          "targets": [
+            {
+              "expr": "azure_finops_last_update_timestamp * 1000",
+              "legendFormat": "Last Update",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "red", "value": 0.5 }
+                ]
+              },
+              "unit": "percentunit",
+              "decimals": 1,
+              "min": 0,
+              "max": 1
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 4, "w": 6, "x": 6, "y": 26 },
+          "id": 10,
+          "options": {
+            "colorMode": "background",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "textMode": "auto"
+          },
+          "title": "Exporter Up",
+          "type": "stat",
+          "targets": [
+            {
+              "expr": "up{job=\"kubernetes-pods\", container=\"exporter\", namespace=\"azure-finops\"}",
+              "legendFormat": "Up",
+              "refId": "A"
+            }
+          ]
+        }
+      ],
+      "refresh": "5m",
+      "schemaVersion": 39,
+      "tags": ["finops", "azure", "cost", "budget"],
+      "templating": { "list": [] },
+      "time": { "from": "now-30d", "to": "now" },
+      "timepicker": {},
+      "timezone": "browser",
+      "title": "Azure FinOps — Cost & Budget Dashboard",
+      "uid": "azure-finops-dashboard",
+      "version": 1
+    }

@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: azure-finops-config
+  namespace: azure-finops
+data:
+  # Cost management
+  MONTHLY_BUDGET_USD: "50.00"
+  COLLECTION_INTERVAL_SECONDS: "3600"
+  COST_HISTORY_DAYS: "30"
+  RESOURCE_GROUP_FILTER: ""
+
+  # Budget alert threshold (0.0–1.0)
+  BUDGET_ALERT_THRESHOLD: "0.8"
+
+  # Uptime Kuma push monitor URL (leave empty to disable alerting)
+  # Create a Push type monitor in Uptime Kuma and paste the URL here
+  UPTIME_KUMA_PUSH_URL: ""
+
+  # Metrics server port
+  METRICS_PORT: "8080"

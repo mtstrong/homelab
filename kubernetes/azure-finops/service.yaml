@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: azure-finops-exporter
+  namespace: azure-finops
+  labels:
+    app: azure-finops-exporter
+spec:
+  type: ClusterIP
+  selector:
+    app: azure-finops-exporter
+  ports:
+    - name: http-metrics
+      port: 8080
+      targetPort: 8080
+      protocol: TCP

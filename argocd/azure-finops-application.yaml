@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: azure-finops
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/mtstrong/homelab.git
+    targetRevision: main
+    path: kubernetes/azure-finops
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: azure-finops
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+  ignoreDifferences:
+    - group: ""
+      kind: Secret
+      name: azure-finops-credentials
+      namespace: azure-finops
