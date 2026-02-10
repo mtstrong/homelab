@@ -12,7 +12,42 @@ Manages all `tehmatt.com` DNS records in Cloudflare via Terraform.
 
 > \* TXT records for ACME challenges are created/destroyed dynamically by cert-manager and are **not** managed here to avoid conflicts.
 
-## Quick Start
+## State Backend
+
+State is stored remotely in **Azure Blob Storage** with the `azurerm` backend:
+
+| Setting | Value |
+|---------|-------|
+| Resource Group | `rg-tofu-state` |
+| Storage Account | `stmthomelabstate` |
+| Container | `tfstate` |
+| State Key | `cloudflare-dns.tfstate` |
+
+Authentication uses **OIDC (federated credentials)** via the `sp-homelab-terraform` service principal — no client secrets needed.
+
+## CI/CD & Drift Detection
+
+A GitHub Actions workflow ([terraform-cloudflare-dns.yml](../../.github/workflows/terraform-cloudflare-dns.yml)) provides:
+
+| Trigger | Action |
+|---------|--------|
+| **Pull Request** | `terraform plan` + comment on PR |
+| **Push to main** | `terraform plan` → `terraform apply` (if changes) |
+| **Daily (06:00 UTC)** | `terraform plan` → alert if drift detected |
+| **Manual** | `workflow_dispatch` for on-demand runs |
+
+### GitHub Secrets Required
+
+| Secret | Description |
+|--------|-------------|
+| `ARM_CLIENT_ID` | Azure SP app ID (`sp-homelab-terraform`) |
+| `ARM_TENANT_ID` | Azure AD tenant ID |
+| `ARM_SUBSCRIPTION_ID` | Azure subscription ID |
+| `CLOUDFLARE_API_TOKEN` | Cloudflare API token (Zone:DNS:Edit) |
+| `CLOUDFLARE_ZONE_ID` | Cloudflare zone ID for tehmatt.com |
+| `PUBLIC_IP` | Your WAN IP for A records |
+
+## Quick Start (Local)
 
 ```bash
 cd terraform/cloudflare-dns
@@ -21,10 +56,12 @@ cd terraform/cloudflare-dns
 cp terraform.tfvars.example terraform.tfvars
 # Edit terraform.tfvars — set your API token and public IP
 
-# 2. Initialize Terraform
+# 2. Initialize Terraform (connects to Azure backend)
+#    Requires: az login (or ARM_* env vars)
+export ARM_USE_OIDC=false  # use az login locally
 terraform init
 
-# 3. Import existing records into state
+# 3. Import existing records into state (one-time only)
 bash import.sh
 
 # 4. Verify — should show no changes
@@ -61,7 +98,7 @@ Update `public_ip` in `terraform.tfvars` and run `terraform apply`. All A record
 
 | File | Purpose |
 |------|---------|
-| `versions.tf` | Provider version constraints |
+| `versions.tf` | Provider + Azure backend configuration |
 | `main.tf` | Provider config, DNS record resources |
 | `variables.tf` | Input variable definitions with record maps |
 | `outputs.tf` | Useful outputs (record FQDNs, counts) |
@@ -73,4 +110,6 @@ Update `public_ip` in `terraform.tfvars` and run `terraform apply`. All A record
 
 - `terraform.tfvars` is gitignored — **never commit API tokens**
 - The Cloudflare API token needs only `Zone:DNS:Edit` permission for the `tehmatt.com` zone
-- State file contains record IDs (not secrets), but is still gitignored as best practice
+- State is stored in Azure Blob Storage (encrypted at rest, versioned)
+- GitHub Actions uses OIDC — no long-lived credentials stored in GitHub
+- SP `sp-homelab-terraform` has only `Storage Blob Data Contributor` on the state storage account

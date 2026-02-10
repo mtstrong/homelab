@@ -1,0 +1,168 @@
+name: "Terraform — Cloudflare DNS"
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "terraform/cloudflare-dns/**"
+      - ".github/workflows/terraform-cloudflare-dns.yml"
+  pull_request:
+    paths:
+      - "terraform/cloudflare-dns/**"
+      - ".github/workflows/terraform-cloudflare-dns.yml"
+  schedule:
+    # Drift detection — runs daily at 06:00 UTC
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  id-token: write   # OIDC token for Azure login
+  contents: read
+  pull-requests: write  # Comment plan output on PRs
+
+env:
+  TF_DIR: terraform/cloudflare-dns
+  ARM_USE_OIDC: true
+  ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+  ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+  ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+
+jobs:
+  # -----------------------------------------------------------
+  # Plan — runs on PRs, pushes, schedule, and manual triggers
+  # -----------------------------------------------------------
+  plan:
+    name: Terraform Plan
+    runs-on: ubuntu-latest
+    outputs:
+      has_changes: ${{ steps.plan.outputs.has_changes }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Azure Login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.ARM_CLIENT_ID }}
+          tenant-id: ${{ secrets.ARM_TENANT_ID }}
+          subscription-id: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~> 1.9"
+
+      - name: Terraform Init
+        working-directory: ${{ env.TF_DIR }}
+        run: terraform init -input=false
+
+      - name: Terraform Validate
+        working-directory: ${{ env.TF_DIR }}
+        run: terraform validate
+
+      - name: Terraform Plan
+        id: plan
+        working-directory: ${{ env.TF_DIR }}
+        env:
+          TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          TF_VAR_zone_id: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+          TF_VAR_public_ip: ${{ secrets.PUBLIC_IP }}
+        run: |
+          set +e
+          terraform plan -detailed-exitcode -no-color -out=tfplan 2>&1 | tee plan_output.txt
+          EXIT_CODE=$?
+          set -e
+
+          # Exit codes: 0 = no changes, 1 = error, 2 = changes present
+          if [ "$EXIT_CODE" -eq 2 ]; then
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+            echo "::warning::Terraform detected drift — changes are pending"
+          elif [ "$EXIT_CODE" -eq 0 ]; then
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            echo "No changes detected — infrastructure in sync"
+          else
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            echo "::error::Terraform plan failed"
+            exit 1
+          fi
+
+      # Comment plan output on PRs
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const plan = fs.readFileSync('${{ env.TF_DIR }}/plan_output.txt', 'utf8');
+            const truncated = plan.length > 60000
+              ? plan.substring(0, 60000) + '\n\n--- output truncated ---'
+              : plan;
+
+            const body = `### Terraform Plan — Cloudflare DNS
+            \`\`\`
+            ${truncated}
+            \`\`\`
+            *Pushed by @${context.actor}*`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+  # -----------------------------------------------------------
+  # Apply — only on push to main (after PR merge)
+  # -----------------------------------------------------------
+  apply:
+    name: Terraform Apply
+    needs: plan
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push' && needs.plan.outputs.has_changes == 'true'
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Azure Login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.ARM_CLIENT_ID }}
+          tenant-id: ${{ secrets.ARM_TENANT_ID }}
+          subscription-id: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~> 1.9"
+
+      - name: Terraform Init
+        working-directory: ${{ env.TF_DIR }}
+        run: terraform init -input=false
+
+      - name: Terraform Apply
+        working-directory: ${{ env.TF_DIR }}
+        env:
+          TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          TF_VAR_zone_id: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+          TF_VAR_public_ip: ${{ secrets.PUBLIC_IP }}
+        run: terraform apply -auto-approve -input=false
+
+  # -----------------------------------------------------------
+  # Drift Alert — notify on scheduled runs if drift detected
+  # -----------------------------------------------------------
+  drift-alert:
+    name: Drift Alert
+    needs: plan
+    if: github.event_name == 'schedule' && needs.plan.outputs.has_changes == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Alert drift detected
+        run: |
+          echo "::warning::DRIFT DETECTED — Cloudflare DNS records have been modified outside of Terraform."
+          echo "Run 'terraform plan' locally in terraform/cloudflare-dns/ to see details."
+          echo "Then 'terraform apply' to reconcile, or update variables.tf to match desired state."
+          exit 1  # Fail the workflow so it shows as red in GitHub
