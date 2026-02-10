@@ -71,8 +71,9 @@ spec:
           name: books
       volumes:
       - name: config
-        persistentVolumeClaim:
-          claimName: calibre-config
+        nfs:
+          server: 192.168.1.38
+          path: /mnt/TrueNAS/proxmox/config/calibre
       - name: books
         nfs:
           server: 192.168.1.38
