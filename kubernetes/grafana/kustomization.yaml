@@ -13,3 +13,4 @@ resources:
   - dashboard-provider.yaml
   - dashboard-plex-enhanced.yaml
   - dashboard-technotim-plex.yaml
+  - grafana-dashboard-finops.yaml
