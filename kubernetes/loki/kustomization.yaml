@@ -9,3 +9,8 @@ resources:
   - deployment.yaml
   - service.yaml
   - pvc.yaml
+  - ingress.yaml
+  - default-headers.yaml
+  - promtail-rbac.yaml
+  - promtail-configmap.yaml
+  - promtail-daemonset.yaml

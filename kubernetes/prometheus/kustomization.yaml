@@ -10,3 +10,5 @@ resources:
   - deployment.yaml
   - service.yaml
   - pvc.yaml
+  - ingress.yaml
+  - default-headers.yaml
