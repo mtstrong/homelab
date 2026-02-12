@@ -70,7 +70,7 @@ data:
     \"disk\" ]\n            username: admin\n            headers:\n              X-API-Key:
     {{HOMEPAGE_VAR_PFSENSE_API_KEY}}\n            wan: igc0\n            version:
     2        \n    - Traefik: \n        icon: traefik.png\n        href: https://traefik.tehmatt.com\n
-    \       widget:\n            type: traefik\n            url: http://traefik.traefik.svc.cluster.local:80\n
+    \       widget:\n            type: traefik\n            url: https://traefik.tehmatt.com\n
     \           username: matt\n            password: {{HOMEPAGE_VAR_COMMON_PASSWORD}}\n-
     Kubernetes Management:\n    - ArgoCD:\n        icon: argocd.png\n        href: https://argocd.tehmatt.com\n
     \       description: GitOps CD\n        widget:\n            type: argocd\n            url:
