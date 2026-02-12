@@ -72,7 +72,7 @@ data:
     2        \n    - Traefik: \n        icon: traefik.png\n        href: https://traefik.tehmatt.com\n
     \       widget:\n            type: traefik\n            url: http://traefik.traefik.svc.cluster.local:80\n
     \           username: matt\n            password: {{HOMEPAGE_VAR_COMMON_PASSWORD}}\n-
-    Kubernetes Management:\n    - ArgoCD:\n        icon: argocd\n        href: https://argocd.tehmatt.com\n
+    Kubernetes Management:\n    - ArgoCD:\n        icon: argocd.png\n        href: https://argocd.tehmatt.com\n
     \       description: GitOps CD\n        widget:\n            type: argocd\n            url:
     http://argocd-server.argocd.svc.cluster.local:80\n            key: \"{{HOMEPAGE_VAR_ARGOCD_TOKEN}}\"\n-
     AI Services:\n    - Ollama:\n        icon: sh-ollama-light.png\n        description:
