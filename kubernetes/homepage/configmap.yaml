@@ -41,15 +41,15 @@ data:
     \           password:  {{HOMEPAGE_VAR_PROXMOX_BACKUP_PASSWORD}}\n            datastore:
     backup-local\n- Media Management:\n    - Sonarr:\n        icon: sonarr.png\n        href:
     https://sonarr.tehmatt.com\n        description: TV Show Management\n        widget:\n
-    \           type: sonarr\n            url: https://sonarr.tehmatt.com\n            key:
+    \           type: sonarr\n            url: http://sonarr.sonarr.svc.cluster.local:8989\n            key:
     {{HOMEPAGE_VAR_SONARR_KEY}}\n    - Radarr:\n        icon: radarr.png\n        href:
     https://radarr.tehmatt.com\n        description: Movie Management\n        widget:\n
-    \           type: radarr\n            url: https://radarr.tehmatt.com\n            key:
+    \           type: radarr\n            url: http://radarr.radarr.svc.cluster.local:7878\n            key:
     {{HOMEPAGE_VAR_RADARR_KEY}}\n    - Readarr:\n        icon: readarr.png\n        href:
     http://192.168.2.127:8787\n        description: Book Management\n        widget:\n
-    \           type: readarr\n            url: http://192.168.2.127:8787\n            key:
+    \           type: readarr\n            url: http://readarr.readarr.svc.cluster.local:8787\n            key:
     {{HOMEPAGE_VAR_READARR_KEY}}\n    - Prowlarr:\n        icon: prowlarr.png\n        href:
-    http://prowlarr.prowlarr.svc.cluster.local:9696\n        description: Indexer
+    http://192.168.2.122:9696\n        description: Indexer
     Manager\n        widget:\n            type: prowlarr\n            url: http://prowlarr.prowlarr.svc.cluster.local:9696\n
     \           key: {{HOMEPAGE_VAR_PROWLARR_KEY}}\n- Media:\n    - Plex:\n        href:
     https://app.plex.tv/desktop\n        icon: plex.png\n        description: Media
@@ -57,10 +57,10 @@ data:
     \           key: {{HOMEPAGE_VAR_PLEX_KEY}}\n    - Audiobookshelf:\n        icon:
     audiobookshelf.png\n        href: https://abs.tehmatt.com\n        description:
     Audiobook Server\n        widget:\n            type: audiobookshelf\n            url:
-    https://abs.tehmatt.com\n            key: {{HOMEPAGE_VAR_AUDIOBOOKSHELF_KEY}}\n
+    http://audiobookshelf.audiobookshelf.svc.cluster.local:80\n            key: {{HOMEPAGE_VAR_AUDIOBOOKSHELF_KEY}}\n
     \   - Kavita:\n        icon: kavita.png\n        href: https://kavita.tehmatt.com\n
     \       description: Comic Server\n        widget:\n            type: kavita\n
-    \           url: https://kavita.tehmatt.com\n            #key: 9804e636-f42e-4d38-9bbb-66b7def5ae39\n
+    \           url: http://kavita.kavita.svc.cluster.local:5000\n            #key: 9804e636-f42e-4d38-9bbb-66b7def5ae39\n
     \           username: matt\n            password: {{HOMEPAGE_VAR_COMMON_PASSWORD}}\n
     \   - Calibre-Web:\n        icon: calibre.png\n        href: https://calibre.tehmatt.com\n
     \       description: eBook Server\n- Networking:\n    - pfSense:\n        description:
@@ -70,11 +70,11 @@ data:
     \"disk\" ]\n            username: admin\n            headers:\n              X-API-Key:
     {{HOMEPAGE_VAR_PFSENSE_API_KEY}}\n            wan: igc0\n            version:
     2        \n    - Traefik: \n        icon: traefik.png\n        href: https://traefik.tehmatt.com\n
-    \       widget:\n            type: traefik\n            url: https://traefik.tehmatt.com\n
+    \       widget:\n            type: traefik\n            url: http://traefik.traefik.svc.cluster.local:80\n
     \           username: matt\n            password: {{HOMEPAGE_VAR_COMMON_PASSWORD}}\n-
     Kubernetes Management:\n    - ArgoCD:\n        icon: argocd\n        href: https://argocd.tehmatt.com\n
     \       description: GitOps CD\n        widget:\n            type: argocd\n            url:
-    https://argocd.tehmatt.com\n            key: \"{{HOMEPAGE_VAR_ARGOCD_TOKEN}}\"\n-
+    http://argocd-server.argocd.svc.cluster.local:80\n            key: \"{{HOMEPAGE_VAR_ARGOCD_TOKEN}}\"\n-
     AI Services:\n    - Ollama:\n        icon: sh-ollama-light.png\n        description:
     A.I Backend\n        widget:\n          type: customapi\n          url: http://192.168.1.37:11434/api/ps\n
     \         method: GET\n          mappings:\n            - field: models[0].name\n
@@ -83,15 +83,15 @@ data:
     bytes\n            - field: models[0].size_vram\n              label: \"VRAM Used\"\n
     \             format: bytes\n    - Open WebUI:\n        icon: open-webui-light.png\n
     \       href: http://192.168.1.37:3008\n        description: A.I Frontend\n        widget:\n
-    \         type: customapi\n          url: http://192.168.1.37:3008/api/models\n
+    \         type: customapi\n          url: http://ollama.ollama.svc.cluster.local:3008/api/models\n
     \         headers:\n            Authorization: \"Bearer {{HOMEPAGE_VAR_OPENWEBUI_TOKEN}}\"\n
     \         mappings:\n            - field: data\n              label: Total Models\n
     \             format: size\n- Home Automation:\n    - Home Assistant:\n        icon:
-    home-assistant.png\n        href: http://192.168.1.37:8123\n        widget:\n
-    \           type: homeassistant\n            url: http://192.168.1.37:8123\n            key:
+    home-assistant.png\n        href: http://192.168.2.132:8123\n        widget:\n
+    \           type: homeassistant\n            url: http://homeassistant.homeassistant.svc.cluster.local:8123\n            key:
     {{HOMEPAGE_VAR_HOMEASSISTANT_KEY}}\n    - Homebridge:\n        icon: homebridge.png\n
-    \       href: http://192.168.1.37:8581\n        widget:\n            type: homebridge\n
-    \           url: http://192.168.1.37:8581\n            username: matt\n            password:
+    \       href: http://192.168.2.130:8581\n        widget:\n            type: homebridge\n
+    \           url: http://homebridge.homebridge.svc.cluster.local:8581\n            username: matt\n            password:
     {{HOMEPAGE_VAR_COMMON_PASSWORD}}\n- Uptime:\n    - Uptime Kuma:\n        href:
     http://mthomelabmonitor.eastus.azurecontainer.io:3001\n        description: External Service Monitoring\n        icon:
     uptime-kuma.png\n        widget:\n            type: uptimekuma\n            url:
