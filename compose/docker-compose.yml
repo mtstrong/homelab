@@ -124,7 +124,7 @@ services:
     restart: unless-stopped
 
   calibre:
-    image: ghcr.io/linuxserver/calibre:8.8.0
+    image: ghcr.io/linuxserver/calibre:8.16.2
     container_name: calibre
     environment:
       - PUID=1000
