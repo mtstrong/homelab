@@ -6,7 +6,16 @@ data:
             - abbr: GH
               href: https://github.com/mtstrong/
   custom.css: ""
-  custom.js: ""
+  custom.js: |
+    // Append a visitor counter badge to the bottom-right corner
+    const counter = document.createElement('img');
+    counter.src = 'https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fhomepage.tehmatt.com&count_bg=%2379C83D&title_bg=%23555555&title=visits&edge_flat=false';
+    counter.alt = 'visitor count';
+    counter.style.position = 'fixed';
+    counter.style.bottom = '10px';
+    counter.style.right = '10px';
+    counter.style.zIndex = '9999';
+    document.body.appendChild(counter);
   docker.yaml: ""
   kubernetes.yaml: |
     mode: cluster
