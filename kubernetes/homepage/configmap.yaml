@@ -17,7 +17,7 @@ data:
       counter.style.right = '10px';
       counter.style.zIndex = '9999';
       document.body.appendChild(counter);
-    });
+      // No custom JavaScript currently in use.
   docker.yaml: ""
   kubernetes.yaml: |
     mode: cluster
