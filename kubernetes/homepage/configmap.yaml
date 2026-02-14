@@ -10,7 +10,7 @@ data:
     // Append a visitor counter badge to the bottom-right corner
     window.addEventListener('load', function() {
       var counter = document.createElement('img');
-      counter.src = 'https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fhomepage.tehmatt.com&count_bg=%2379C83D&title_bg=%23555555&title=visits&edge_flat=false';
+      counter.src = 'https://visitor-badge.laobi.icu/badge?page_id=tehmatt.homepage';
       counter.alt = 'visitor count';
       counter.style.position = 'fixed';
       counter.style.bottom = '10px';
