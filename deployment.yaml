@@ -1,63 +1,63 @@
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: kavita
-  namespace: kavita
+  name: notifiarr
+  namespace: notifiarr
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: kavita
+      app: notifiarr
   template:
     metadata:
       labels:
-        app: kavita
+        app: notifiarr
     spec:
       nodeSelector:
         worker: "true"
       containers:
-      - name: kavita
-        image: jvmilazz0/kavita:0.8.9
-        env:
-        - name: TZ
-          value: "America/Chicago"
+      - name: notifiarr
+        image: golift/notifiarr:0.9.2
         ports:
-        - containerPort: 5000
+        - containerPort: 5454
           name: http
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 5000
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 6
+        volumeMounts:
+        - name: config
+          mountPath: /config
+        - name: machine-id
+          mountPath: /etc/machine-id
+          readOnly: true
+        - name: utmp
+          mountPath: /var/run/utmp
+          readOnly: true
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "50m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
         livenessProbe:
           httpGet:
             path: /
-            port: 5000
-          initialDelaySeconds: 60
-          periodSeconds: 30
-          timeoutSeconds: 5
-          failureThreshold: 6
-        resources:
-          requests:
-            cpu: 100m
-            memory: 256Mi
-          limits:
-            cpu: 1000m
-            memory: 1Gi
-        volumeMounts:
-        - mountPath: /kavita/config
-          name: config
-        - mountPath: /comics
-          name: comics
+            port: 5454
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 5454
+          initialDelaySeconds: 10
+          periodSeconds: 5
       volumes:
       - name: config
         persistentVolumeClaim:
-          claimName: kavita
-      - name: comics
-        nfs:
-          server: 192.168.1.38
-          path: /mnt/TrueNAS/comics
+          claimName: notifiarr-config
+      - name: machine-id
+        hostPath:
+          path: /etc/machine-id
+          type: File
+      - name: utmp
+        hostPath:
+          path: /var/run/utmp
+          type: File
