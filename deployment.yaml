@@ -1,80 +1,79 @@
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: calibre-web
-  namespace: calibre
+  name: loki
+  namespace: loki-stack
+  labels:
+    app: loki
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: calibre-web
+      app: loki
   template:
     metadata:
       labels:
-        app: calibre-web
+        app: loki
     spec:
       nodeSelector:
         worker: "true"
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: NotIn
+                values:
+                - k3s-06
+      securityContext:
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        fsGroupChangePolicy: OnRootMismatch
       containers:
-      - name: calibre-web
-        image: lscr.io/linuxserver/calibre-web:0.6.26-ls369
-        env:
-        - name: PUID
-          value: "1000"
-        - name: PGID
-          value: "1000"
-        - name: TZ
-          value: "America/Chicago"
-        - name: DOCKER_MODS
-          value: "linuxserver/mods:universal-calibre"
-        - name: OAUTHLIB_RELAX_TOKEN_SCOPE
-          value: "1"
-        - name: SESSION_COOKIE_SAMESITE
-          value: "Lax"
-        - name: SESSION_COOKIE_SECURE
-          value: "True"
-        - name: REMEMBER_COOKIE_SAMESITE
-          value: "Lax"
-        - name: REMEMBER_COOKIE_SECURE
-          value: "True"
-        ports:
-        - containerPort: 8083
-          name: http
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 8083
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 6
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 8083
-          initialDelaySeconds: 60
-          periodSeconds: 30
-          timeoutSeconds: 5
-          failureThreshold: 6
+      - name: loki
+        image: grafana/loki:3.6.6-amd64
+        args:
+        - -config.file=/etc/loki/config.yaml
+        - -config.expand-env=true
         resources:
           requests:
             cpu: 100m
             memory: 256Mi
           limits:
-            cpu: 1000m
+            cpu: 500m
             memory: 1Gi
+        ports:
+        - name: http-metrics
+          containerPort: 3100
+        - name: grpc
+          containerPort: 9095
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 3100
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 2
+          failureThreshold: 6
+        livenessProbe:
+          httpGet:
+            path: /ready
+            port: 3100
+          initialDelaySeconds: 30
+          periodSeconds: 20
+          timeoutSeconds: 2
+          failureThreshold: 6
         volumeMounts:
-        - mountPath: /config
-          name: config
-        - mountPath: /books
-          name: books
+        - name: config
+          mountPath: /etc/loki
+        - name: loki-data
+          mountPath: /loki
       volumes:
       - name: config
-        nfs:
-          server: 192.168.1.38
-          path: /mnt/TrueNAS/proxmox/config/calibre
-      - name: books
-        nfs:
-          server: 192.168.1.38
-          path: /mnt/TrueNAS/books
+        configMap:
+          name: loki-config
+      - name: loki-data
+        persistentVolumeClaim:
+          claimName: loki-data-pvc
