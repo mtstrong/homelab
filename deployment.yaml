@@ -1,42 +1,62 @@
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: overseerr
-  namespace: overseerr
+  name: prowlarr
+  namespace: prowlarr
   labels:
-    app: overseerr
-    app.kubernetes.io/instance: overseerr
+    app: prowlarr
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: overseerr
+      app: prowlarr
   template:
     metadata:
       labels:
-        app: overseerr
+        app: prowlarr
     spec:
       nodeSelector:
         worker: "true"
       containers:
-      - name: overseerr
-        image: linuxserver/overseerr:v1.35.0-ls158
+      - name: prowlarr
+        image: lscr.io/linuxserver/prowlarr:2.3.3-nightly
         env:
-        - name: TZ
-          value: America/Chicago
         - name: PUID
           value: "1000"
         - name: PGID
           value: "1000"
+        - name: TZ
+          value: "America/Chicago"
         ports:
-        - containerPort: 5055
-          protocol: TCP
+        - containerPort: 9696
+          name: http
         volumeMounts:
-        - name: overseerr
+        - name: config
           mountPath: /config
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /ping
+            port: 9696
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /ping
+            port: 9696
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
       volumes:
-      - name: overseerr
-        nfs:
-          server: 192.168.1.38
-          path: /mnt/TrueNAS/proxmox/config/overseerr
+      - name: config
+        persistentVolumeClaim:
+          claimName: prowlarr-config
