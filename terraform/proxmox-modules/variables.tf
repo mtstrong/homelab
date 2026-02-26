@@ -2,7 +2,7 @@
 variable "proxmox_api_url" {
   description = "Proxmox API URL"
   type        = string
-  default     = "https://192.168.1.100:8006/api2/json"
+  default     = "https://bd790i.local:8006/api2/json"
 }
 
 variable "proxmox_token_id" {
@@ -27,7 +27,7 @@ variable "proxmox_tls_insecure" {
 variable "clone_template" {
   description = "Template VM name to clone from"
   type        = string
-  default     = "ubuntu-22.04-cloud"
+  default     = "ubuntu-cloud"
 }
 
 variable "target_node" {
