@@ -40,7 +40,7 @@ variable "target_node" {
 variable "cloud_init_user" {
   description = "Cloud-init user"
   type        = string
-  default     = "ubuntu"
+  default     = "homelab"
 }
 
 variable "cloud_init_password" {
@@ -50,58 +50,91 @@ variable "cloud_init_password" {
 }
 
 ## Network Configuration
-variable "bridge_vlan0" {
-  description = "Bridge interface for VLAN0"
+variable "bridge_name" {
+  description = "Network bridge name"
   type        = string
   default     = "vmbr0"
 }
 
-## K3S Web Node Configuration
-variable "create_web_vms" {
-  description = "Create K3S web/control plane nodes"
+variable "vlan_tag" {
+  description = "VLAN tag for k3s network"
+  type        = number
+  default     = 2
+}
+
+## Control VM Configuration
+variable "create_control_vm" {
+  description = "Create control/master node"
   type        = bool
   default     = false
 }
 
-variable "web_vm_id" {
-  description = "VM ID for web node"
-  type        = number
-  default     = 200
-}
-
-variable "web_cores" {
-  description = "Web node CPU cores"
-  type        = number
-  default     = 4
-}
-
-variable "web_memory" {
-  description = "Web node memory in MB"
-  type        = number
-  default     = 4096
-}
-
-variable "web_disk_size" {
-  description = "Web node disk size"
+variable "control_vm_name" {
+  description = "Control VM name"
   type        = string
-  default     = "50G"
+  default     = "k3s-control"
 }
 
-variable "web_ipconfig" {
-  description = "Web node IP configuration"
+variable "control_vmid" {
+  description = "Control VM ID (100-199 range)"
+  type        = number
+  default     = 100
+}
+
+variable "control_cores" {
+  description = "Control node CPU cores"
+  type        = number
+  default     = 8
+}
+
+variable "control_memory" {
+  description = "Control node memory in MB"
+  type        = number
+  default     = 8192
+}
+
+variable "control_disk_size" {
+  description = "Control node disk size"
+  type        = string
+  default     = "40G"
+}
+
+variable "control_ipconfig" {
+  description = "Control node IP configuration"
   type        = string
   default     = "ip=dhcp"
 }
 
-## K3S Worker Nodes Configuration
+## Worker VM Configuration
 variable "create_worker_vms" {
-  description = "Create K3S worker nodes"
+  description = "Create worker nodes"
   type        = bool
   default     = false
 }
 
 variable "worker_vms" {
   description = "Worker VM configurations"
+  type = map(object({
+    name        = string
+    target_node = string
+    vmid        = number
+    cores       = number
+    memory      = number
+    disk_size   = string
+    ipconfig    = string
+  }))
+  default = {}
+}
+
+## Longhorn VM Configuration
+variable "create_longhorn_vms" {
+  description = "Create Longhorn storage nodes"
+  type        = bool
+  default     = false
+}
+
+variable "longhorn_vms" {
+  description = "Longhorn storage VM configurations"
   type = map(object({
     name        = string
     target_node = string
