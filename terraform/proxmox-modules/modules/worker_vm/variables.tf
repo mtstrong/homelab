@@ -12,8 +12,8 @@ variable "vmid" {
   description = "VM ID in Proxmox"
   type        = number
   validation {
-    condition     = var.vmid >= 200 && var.vmid < 300
-    error_message = "Worker VM IDs should be 200-299."
+    condition     = var.vmid >= 100 && var.vmid < 500
+    error_message = "VM IDs should be between 100-499."
   }
 }
 

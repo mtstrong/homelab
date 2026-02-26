@@ -2,7 +2,7 @@ terraform {
   required_providers {
     proxmox = {
       source  = "telmate/proxmox"
-      version = "~> 2.9"
+      version = "3.0.2-rc07"
     }
   }
 }
@@ -14,20 +14,15 @@ resource "proxmox_vm_qemu" "control_vm" {
 
   clone      = var.clone_template
 
-  cores      = var.cores
-  sockets    = var.sockets
-  cpu        = var.cpu_type
-  memory     = var.memory
-  balloon    = 0
-
-  disk {
-    type    = "scsi"
-    storage = var.storage
-    size    = var.disk_size
-    ssd     = 1
+  cpu {
+    cores   = var.cores
+    sockets = var.sockets 
   }
+  memory = var.memory
+  balloon = 0
 
   network {
+    id     = 0
     model  = "virtio"
     bridge = var.bridge
     tag    = var.vlan_tag
