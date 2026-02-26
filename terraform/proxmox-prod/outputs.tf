@@ -3,23 +3,20 @@ output "cluster_topology" {
   value = {
     control_planes = {
       for key, vm in module.control : vm.vm_name => {
-        vmid   = vm.vm_id
-        status = vm.vm_status
-        ip     = vm.default_ipv4_address
+        vmid = vm.vm_id
+        ip   = vm.default_ipv4_address
       }
     }
     workers = {
       for key, vm in module.workers : vm.vm_name => {
-        vmid   = vm.vm_id
-        status = vm.vm_status
-        ip     = vm.default_ipv4_address
+        vmid = vm.vm_id
+        ip   = vm.default_ipv4_address
       }
     }
     longhorn = {
       for key, vm in module.longhorn : vm.vm_name => {
-        vmid   = vm.vm_id
-        status = vm.vm_status
-        ip     = vm.default_ipv4_address
+        vmid = vm.vm_id
+        ip   = vm.default_ipv4_address
       }
     }
   }
