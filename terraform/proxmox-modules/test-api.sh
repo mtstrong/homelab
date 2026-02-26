@@ -1,6 +1,6 @@
 #!/bin/bash
 TOKEN_ID="terraform@pam!terraform"
-TOKEN_SECRET="REDACTED_TOKEN_SECRET"
+TOKEN_SECRET="${TF_VAR_proxmox_token_secret}"  # Use environment variable
 PROXMOX_HOST="bd790i.local"
 NODE="um773a"
 

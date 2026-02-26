@@ -37,7 +37,7 @@ echo "  Click 'Add secret'"
 echo ""
 
 SECRET_2_NAME="PROXMOX_TOKEN_SECRET"
-SECRET_2_VALUE="REDACTED_TOKEN_SECRET"
+SECRET_2_VALUE="xxxxx-xxxxx-xxxxx-xxxxx"  # Your actual token secret
 echo "Secret #2: $SECRET_2_NAME"
 echo "  Click 'New repository secret'"
 echo "  Name: $SECRET_2_NAME"

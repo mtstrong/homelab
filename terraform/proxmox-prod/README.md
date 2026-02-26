@@ -26,7 +26,7 @@ Add these secrets to your GitHub repository settings:
 
 ```
 PROXMOX_TOKEN_ID       = terraform@pam!terraform
-PROXMOX_TOKEN_SECRET   = REDACTED_TOKEN_SECRET
+PROXMOX_TOKEN_SECRET   = xxxxx-xxxxx-xxxxx-xxxxx  # ⚠️ Use environment variables
 CLOUD_INIT_PASSWORD    = your-vm-password
 ```
 
