@@ -8,11 +8,6 @@ output "vm_name" {
   value       = proxmox_vm_qemu.worker_vm.name
 }
 
-output "vm_status" {
-  description = "VM status"
-  value       = proxmox_vm_qemu.worker_vm.status
-}
-
 output "default_ipv4_address" {
   description = "Default IPv4 address"
   value       = try(proxmox_vm_qemu.worker_vm.default_ipv4_address, null)
