@@ -4,5 +4,6 @@ terraform {
     storage_account_name = "tfstatehomelabmatt"
     container_name       = "tfstate"
     key                  = "proxmox-prod.tfstate"
+    use_azuread_auth     = true
   }
 }
