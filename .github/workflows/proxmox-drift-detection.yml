@@ -26,16 +26,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Copy terraform.tfvars
-        run: |
-          if [ -f /home/matt/code/homelab/terraform/proxmox-prod/terraform.tfvars ]; then
-            cp /home/matt/code/homelab/terraform/proxmox-prod/terraform.tfvars .
-          else
-            echo "ERROR: terraform.tfvars not found at expected location"
-            exit 1
-          fi
-        working-directory: ${{ github.workspace }}/terraform/proxmox-prod
-
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:

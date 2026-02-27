@@ -15,7 +15,7 @@
 terraform.tfvars
 override.tf
 override.tf.json
-*.auto.tfvars
+# *.auto.tfvars  # Commented out - terraform.auto.tfvars contains non-sensitive config
 *.auto.tfvars.json
 .env
 
