@@ -9,16 +9,16 @@ terraform {
 }
 
 provider "proxmox" {
-  pm_api_url      = var.proxmox_api_url
-  pm_api_token_id = var.proxmox_token_id
+  pm_api_url          = var.proxmox_api_url
+  pm_api_token_id     = var.proxmox_token_id
   pm_api_token_secret = var.proxmox_token_secret
-  pm_tls_insecure = var.proxmox_tls_insecure
+  pm_tls_insecure     = var.proxmox_tls_insecure
 }
 
 # Reference modules from the module registry (parent directory)
 module "control" {
   source = "../proxmox-modules/modules/control_vm"
-  
+
   for_each = var.control_vms
 
   vm_name             = each.value.name
@@ -37,7 +37,7 @@ module "control" {
 
 module "workers" {
   source = "../proxmox-modules/modules/worker_vm"
-  
+
   for_each = var.worker_vms
 
   vm_name             = each.value.name
@@ -56,7 +56,7 @@ module "workers" {
 
 module "longhorn" {
   source = "../proxmox-modules/modules/longhorn_vm"
-  
+
   for_each = var.longhorn_vms
 
   vm_name             = each.value.name
