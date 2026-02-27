@@ -25,11 +25,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Azure Login
-        uses: azure/login@v2
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
@@ -42,6 +37,7 @@ jobs:
       - name: Terraform Init
         run: terraform init
         env:
+          ARM_ACCESS_KEY: ${{ secrets.ARM_ACCESS_KEY }}
           TF_VAR_proxmox_token_id: ${{ secrets.PROXMOX_TOKEN_ID }}
           TF_VAR_proxmox_token_secret: ${{ secrets.PROXMOX_TOKEN_SECRET }}
           TF_VAR_cloud_init_password: ${{ secrets.CLOUD_INIT_PASSWORD }}
@@ -53,6 +49,7 @@ jobs:
         id: plan
         run: terraform plan -no-color -lock=false
         env:
+          ARM_ACCESS_KEY: ${{ secrets.ARM_ACCESS_KEY }}
           TF_VAR_proxmox_token_id: ${{ secrets.PROXMOX_TOKEN_ID }}
           TF_VAR_proxmox_token_secret: ${{ secrets.PROXMOX_TOKEN_SECRET }}
           TF_VAR_cloud_init_password: ${{ secrets.CLOUD_INIT_PASSWORD }}
