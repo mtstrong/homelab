@@ -62,7 +62,7 @@ jobs:
         if: always()
         run: |
           {
-            echo "## 🔍 Infrastruc ture Drift Detection"
+            echo "## 🔍 Infrastructure Drift Detection"
             echo ""
             echo "**Timestamp:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
             echo ""
