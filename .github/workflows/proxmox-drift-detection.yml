@@ -15,7 +15,8 @@ permissions:
 jobs:
   drift-detection:
     name: Check for Infrastructure Drift
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux]
+    timeout-minutes: 10
     
     defaults:
       run:
