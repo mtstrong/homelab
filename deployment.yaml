@@ -1,77 +1,62 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: prometheus
-  namespace: prometheus
+  name: prowlarr
+  namespace: prowlarr
   labels:
-    app: prometheus
+    app: prowlarr
 spec:
-  strategy:
-    type: Recreate
   replicas: 1
   selector:
     matchLabels:
-      app: prometheus
+      app: prowlarr
   template:
     metadata:
       labels:
-        app: prometheus
+        app: prowlarr
     spec:
       nodeSelector:
         worker: "true"
-      securityContext:
-        runAsUser: 65534
-        runAsGroup: 65534
-        fsGroup: 65534
-        fsGroupChangePolicy: OnRootMismatch
-      serviceAccountName: prometheus
-      automountServiceAccountToken: true
       containers:
-      - name: prometheus
-        image: prom/prometheus:v3.10.0-rc.1-busybox
-        imagePullPolicy: IfNotPresent
-        args:
-        - --config.file=/etc/prometheus/prometheus.yml
-        - --storage.tsdb.path=/prometheus
-        - --web.enable-lifecycle
+      - name: prowlarr
+        image: lscr.io/linuxserver/prowlarr:2.3.3-nightly
+        env:
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        - name: TZ
+          value: "America/Chicago"
         ports:
-        - name: http
-          containerPort: 9090
-        readinessProbe:
-          httpGet:
-            path: /-/ready
-            port: 9090
-          initialDelaySeconds: 10
-          periodSeconds: 10
-          timeoutSeconds: 2
-          failureThreshold: 6
-        livenessProbe:
-          httpGet:
-            path: /-/healthy
-            port: 9090
-          initialDelaySeconds: 30
-          periodSeconds: 20
-          timeoutSeconds: 2
-          failureThreshold: 6
-        resources:
-          requests:
-            cpu: 250m
-            memory: 512Mi
-          limits:
-            cpu: 1000m
-            memory: 2Gi
+        - containerPort: 9696
+          name: http
         volumeMounts:
         - name: config
-          mountPath: /etc/prometheus
-        - name: data
-          mountPath: /prometheus
+          mountPath: /config
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /ping
+            port: 9696
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /ping
+            port: 9696
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
       volumes:
       - name: config
-        configMap:
-          name: prometheus-config
-          items:
-          - key: prometheus.yml
-            path: prometheus.yml
-      - name: data
         persistentVolumeClaim:
-          claimName: prometheus-pvc
+          claimName: prowlarr-config
