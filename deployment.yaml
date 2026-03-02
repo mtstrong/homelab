@@ -2,49 +2,33 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: calibre-web
-  namespace: calibre
+  name: kavita
+  namespace: kavita
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: calibre-web
+      app: kavita
   template:
     metadata:
       labels:
-        app: calibre-web
+        app: kavita
     spec:
       nodeSelector:
         worker: "true"
       containers:
-      - name: calibre-web
-        image: lscr.io/linuxserver/calibre-web:0.6.26-ls369
+      - name: kavita
+        image: jvmilazz0/kavita:0.8.9
         env:
-        - name: PUID
-          value: "1000"
-        - name: PGID
-          value: "1000"
         - name: TZ
           value: "America/Chicago"
-        - name: DOCKER_MODS
-          value: "linuxserver/mods:universal-calibre"
-        - name: OAUTHLIB_RELAX_TOKEN_SCOPE
-          value: "1"
-        - name: SESSION_COOKIE_SAMESITE
-          value: "Lax"
-        - name: SESSION_COOKIE_SECURE
-          value: "True"
-        - name: REMEMBER_COOKIE_SAMESITE
-          value: "Lax"
-        - name: REMEMBER_COOKIE_SECURE
-          value: "True"
         ports:
-        - containerPort: 8083
+        - containerPort: 5000
           name: http
         readinessProbe:
           httpGet:
             path: /
-            port: 8083
+            port: 5000
           initialDelaySeconds: 30
           periodSeconds: 10
           timeoutSeconds: 5
@@ -52,7 +36,7 @@ spec:
         livenessProbe:
           httpGet:
             path: /
-            port: 8083
+            port: 5000
           initialDelaySeconds: 60
           periodSeconds: 30
           timeoutSeconds: 5
@@ -65,16 +49,15 @@ spec:
             cpu: 1000m
             memory: 1Gi
         volumeMounts:
-        - mountPath: /config
+        - mountPath: /kavita/config
           name: config
-        - mountPath: /books
-          name: books
+        - mountPath: /comics
+          name: comics
       volumes:
       - name: config
+        persistentVolumeClaim:
+          claimName: kavita
+      - name: comics
         nfs:
           server: 192.168.1.38
-          path: /mnt/TrueNAS/proxmox/config/calibre
-      - name: books
-        nfs:
-          server: 192.168.1.38
-          path: /mnt/TrueNAS/books
+          path: /mnt/TrueNAS/comics
