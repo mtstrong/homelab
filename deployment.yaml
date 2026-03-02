@@ -1,79 +1,63 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: loki
-  namespace: loki-stack
-  labels:
-    app: loki
+  name: notifiarr
+  namespace: notifiarr
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: loki
+      app: notifiarr
   template:
     metadata:
       labels:
-        app: loki
+        app: notifiarr
     spec:
       nodeSelector:
         worker: "true"
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: kubernetes.io/hostname
-                operator: NotIn
-                values:
-                - k3s-06
-      securityContext:
-        runAsUser: 10001
-        runAsGroup: 10001
-        fsGroup: 10001
-        fsGroupChangePolicy: OnRootMismatch
       containers:
-      - name: loki
-        image: grafana/loki:3.6.7-amd64
-        args:
-        - -config.file=/etc/loki/config.yaml
-        - -config.expand-env=true
-        resources:
-          requests:
-            cpu: 100m
-            memory: 256Mi
-          limits:
-            cpu: 500m
-            memory: 1Gi
+      - name: notifiarr
+        image: golift/notifiarr:0.9.4
         ports:
-        - name: http-metrics
-          containerPort: 3100
-        - name: grpc
-          containerPort: 9095
-        readinessProbe:
-          httpGet:
-            path: /ready
-            port: 3100
-          initialDelaySeconds: 10
-          periodSeconds: 10
-          timeoutSeconds: 2
-          failureThreshold: 6
-        livenessProbe:
-          httpGet:
-            path: /ready
-            port: 3100
-          initialDelaySeconds: 30
-          periodSeconds: 20
-          timeoutSeconds: 2
-          failureThreshold: 6
+        - containerPort: 5454
+          name: http
         volumeMounts:
         - name: config
-          mountPath: /etc/loki
-        - name: loki-data
-          mountPath: /loki
+          mountPath: /config
+        - name: machine-id
+          mountPath: /etc/machine-id
+          readOnly: true
+        - name: utmp
+          mountPath: /var/run/utmp
+          readOnly: true
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "50m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 5454
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 5454
+          initialDelaySeconds: 10
+          periodSeconds: 5
       volumes:
       - name: config
-        configMap:
-          name: loki-config
-      - name: loki-data
         persistentVolumeClaim:
-          claimName: loki-data-pvc
+          claimName: notifiarr-config
+      - name: machine-id
+        hostPath:
+          path: /etc/machine-id
+          type: File
+      - name: utmp
+        hostPath:
+          path: /var/run/utmp
+          type: File
