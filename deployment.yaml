@@ -3,20 +3,20 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: radarr
-  name: radarr
-  namespace: radarr
+    app: tautulli
+  name: tautulli
+  namespace: tautulli
 spec:
   strategy:
     type: Recreate
   replicas: 1
   selector:
     matchLabels:
-      app: radarr
+      app: tautulli
   template:
     metadata:
       labels:
-        app: radarr
+        app: tautulli
     spec:
       nodeSelector:
         worker: "true"
@@ -26,8 +26,8 @@ spec:
         fsGroup: 1000
         fsGroupChangePolicy: OnRootMismatch
       containers:
-      - name: radarr
-        image: lscr.io/linuxserver/radarr:6.1.1-develop
+      - name: tautulli
+        image: lscr.io/linuxserver/tautulli:v2.16.1-ls217
         imagePullPolicy: IfNotPresent
         env:
         - name: PUID
@@ -36,52 +36,30 @@ spec:
           value: "1000"
         - name: TZ
           value: "America/Chicago"
-        - name: UMASK_SET
-          value: "022"
         ports:
-        - containerPort: 7878
+        - containerPort: 8181
           name: http
           protocol: TCP
         readinessProbe:
           httpGet:
-            path: /ping
-            port: 7878
+            path: /
+            port: 8181
           initialDelaySeconds: 30
           periodSeconds: 15
           timeoutSeconds: 5
-          failureThreshold: 6
+          failureThreshold: 3
         livenessProbe:
           httpGet:
-            path: /ping
-            port: 7878
+            path: /
+            port: 8181
           initialDelaySeconds: 60
           periodSeconds: 30
           timeoutSeconds: 5
-          failureThreshold: 6
-        resources:
-          requests:
-            cpu: 200m
-            memory: 512Mi
-          limits:
-            cpu: 2000m
-            memory: 2Gi
+          failureThreshold: 3
         volumeMounts:
-        - mountPath: /config
-          name: config
-        - mountPath: /movies
-          name: movies
-        - mountPath: /downloads
-          name: downloads
+        - name: config
+          mountPath: /config
       volumes:
       - name: config
-        nfs:
-          server: 192.168.1.38
-          path: /mnt/TrueNAS/proxmox/config/radarr
-      - name: movies
-        nfs:
-          server: 192.168.1.38
-          path: /mnt/TrueNAS/movies
-      - name: downloads
-        nfs:
-          server: 192.168.1.38
-          path: /mnt/OneTbs/nzb-dls
+        persistentVolumeClaim:
+          claimName: tautulli
