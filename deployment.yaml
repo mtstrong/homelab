@@ -1,42 +1,77 @@
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: overseerr
-  namespace: overseerr
+  name: prometheus
+  namespace: prometheus
   labels:
-    app: overseerr
-    app.kubernetes.io/instance: overseerr
+    app: prometheus
 spec:
+  strategy:
+    type: Recreate
   replicas: 1
   selector:
     matchLabels:
-      app: overseerr
+      app: prometheus
   template:
     metadata:
       labels:
-        app: overseerr
+        app: prometheus
     spec:
       nodeSelector:
         worker: "true"
+      securityContext:
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
+        fsGroupChangePolicy: OnRootMismatch
+      serviceAccountName: prometheus
+      automountServiceAccountToken: true
       containers:
-      - name: overseerr
-        image: linuxserver/overseerr:v1.35.0-ls158
-        env:
-        - name: TZ
-          value: America/Chicago
-        - name: PUID
-          value: "1000"
-        - name: PGID
-          value: "1000"
+      - name: prometheus
+        image: prom/prometheus:v3.10.0-rc.1-busybox
+        imagePullPolicy: IfNotPresent
+        args:
+        - --config.file=/etc/prometheus/prometheus.yml
+        - --storage.tsdb.path=/prometheus
+        - --web.enable-lifecycle
         ports:
-        - containerPort: 5055
-          protocol: TCP
+        - name: http
+          containerPort: 9090
+        readinessProbe:
+          httpGet:
+            path: /-/ready
+            port: 9090
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 2
+          failureThreshold: 6
+        livenessProbe:
+          httpGet:
+            path: /-/healthy
+            port: 9090
+          initialDelaySeconds: 30
+          periodSeconds: 20
+          timeoutSeconds: 2
+          failureThreshold: 6
+        resources:
+          requests:
+            cpu: 250m
+            memory: 512Mi
+          limits:
+            cpu: 1000m
+            memory: 2Gi
         volumeMounts:
-        - name: overseerr
-          mountPath: /config
+        - name: config
+          mountPath: /etc/prometheus
+        - name: data
+          mountPath: /prometheus
       volumes:
-      - name: overseerr
-        nfs:
-          server: 192.168.1.38
-          path: /mnt/TrueNAS/proxmox/config/overseerr
+      - name: config
+        configMap:
+          name: prometheus-config
+          items:
+          - key: prometheus.yml
+            path: prometheus.yml
+      - name: data
+        persistentVolumeClaim:
+          claimName: prometheus-pvc
