@@ -74,4 +74,4 @@ spec:
       - name: handbrake-data
         nfs:
           server: 192.168.1.38
-          path: /mnt/TrueNAS/handbrake
+          path: /mnt/OneTbs/nzb-dls
