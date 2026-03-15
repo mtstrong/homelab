@@ -9,7 +9,7 @@ spec:
     app: handbrake
   ports:
   - name: http
-    port: 5800
-    targetPort: 5800
+    port: 9999
+    targetPort: 9999
     protocol: TCP
   type: ClusterIP

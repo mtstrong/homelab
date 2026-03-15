@@ -20,52 +20,64 @@ spec:
     spec:
       nodeSelector:
         worker: "true"
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
       containers:
-      - name: handbrake
-        image: jlesage/handbrake:v25.07.2
+      - name: handbrake-server
+        image: ghcr.io/thenickoftime/handbrake-web-server:latest
         imagePullPolicy: IfNotPresent
-        env:
-        - name: USER_ID
-          value: "1000"
-        - name: GROUP_ID
-          value: "1000"
-        - name: TZ
-          value: "America/Chicago"
         ports:
-        - containerPort: 5800
+        - containerPort: 9999
           name: http
           protocol: TCP
         readinessProbe:
-          httpGet:
-            path: /
-            port: 5800
-          initialDelaySeconds: 30
+          tcpSocket:
+            port: 9999
+          initialDelaySeconds: 20
           periodSeconds: 15
-          timeoutSeconds: 10
+          timeoutSeconds: 5
           failureThreshold: 6
         livenessProbe:
-          httpGet:
-            path: /
-            port: 5800
-          initialDelaySeconds: 60
-          periodSeconds: 30
-          timeoutSeconds: 10
+          tcpSocket:
+            port: 9999
+          initialDelaySeconds: 45
+          periodSeconds: 20
+          timeoutSeconds: 5
           failureThreshold: 6
         resources:
           requests:
-            memory: "512Mi"
+            memory: "256Mi"
             cpu: "200m"
           limits:
             memory: "2Gi"
             cpu: "2000m"
         volumeMounts:
-        - mountPath: /config
+        - mountPath: /data
           name: config
-        - mountPath: /storage
+        - mountPath: /video
           name: handbrake-data
-        - mountPath: /watch
-          name: handbrake-data
-        - mountPath: /output
+      - name: handbrake-worker
+        image: ghcr.io/thenickoftime/handbrake-web-worker:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: WORKER_ID
+          value: handbrake-worker-1
+        - name: SERVER_URL
+          value: localhost
+        - name: SERVER_PORT
+          value: "9999"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "2Gi"
+            cpu: "2000m"
+        volumeMounts:
+        - mountPath: /video
           name: handbrake-data
       volumes:
       - name: config

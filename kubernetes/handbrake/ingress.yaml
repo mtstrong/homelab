@@ -12,7 +12,7 @@ spec:
     kind: Rule
     services:
     - name: handbrake
-      port: 5800
+      port: 9999
     middlewares:
     - name: tinyauth-forwardauth
     - name: default-headers
