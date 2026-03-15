@@ -12,7 +12,6 @@ spec:
   commonName: "*.tehmatt.com" # change to your domain
   dnsNames:
   - "*.tehmatt.com" # change to your domain
-  - tehmatt.com # change to your domain
   # Enable automatic secret mirroring via emberstack/kubernetes-reflector so Traefik can find the
   # wildcard certificate secret in application namespaces without duplicating cert-manager configs.
   # See: https://github.com/emberstack/kubernetes-reflector
