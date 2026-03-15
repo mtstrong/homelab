@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: handbrake
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: homelab
+    app.kubernetes.io/name: handbrake
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/mtstrong/homelab.git
+    path: kubernetes/handbrake
+    targetRevision: HEAD
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: handbrake
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true

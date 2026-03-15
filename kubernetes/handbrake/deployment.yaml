@@ -1,0 +1,77 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: handbrake
+  name: handbrake
+  namespace: handbrake
+spec:
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: handbrake
+  template:
+    metadata:
+      labels:
+        app: handbrake
+    spec:
+      nodeSelector:
+        worker: "true"
+      containers:
+      - name: handbrake
+        image: jlesage/handbrake:v25.07.2
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: USER_ID
+          value: "1000"
+        - name: GROUP_ID
+          value: "1000"
+        - name: TZ
+          value: "America/Chicago"
+        ports:
+        - containerPort: 5800
+          name: http
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 5800
+          initialDelaySeconds: 30
+          periodSeconds: 15
+          timeoutSeconds: 10
+          failureThreshold: 6
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 5800
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 6
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "200m"
+          limits:
+            memory: "2Gi"
+            cpu: "2000m"
+        volumeMounts:
+        - mountPath: /config
+          name: config
+        - mountPath: /storage
+          name: handbrake-data
+        - mountPath: /watch
+          name: handbrake-data
+        - mountPath: /output
+          name: handbrake-data
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: handbrake-config
+      - name: handbrake-data
+        nfs:
+          server: 192.168.1.38
+          path: /mnt/TrueNAS/handbrake
