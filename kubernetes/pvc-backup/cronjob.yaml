@@ -1,0 +1,39 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: pvc-backup
+  namespace: pvc-backup
+spec:
+  schedule: "0 2 * * *"  # 2 AM daily
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      activeDeadlineSeconds: 3600  # 1 hour max
+      template:
+        spec:
+          serviceAccountName: pvc-backup
+          nodeSelector:
+            worker: "true"
+          restartPolicy: Never
+          containers:
+            - name: backup
+              image: bitnami/kubectl:latest
+              command: ["/bin/sh", "/scripts/backup.sh"]
+              volumeMounts:
+                - name: backup-script
+                  mountPath: /scripts
+                - name: nfs-backups
+                  mountPath: /backups
+          volumes:
+            - name: backup-script
+              configMap:
+                name: pvc-backup-script
+                defaultMode: 0755
+            - name: nfs-backups
+              nfs:
+                server: 192.168.1.38
+                path: /mnt/TrueNAS/proxmox/longhorn-backups

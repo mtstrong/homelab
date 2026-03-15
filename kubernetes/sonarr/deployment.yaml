@@ -42,22 +42,30 @@ spec:
         - containerPort: 8989
           name: http
           protocol: TCP
+        startupProbe:
+          httpGet:
+            path: /ping
+            port: 8989
+          initialDelaySeconds: 20
+          periodSeconds: 10
+          timeoutSeconds: 10
+          failureThreshold: 30
         readinessProbe:
           httpGet:
             path: /ping
             port: 8989
           initialDelaySeconds: 30
           periodSeconds: 15
-          timeoutSeconds: 5
-          failureThreshold: 6
+          timeoutSeconds: 10
+          failureThreshold: 8
         livenessProbe:
           httpGet:
             path: /ping
             port: 8989
-          initialDelaySeconds: 60
+          initialDelaySeconds: 90
           periodSeconds: 30
-          timeoutSeconds: 5
-          failureThreshold: 6
+          timeoutSeconds: 10
+          failureThreshold: 8
         resources:
           requests:
             cpu: 200m
@@ -74,9 +82,8 @@ spec:
           name: downloads
       volumes:
       - name: config
-        nfs:
-          server: 192.168.1.38
-          path: /mnt/TrueNAS/proxmox/config/sonarr
+        persistentVolumeClaim:
+          claimName: sonarr
       - name: tv
         nfs:
           server: 192.168.1.38
