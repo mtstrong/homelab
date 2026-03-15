@@ -14,5 +14,6 @@ spec:
     - name: handbrake
       port: 5800
     middlewares:
+    - name: tinyauth-forwardauth
     - name: default-headers
   tls: {}

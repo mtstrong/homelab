@@ -1,0 +1,81 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tinyauth
+  namespace: tinyauth
+  labels:
+    app: tinyauth
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tinyauth
+  template:
+    metadata:
+      labels:
+        app: tinyauth
+    spec:
+      nodeSelector:
+        worker: "true"
+      containers:
+      - name: tinyauth
+        image: ghcr.io/steveiliop56/tinyauth:v3
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: APP_URL
+          value: https://tinyauth.tehmatt.com
+        - name: SECRET
+          valueFrom:
+            secretKeyRef:
+              name: tinyauth-secrets
+              key: SECRET
+        - name: GOOGLE_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: tinyauth-secrets
+              key: GOOGLE_CLIENT_ID
+        - name: GOOGLE_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: tinyauth-secrets
+              key: GOOGLE_CLIENT_SECRET
+        - name: OAUTH_WHITELIST
+          valueFrom:
+            secretKeyRef:
+              name: tinyauth-secrets
+              key: OAUTH_WHITELIST
+        - name: TZ
+          value: America/Chicago
+        ports:
+        - name: http
+          containerPort: 3000
+          protocol: TCP
+        readinessProbe:
+          tcpSocket:
+            port: 3000
+          initialDelaySeconds: 15
+          periodSeconds: 15
+          timeoutSeconds: 5
+          failureThreshold: 6
+        livenessProbe:
+          tcpSocket:
+            port: 3000
+          initialDelaySeconds: 45
+          periodSeconds: 20
+          timeoutSeconds: 5
+          failureThreshold: 6
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+        volumeMounts:
+        - name: data
+          mountPath: /data
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: tinyauth-data
