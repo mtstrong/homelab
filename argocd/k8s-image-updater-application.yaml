@@ -23,3 +23,6 @@ spec:
       kind: Secret
       name: github-token
       namespace: image-updater
+      jsonPointers:
+        - /data
+        - /stringData
