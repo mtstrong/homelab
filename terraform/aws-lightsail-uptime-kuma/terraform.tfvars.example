@@ -1,0 +1,19 @@
+# Example terraform.tfvars file
+# Copy this file to terraform.tfvars and customize as needed
+
+# AWS Configuration
+aws_region = "us-east-1"
+
+# Service Configuration
+service_name = "uptime-kuma"
+environment  = "prod"
+
+# Container Configuration
+uptime_kuma_image = "louislam/uptime-kuma:latest"
+container_power   = "nano"   # nano ($7/mo), micro ($10/mo), small ($20/mo), medium ($40/mo), large ($80/mo), xlarge ($160/mo)
+container_scale   = 1        # Number of instances (1-20)
+
+# Custom Domain (Optional)
+# Uncomment and configure if you want to use a custom domain
+# domain_name = "example.com"
+# subdomain   = "uptime"      # Will create uptime.example.com
