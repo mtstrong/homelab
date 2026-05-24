@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: headscale-key-nas
+  name: headscale-users-list
   namespace: headscale
 spec:
   ttlSecondsAfterFinished: 600
@@ -10,10 +10,10 @@ spec:
     spec:
       restartPolicy: Never
       containers:
-        - name: create-key
+        - name: users-list
           image: headscale/headscale:0.26.1
           command: ["headscale"]
-          args: ["--config", "/etc/headscale/config.yaml", "preauthkeys", "create", "--user", "1", "--reusable", "--expiration", "0"]
+          args: ["--config", "/etc/headscale/config.yaml", "--output", "json", "users", "list"]
           volumeMounts:
             - name: config
               mountPath: /etc/headscale
