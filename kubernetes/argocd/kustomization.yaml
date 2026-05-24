@@ -15,6 +15,7 @@ resources:
 - apps/notifiarr.yaml
 - apps/prowlarr.yaml
 - apps/vaultwarden.yaml
+- apps/headscale.yaml
 
 patchesStrategicMerge:
 - patch-repo-server-avp.yaml
