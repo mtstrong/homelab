@@ -29,8 +29,10 @@ data:
     disable_check_updates: false
     ephemeral_node_inactivity_timeout: 30m
 
-    db_type: sqlite3
-    db_path: /var/lib/headscale/db.sqlite
+    database:
+      type: sqlite
+      sqlite:
+        path: /var/lib/headscale/db.sqlite
 
     policy:
       mode: file
