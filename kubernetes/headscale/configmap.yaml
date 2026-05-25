@@ -58,6 +58,7 @@ data:
       "groups": {
         "group:nas-admins": [
           "you@headscale",
+          "nas@headscale",
         ],
       },
 
