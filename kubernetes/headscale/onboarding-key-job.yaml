@@ -11,7 +11,7 @@ spec:
       restartPolicy: Never
       containers:
         - name: create-key
-          image: headscale/headscale:0.28.0
+          image: headscale/headscale:0.26.1
           command: ["headscale"]
           args: ["--config", "/etc/headscale/config.yaml", "preauthkeys", "create", "--user", "1", "--reusable", "--expiration", "0"]
           volumeMounts:

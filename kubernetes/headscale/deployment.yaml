@@ -19,7 +19,7 @@ spec:
         worker: "true"
       containers:
         - name: headscale
-          image: headscale/headscale:0.28.0
+          image: headscale/headscale:0.26.1
           imagePullPolicy: IfNotPresent
           args:
             - serve
