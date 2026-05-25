@@ -34,8 +34,8 @@ data:
       sqlite:
         path: /var/lib/headscale/db.sqlite
 
-    unix_socket: /var/lib/headscale/headscale.sock
-    unix_socket_permission: "0770"
+    unix_socket: /tmp/headscale.sock
+    unix_socket_permission: "0666"
 
     policy:
       mode: file
