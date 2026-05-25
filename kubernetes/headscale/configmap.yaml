@@ -37,6 +37,9 @@ data:
     unix_socket: /tmp/headscale.sock
     unix_socket_permission: "0666"
 
+    cli:
+      timeout: 60s
+
     policy:
       mode: file
       path: /etc/headscale/acl.hujson
