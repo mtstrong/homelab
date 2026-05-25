@@ -58,13 +58,7 @@ data:
       "groups": {
         "group:nas-admins": [
           "you@headscale",
-          "nas@headscale",
         ],
-      },
-
-      // Tag your Synology node with: tag:synology
-      "tagOwners": {
-        "tag:synology": ["group:nas-admins"],
       },
 
       "acls": [
@@ -72,11 +66,7 @@ data:
           "action": "accept",
           "src": ["group:nas-admins"],
           "dst": [
-            "tag:synology:22",    // SSH
-            "tag:synology:445",   // SMB
-            "tag:synology:5000",  // DSM HTTP
-            "tag:synology:5001",  // DSM HTTPS
-            "tag:synology:2049",  // NFS
+            "*:*",  // Temporary broad access from admin user(s)
           ],
         },
       ],
