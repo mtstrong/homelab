@@ -35,7 +35,7 @@ This repository contains the complete infrastructure-as-code for my homelab — 
 - **Full observability** — Prometheus, Grafana, Loki + Promtail, Node Exporter, cAdvisor
 - **IaC everywhere** — Terraform manages Cloudflare DNS, Oracle Cloud, and Azure infrastructure
 - **CI/CD with drift detection** — GitHub Actions pipelines with scheduled drift checks that auto-create issues
-- **Security-first** — CrowdSec WAF, Azure OIDC (no stored credentials), tfsec scanning, Vaultwarden
+- **Security-first** — Azure OIDC (no stored credentials), tfsec scanning, Vaultwarden
 
 ---
 
@@ -65,7 +65,7 @@ graph TB
     subgraph Cluster["K3s Kubernetes Cluster — Minisforum UM773a Nodes"]
         direction TB
 
-        TRAEFIK[🔀 Traefik Ingress<br/>+ CrowdSec Bouncer]
+        TRAEFIK[🔀 Traefik Ingress]
 
         subgraph GitOps
             ARGOCD[🔄 Argo CD]
@@ -132,7 +132,7 @@ graph TB
 | **Infrastructure as Code** | Terraform (Cloudflare, Oracle Cloud, Azure, Proxmox providers) |
 | **CI/CD** | GitHub Actions (self-hosted + cloud runners), Renovate Bot, Docker Buildx, GHCR |
 | **Monitoring** | Prometheus v3.5.1, Grafana v12.3.1, Loki v3.6.4, Promtail, Node Exporter, cAdvisor |
-| **Security** | HashiCorp Vault, CrowdSec WAF, tfsec, Vaultwarden, Azure OIDC |
+| **Security** | HashiCorp Vault, tfsec, Vaultwarden, Azure OIDC |
 | **Networking** | Traefik, Cert-Manager, Cloudflare DNS/CDN, NordLynx VPN |
 | **Config Management** | Ansible (Linux, Windows, MiSTer FPGA) |
 | **Containers** | Docker, Docker Compose |
@@ -170,7 +170,6 @@ homelab/
 ├── 📂 dockerfiles/            # Custom container images
 ├── 📂 docs/                   # Operational runbooks and upgrade guides
 ├── 📂 Helm/                   # Helm values for Traefik, Cert-Manager
-├── 📂 helm/                   # Helm values for CrowdSec
 ├── 📂 kubernetes/             # 31 Kustomize-based app manifests (the core of the repo)
 │   ├── argocd/                # Argo CD + Vault Plugin
 │   ├── prometheus/            # Prometheus with K8s service discovery
@@ -291,7 +290,6 @@ All Terraform state is stored in **Azure Storage** with **OIDC authentication** 
 ## 🔐 Security
 
 - **HashiCorp Vault** — Centralized secrets with Kubernetes auth, injected at deploy time via AVP
-- **CrowdSec** — Community-driven WAF with Traefik bouncer plugin, 4-hour auto-ban
 - **Azure OIDC** — Federated identity for CI/CD, no stored cloud credentials
 - **tfsec** — Infrastructure security scanning in CI pipelines
 - **Vaultwarden** — Self-hosted password management
