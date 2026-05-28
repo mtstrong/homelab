@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM python:3.14-slim
 
 LABEL org.opencontainers.image.source="https://github.com/mtstrong/homelab"
 LABEL org.opencontainers.image.description="Azure FinOps Exporter — Prometheus metrics for Azure cost data"
