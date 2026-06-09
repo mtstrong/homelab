@@ -66,9 +66,9 @@ spec:
       volumes:
       - name: config
         nfs:
-          server: 192.168.1.38
+          server: 192.168.1.51
           path: /mnt/TrueNAS/proxmox/config/sabnzbd
       - name: downloads
         nfs:
-          server: 192.168.1.38
+          server: 192.168.1.51
           path: /mnt/OneTbs/nzb-dls

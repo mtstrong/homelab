@@ -38,5 +38,5 @@ spec:
       volumes:
       - name: overseerr
         nfs:
-          server: 192.168.1.38
+          server: 192.168.1.51
           path: /mnt/TrueNAS/proxmox/config/overseerr
