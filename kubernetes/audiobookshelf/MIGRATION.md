@@ -59,7 +59,7 @@ Branch: `feature/audiobookshelf-k8s-migration`
 ### Phase 2: Data Migration (Following Jim's Garage Method)
 
 4. **Ensure TrueNAS NFS shares exist**:
-   - Verify `/mnt/TrueNAS/audiobooks` and `/mnt/TrueNAS/podcasts` exist on TrueNAS (192.168.1.51)
+   - Verify `/mnt/TrueNAS/audiobooks` and `/mnt/TrueNAS/podcasts` exist on TrueNAS (192.168.1.70)
    - If they don't exist, create them on TrueNAS and configure NFS exports
 
 5. **Copy audiobooks and podcasts to TrueNAS** (if not already there):
@@ -72,8 +72,8 @@ Branch: `feature/audiobookshelf-k8s-migration`
    Or mount TrueNAS shares directly and copy:
    ```bash
    sudo mkdir -p /mnt/temp/audiobooks /mnt/temp/podcasts
-   sudo mount -t nfs 192.168.1.51:/mnt/TrueNAS/audiobooks /mnt/temp/audiobooks
-   sudo mount -t nfs 192.168.1.51:/mnt/TrueNAS/podcasts /mnt/temp/podcasts
+   sudo mount -t nfs 192.168.1.70:/mnt/TrueNAS/audiobooks /mnt/temp/audiobooks
+   sudo mount -t nfs 192.168.1.70:/mnt/TrueNAS/podcasts /mnt/temp/podcasts
    sudo rsync -avxHAX /var/lib/docker/volumes/audiobooks/_data/ /mnt/temp/audiobooks/
    sudo rsync -avxHAX /var/lib/docker/volumes/podcasts/_data/ /mnt/temp/podcasts/
    sudo umount /mnt/temp/audiobooks /mnt/temp/podcasts
@@ -198,7 +198,7 @@ docker start audiobookshelf
 
 ## Notes
 
-- **NFS Mounts**: Audiobooks and podcasts are stored on TrueNAS (192.168.1.51) via NFS mounts at `/mnt/TrueNAS/audiobooks` and `/mnt/TrueNAS/podcasts`
+- **NFS Mounts**: Audiobooks and podcasts are stored on TrueNAS (192.168.1.70) via NFS mounts at `/mnt/TrueNAS/audiobooks` and `/mnt/TrueNAS/podcasts`
 - **PVCs**: Only config, metadata, and uploads use Longhorn persistent volumes
 - The migration preserves all data: library, metadata, users, settings
 - Downtime required: Stop Docker → Migrate Data → Start K8s (estimate: 15-30 min for PVC data only)

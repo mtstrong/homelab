@@ -44,8 +44,8 @@ data:
     \       description: NAS\n        widget:\n            type: diskstation\n            url:
     http://192.168.1.70:5000\n            username: {{HOMEPAGE_VAR_SYNOLOGY_USERNAME}}\n
     \           password: {{HOMEPAGE_VAR_SYNOLOGY_PASSWORD}}\n    - TrueNAS:\n        icon:
-    truenas.png\n        href: http://192.168.1.51\n        description: NAS\n        widget:\n
-    \           type: truenas\n            url: http://192.168.1.51\n            key:
+    truenas.png\n        href: http://192.168.1.70\n        description: NAS\n        widget:\n
+    \           type: truenas\n            url: http://192.168.1.70\n            key:
     {{HOMEPAGE_VAR_TRUENAS_KEY}}\n    - Proxmox Backup Server:\n        icon: proxmox.svg\n
     \       href: https://192.168.1.117:8007\n        widget:\n            type: proxmoxbackupserver\n
     \           url: https://192.168.1.117:8007\n            username:  root@pam!api\n
@@ -64,7 +64,7 @@ data:
     Manager\n        widget:\n            type: prowlarr\n            url: http://prowlarr.prowlarr.svc.cluster.local:9696\n
     \           key: {{HOMEPAGE_VAR_PROWLARR_KEY}}\n- Media:\n    - Plex:\n        href:
     https://app.plex.tv/desktop\n        icon: plex.png\n        description: Media
-    Server\n        widget:\n            type: plex\n            url: http://192.168.1.51:32400\n
+    Server\n        widget:\n            type: plex\n            url: http://192.168.1.70:32400\n
     \           key: {{HOMEPAGE_VAR_PLEX_KEY}}\n    - Audiobookshelf:\n        icon:
     audiobookshelf.png\n        href: https://abs.tehmatt.com\n        description:
     Audiobook Server\n        widget:\n            type: audiobookshelf\n            url:
