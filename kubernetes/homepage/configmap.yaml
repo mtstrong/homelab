@@ -97,10 +97,7 @@ data:
     \         type: customapi\n          url: http://ollama.ollama.svc.cluster.local:3008/api/models\n
     \         headers:\n            Authorization: \"Bearer {{HOMEPAGE_VAR_OPENWEBUI_TOKEN}}\"\n
     \         mappings:\n            - field: data\n              label: Total Models\n
-    \             format: size\n- Home Automation:\n    - Home Assistant:\n        icon:
-    home-assistant.png\n        href: http://192.168.2.132:8123\n        widget:\n
-    \           type: homeassistant\n            url: http://homeassistant.homeassistant.svc.cluster.local:8123\n            key:
-    {{HOMEPAGE_VAR_HOMEASSISTANT_KEY}}\n    - Homebridge:\n        icon: homebridge.png\n
+    \             format: size\n- Home Automation:\n    - Homebridge:\n        icon: homebridge.png\n
     \       href: http://192.168.2.130:8581\n        widget:\n            type: homebridge\n
     \           url: http://homebridge.homebridge.svc.cluster.local:8581\n            username: matt\n            password:
     {{HOMEPAGE_VAR_COMMON_PASSWORD}}\n- Uptime:\n    - Uptime Kuma:\n        href:

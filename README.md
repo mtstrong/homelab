@@ -88,7 +88,7 @@ graph TB
         subgraph Apps["📦 Applications"]
             MEDIA[Sonarr · Radarr · Prowlarr<br/>Sabnzbd · Overseerr · Tautulli]
             BOOKS[Audiobookshelf · Kavita<br/>Readarr · Calibre]
-            HOME[Home Assistant<br/>Homebridge]
+            HOME[Homebridge]
             UTIL[Homepage · IT-Tools<br/>Vaultwarden · Mealie · RomM]
             AI[Ollama · Open WebUI]
         end
@@ -232,7 +232,6 @@ Developer pushes to main
 ### Home Automation
 | Service | Description |
 |:--------|:------------|
-| Home Assistant | Central home automation hub |
 | Homebridge | HomeKit bridge for non-native devices |
 
 ### Utilities & Productivity

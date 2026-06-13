@@ -31,7 +31,6 @@ data:
     audiobookshelf audiobookshelf-metadata
     audiobookshelf audiobookshelf-uploads
     grafana grafana-pvc
-    homeassistant homeassistant-config
     homebridge homebridge-config
     kavita kavita
     loki-stack loki-data-pvc
