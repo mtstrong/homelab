@@ -16,7 +16,7 @@ Prepared PVCs in this repo for the remaining config migrations:
 | App | Namespace | Current TrueNAS path | Measured size | New PVC | StorageClass | Requested size | Status |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Overseerr | `overseerr` | `/mnt/TrueNAS/proxmox/config/overseerr` | `2.9M` | `overseerr` | `longhorn` | `1Gi` | Migrated live on `2026-06-12` |
-| Calibre | `calibre` | `/mnt/TrueNAS/proxmox/config/calibre` | `35M` | `calibre-config` | `longhorn` | `5Gi` | Pending |
+| Calibre | `calibre` | `/mnt/TrueNAS/proxmox/config/calibre` | `35M` | `calibre-config` | `longhorn` | `5Gi` | Migrated live on `2026-06-12` |
 | SABnzbd | `sabnzbd` | `/mnt/TrueNAS/proxmox/config/sabnzbd` | `9.1M` | `sabnzbd-config` | `longhorn` | `5Gi` | Pending |
 | Mealie | `mealie` | `/mnt/TrueNAS/proxmox/config/mealie` | `1.1M` | `mealie-data` | `longhorn` | `5Gi` | Migrated live on `2026-06-12` |
 
@@ -26,8 +26,7 @@ The measured source usage is far below the planned PVC sizes, so none of these f
 
 ## Recommended Order
 
-1. Calibre
-2. SABnzbd
+1. SABnzbd
 
 This order starts with the smallest and lowest-risk config stores before touching download workflow state.
 
