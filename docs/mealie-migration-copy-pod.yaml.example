@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mealie-migration-copy
+  namespace: mealie
+spec:
+  restartPolicy: Never
+  containers:
+  - name: copy
+    image: alpine:3.20
+    command:
+    - /bin/sh
+    - -c
+    - |
+      set -e
+      apk add --no-cache rsync >/dev/null
+      rsync -aHAX --delete /source/ /target/
+      echo "SOURCE"
+      du -sh /source
+      echo "TARGET"
+      du -sh /target
+    volumeMounts:
+    - name: source
+      mountPath: /source
+      readOnly: true
+    - name: target
+      mountPath: /target
+  volumes:
+  - name: source
+    nfs:
+      server: 192.168.1.70
+      path: /mnt/TrueNAS/proxmox/config/mealie
+  - name: target
+    persistentVolumeClaim:
+      claimName: mealie-data
