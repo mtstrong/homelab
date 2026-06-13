@@ -17,18 +17,14 @@ Prepared PVCs in this repo for the remaining config migrations:
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Overseerr | `overseerr` | `/mnt/TrueNAS/proxmox/config/overseerr` | `2.9M` | `overseerr` | `longhorn` | `1Gi` | Migrated live on `2026-06-12` |
 | Calibre | `calibre` | `/mnt/TrueNAS/proxmox/config/calibre` | `35M` | `calibre-config` | `longhorn` | `5Gi` | Migrated live on `2026-06-12` |
-| SABnzbd | `sabnzbd` | `/mnt/TrueNAS/proxmox/config/sabnzbd` | `9.1M` | `sabnzbd-config` | `longhorn` | `5Gi` | Pending |
+| SABnzbd | `sabnzbd` | `/mnt/TrueNAS/proxmox/config/sabnzbd` | `9.1M` | `sabnzbd-config` | `longhorn` | `5Gi` | Migrated live on `2026-06-12` |
 | Mealie | `mealie` | `/mnt/TrueNAS/proxmox/config/mealie` | `1.1M` | `mealie-data` | `longhorn` | `5Gi` | Migrated live on `2026-06-12` |
 
 If all four PVCs are created as sized above, total requested Longhorn capacity increases by 16 GiB, taking the cluster from 97 GiB to 113 GiB requested. Based on current free capacity, aggregate Longhorn space is not the limiting factor for these config migrations.
 
 The measured source usage is far below the planned PVC sizes, so none of these four apps need a PVC size increase before cutover.
 
-## Recommended Order
-
-1. SABnzbd
-
-This order starts with the smallest and lowest-risk config stores before touching download workflow state.
+All remaining Kubernetes application config previously stored on TrueNAS NFS has now been migrated to Longhorn.
 
 ## Important GitOps Note
 
