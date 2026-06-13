@@ -18,7 +18,7 @@ Prepared PVCs in this repo for the remaining config migrations:
 | Overseerr | `overseerr` | `/mnt/TrueNAS/proxmox/config/overseerr` | `2.9M` | `overseerr` | `longhorn` | `1Gi` | Migrated live on `2026-06-12` |
 | Calibre | `calibre` | `/mnt/TrueNAS/proxmox/config/calibre` | `35M` | `calibre-config` | `longhorn` | `5Gi` | Pending |
 | SABnzbd | `sabnzbd` | `/mnt/TrueNAS/proxmox/config/sabnzbd` | `9.1M` | `sabnzbd-config` | `longhorn` | `5Gi` | Pending |
-| Mealie | `mealie` | `/mnt/TrueNAS/proxmox/config/mealie` | `1.1M` | `mealie-data` | `longhorn` | `5Gi` | Pending |
+| Mealie | `mealie` | `/mnt/TrueNAS/proxmox/config/mealie` | `1.1M` | `mealie-data` | `longhorn` | `5Gi` | Migrated live on `2026-06-12` |
 
 If all four PVCs are created as sized above, total requested Longhorn capacity increases by 16 GiB, taking the cluster from 97 GiB to 113 GiB requested. Based on current free capacity, aggregate Longhorn space is not the limiting factor for these config migrations.
 
@@ -26,15 +26,14 @@ The measured source usage is far below the planned PVC sizes, so none of these f
 
 ## Recommended Order
 
-1. Mealie
-2. Calibre
-3. SABnzbd
+1. Calibre
+2. SABnzbd
 
 This order starts with the smallest and lowest-risk config stores before touching download workflow state.
 
 ## Important GitOps Note
 
-Overseerr ArgoCD auto-sync was paused live during cutover so the cluster would not revert to the remote Git state before these local manifest changes are committed and pushed. Do not re-enable auto-sync for the Overseerr application until the updated manifests are present on the tracked remote branch.
+Overseerr and Mealie were both migrated live and their ArgoCD applications were returned to automated sync after the updated manifests were pushed to the tracked remote branch.
 
 ## Per-App Validation
 
