@@ -20,7 +20,6 @@ resources:
 - apps/it-tools.yaml
 - apps/kavita.yaml
 - apps/loki.yaml
-- apps/tinyauth.yaml
 - apps/mealie.yaml
 - apps/node-exporter.yaml
 - apps/notifiarr.yaml

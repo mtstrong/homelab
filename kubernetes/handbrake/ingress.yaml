@@ -14,6 +14,5 @@ spec:
     - name: handbrake
       port: 9999
     middlewares:
-    - name: tinyauth-forwardauth
     - name: default-headers
   tls: {}
