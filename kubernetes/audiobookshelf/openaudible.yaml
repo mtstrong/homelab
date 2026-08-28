@@ -1,0 +1,217 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: openaudible-config
+  namespace: audiobookshelf
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 50Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openaudible
+  namespace: audiobookshelf
+  labels:
+    app: openaudible
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: openaudible
+  template:
+    metadata:
+      labels:
+        app: openaudible
+    spec:
+      nodeSelector:
+        worker: "true"
+        kubernetes.io/arch: amd64
+      securityContext:
+        seccompProfile:
+          type: Unconfined
+      containers:
+      - name: openaudible
+        image: openaudible/openaudible:latest@sha256:de29753bcca6b7a2c465337e073880839b26a5e02fc445cc3ff3d2d0ff383d15
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        - name: TZ
+          value: America/Chicago
+        - name: OA_BETA
+          value: "false"
+        ports:
+        - name: http
+          containerPort: 3000
+          protocol: TCP
+        readinessProbe:
+          tcpSocket:
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 15
+          timeoutSeconds: 5
+          failureThreshold: 12
+        livenessProbe:
+          tcpSocket:
+            port: 3000
+          initialDelaySeconds: 120
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 6
+        resources:
+          requests:
+            cpu: 250m
+            memory: 1Gi
+          limits:
+            cpu: 4000m
+            memory: 4Gi
+        volumeMounts:
+        - name: config
+          mountPath: /config/OpenAudible
+        - name: audiobooks
+          mountPath: /config/OpenAudible/books
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: openaudible-config
+      - name: audiobooks
+        nfs:
+          server: 192.168.1.70
+          path: /mnt/TrueNAS/audiobooks
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: openaudible
+  namespace: audiobookshelf
+spec:
+  selector:
+    app: openaudible
+  ports:
+  - name: http
+    port: 3000
+    targetPort: 3000
+    protocol: TCP
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: openaudible-tinyauth
+  namespace: audiobookshelf
+spec:
+  forwardAuth:
+    address: http://tinyauth.tinyauth.svc.cluster.local:3000/api/auth/traefik
+    trustForwardHeader: true
+    authResponseHeaders:
+    - Remote-User
+    - Remote-Name
+    - Remote-Email
+    - Remote-Groups
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: openaudible
+  namespace: audiobookshelf
+spec:
+  entryPoints:
+  - websecure
+  routes:
+  - kind: Rule
+    match: Host(`openaudible.tehmatt.com`)
+    services:
+    - name: openaudible
+      port: 3000
+    middlewares:
+    - name: openaudible-tinyauth
+    - name: default-headers
+  tls: {}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: openaudible-restart
+  namespace: audiobookshelf
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: openaudible-restart
+  namespace: audiobookshelf
+rules:
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  resourceNames:
+  - openaudible
+  verbs:
+  - get
+  - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: openaudible-restart
+  namespace: audiobookshelf
+subjects:
+- kind: ServiceAccount
+  name: openaudible-restart
+  namespace: audiobookshelf
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: openaudible-restart
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: openaudible-restart
+  namespace: audiobookshelf
+spec:
+  schedule: "0 3 * * *"
+  timeZone: America/Chicago
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          serviceAccountName: openaudible-restart
+          restartPolicy: Never
+          containers:
+          - name: restart
+            image: curlimages/curl:8.16.0@sha256:5a91ea0c9c3ee27b4abe657b68cf6bf0676afa13b236b3bda34283cb3924d4f6
+            command:
+            - /bin/sh
+            - -ec
+            args:
+            - |
+              token="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
+              restarted_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+              curl --fail --silent --show-error \
+                --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt \
+                --header "Authorization: Bearer ${token}" \
+                --header "Content-Type: application/strategic-merge-patch+json" \
+                --request PATCH \
+                --data "{\"spec\":{\"template\":{\"metadata\":{\"annotations\":{\"openaudible.homelab/restarted-at\":\"${restarted_at}\"}}}}}" \
+                "https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT_HTTPS}/apis/apps/v1/namespaces/audiobookshelf/deployments/openaudible"
+            resources:
+              requests:
+                cpu: 10m
+                memory: 32Mi
+              limits:
+                cpu: 100m
+                memory: 128Mi
