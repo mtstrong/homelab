@@ -6,9 +6,9 @@ metadata:
 spec:
   project: default
   sources:
-    - repoURL: https://github.com/falcosecurity/charts.git
-      targetRevision: main
-      path: charts/falco
+    - repoURL: https://falcosecurity.github.io/charts
+      chart: falco
+      targetRevision: 9.1.0
       helm:
         valueFiles:
           - $values/kubernetes/falco/values.yaml

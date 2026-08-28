@@ -24,8 +24,12 @@ spec:
         imagePullPolicy: IfNotPresent
         command: [ "/var/run/argocd/argocd-cmp-server" ]
         env:
+        - name: AVP_TYPE
+          value: vault
         - name: AVP_AUTH_TYPE
           value: kubernetes
+        - name: AVP_K8S_TOKEN_PATH
+          value: /var/run/secrets/tokens/vault-token
         - name: VAULT_ADDR
           valueFrom:
             configMapKeyRef:
