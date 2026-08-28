@@ -1,0 +1,30 @@
+# Example terraform.tfvars file
+# Copy this file to terraform.tfvars and customize as needed
+
+# AWS Configuration
+aws_region = "us-east-1"
+# availability_zones = ["us-east-1a", "us-east-1b"]
+
+# Project Configuration
+project_name = "uptime-kuma"
+environment  = "prod"
+
+# Network Configuration
+vpc_cidr             = "10.0.0.0/16"
+enable_nat_gateway   = true
+allowed_cidr_blocks  = ["0.0.0.0/0"]  # Restrict this to your IP range for security
+
+# ECS Task Configuration
+uptime_kuma_image = "louislam/uptime-kuma:latest"
+task_cpu          = "512"    # 0.5 vCPU
+task_memory       = "1024"   # 1 GB RAM
+desired_count     = 1
+
+# Logging
+log_retention_days = 7
+
+# Load Balancer
+enable_deletion_protection = false  # Set to true for production
+
+# HTTPS Configuration (uncomment and configure if using SSL)
+# certificate_arn = "arn:aws:acm:us-east-1:123456789012:certificate/your-cert-id"

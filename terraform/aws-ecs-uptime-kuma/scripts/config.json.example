@@ -1,0 +1,64 @@
+{
+  "monitors": [
+    {
+      "name": "Example Website",
+      "type": "http",
+      "url": "https://example.com",
+      "interval": 60,
+      "retryInterval": 60,
+      "maxretries": 3,
+      "method": "GET",
+      "expectedStatus": "200-299",
+      "description": "Main website health check"
+    },
+    {
+      "name": "API Endpoint",
+      "type": "http",
+      "url": "https://api.example.com/health",
+      "interval": 30,
+      "retryInterval": 60,
+      "maxretries": 2,
+      "method": "GET",
+      "expectedStatus": "200",
+      "description": "API health endpoint"
+    },
+    {
+      "name": "Database Server",
+      "type": "port",
+      "hostname": "db.example.com",
+      "port": 5432,
+      "interval": 120,
+      "description": "PostgreSQL port check"
+    }
+  ],
+  "notifications": [
+    {
+      "name": "Slack Alerts",
+      "type": "slack",
+      "isDefault": true,
+      "config": {
+        "webhookURL": "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
+      }
+    },
+    {
+      "name": "Email Alerts",
+      "type": "smtp",
+      "isDefault": false,
+      "config": {
+        "hostname": "smtp.gmail.com",
+        "port": 587,
+        "secure": true,
+        "username": "your-email@gmail.com",
+        "password": "your-app-password",
+        "from": "uptime-kuma@example.com",
+        "to": "alerts@example.com"
+      }
+    }
+  ],
+  "settings": {
+    "checkUpdate": false,
+    "checkBeta": false,
+    "keepDataPeriodDays": 180,
+    "serverTimezone": "America/New_York"
+  }
+}
