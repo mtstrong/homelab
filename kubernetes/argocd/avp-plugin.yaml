@@ -18,7 +18,7 @@ data:
       version: v1.0
       discover:
         find:
-          command: ["sh", "-c", "ls -1 *.avp.yaml *.avp.yml 2>/dev/null || ls -1 *avp*.yaml 2>/dev/null || true"]
+          command: ["sh", "-c", "for file in *.avp.yaml *.avp.yml; do [ -f \"$file\" ] && echo \"$file\" && exit 0; done; exit 1"]
       generate:
         command: ["sh", "-c", "argocd-vault-plugin generate ."]
   # Parameters consumed by the avp sidecar
