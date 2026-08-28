@@ -1,13 +1,14 @@
 # OpenAudible automation
 
-OpenAudible is available only through its cluster-local service. Its
-configuration and downloaded AAX files are stored on the `openaudible-config`
-Longhorn volume. Converted books are written directly to the same TrueNAS NFS
-export that Audiobookshelf mounts at `/audiobooks`.
+OpenAudible is available at `http://192.168.2.137:3000` through a private
+MetalLB address. Its configuration and downloaded AAX files are stored on the
+`openaudible-config` Longhorn volume. Converted books are written directly to
+the same TrueNAS NFS export that Audiobookshelf mounts at `/audiobooks`.
 
 ## Initial setup
 
-1. Port-forward the service with `kubectl port-forward -n audiobookshelf service/openaudible 3000:3000`, open `http://localhost:3000`, and wait for the web desktop and OpenAudible installer to finish loading.
+1. From the LAN, open `http://192.168.2.137:3000` and wait for the web desktop
+   and OpenAudible installer to finish loading.
 2. Activate an OpenAudible license. Demo mode cannot convert audiobooks.
 3. Connect the Audible account using **Controls > Connect to Audible** and
    complete any MFA or CAPTCHA prompts.
@@ -43,7 +44,7 @@ kubectl logs deployment/openaudible -n audiobookshelf --tail=100
 ```
 
 OpenAudible's Docker image is experimental and only published for AMD64. The web
-desktop has no native password protection, so do not bypass the TinyAuth
-middleware or expose its service outside the cluster. The pod uses the
-unconfined seccomp profile required by the upstream image to auto-start
-OpenAudible; keep this exception limited to this pod.
+desktop has no native password protection, so keep `192.168.2.137:3000`
+restricted to the trusted LAN and do not port-forward it from the router. The
+pod uses the unconfined seccomp profile required by the upstream image to
+auto-start OpenAudible; keep this exception limited to this pod.
