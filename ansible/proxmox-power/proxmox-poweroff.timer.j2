@@ -1,0 +1,10 @@
+[Unit]
+Description=Daily power-off timer for Proxmox host
+
+[Timer]
+OnCalendar={{ proxmox_poweroff_on_calendar }}
+Persistent=true
+RandomizedDelaySec={{ proxmox_poweroff_randomized_delay_sec }}
+
+[Install]
+WantedBy=timers.target

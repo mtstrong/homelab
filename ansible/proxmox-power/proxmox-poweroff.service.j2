@@ -1,0 +1,8 @@
+[Unit]
+Description=Gracefully power off Proxmox host on a schedule
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/shutdown -P now "Scheduled homelab power window"

@@ -1,0 +1,12 @@
+proxmox_power_targets:
+  - name: pbs
+    mac: aa:bb:cc:dd:ee:ff
+    host: 192.168.1.117
+    broadcast: 192.168.1.255
+  - name: spare-pve
+    mac: aa:bb:cc:dd:ee:00
+    host: 192.168.1.118
+    broadcast: 192.168.1.255
+
+proxmox_poweroff_on_calendar: "*-*-* 23:30:00"
+proxmox_shutdown_delay_minutes: 15

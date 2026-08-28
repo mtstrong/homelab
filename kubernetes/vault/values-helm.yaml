@@ -4,7 +4,7 @@ global:
 server:
   image:
     repository: hashicorp/vault
-    tag: "1.18.1"
+    tag: "2.0.4"
   dataStorage:
     enabled: true
     size: 10Gi

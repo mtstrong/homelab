@@ -27,7 +27,7 @@ spec:
         fsGroupChangePolicy: OnRootMismatch
       containers:
       - name: radarr
-        image: lscr.io/linuxserver/radarr:6.0.4.10291-ls290
+        image: lscr.io/linuxserver/radarr:6.3.0.10514-ls314
         imagePullPolicy: IfNotPresent
         env:
         - name: PUID

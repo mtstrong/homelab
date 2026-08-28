@@ -39,6 +39,6 @@ This folder contains Kubernetes manifests to deploy [RomM](https://romm.app/) an
 
 ## Notes
 
-- Container image is pinned to `rommapp/romm:4.3.2`. Update as needed.
+- Container image is pinned to `rommapp/romm:5.2.0`. Update as needed.
 - MariaDB uses basic liveness/readiness checks. For heavier loads, consider switching to a StatefulSet and tuning resources.
 - RomM exposes port 8080 internally; the Service maps it to 80 consistent with other apps.

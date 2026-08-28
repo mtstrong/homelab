@@ -18,7 +18,7 @@ spec:
         worker: "true"
       containers:
       - name: calibre-web
-        image: lscr.io/linuxserver/calibre-web:0.6.24
+        image: lscr.io/linuxserver/calibre-web:0.6.27
         env:
         - name: PUID
           value: "1000"

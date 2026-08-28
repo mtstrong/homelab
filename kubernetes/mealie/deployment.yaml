@@ -17,7 +17,7 @@ spec:
         worker: "true"
       containers:
       - name: mealie
-        image: ghcr.io/mealie-recipes/mealie:v3.0.2
+        image: ghcr.io/mealie-recipes/mealie:v3.23.1
         ports:
         - containerPort: 9000
           name: http

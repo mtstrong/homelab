@@ -21,7 +21,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: homebridge
-        image: homebridge/homebridge:2024-12-11
+        image: homebridge/homebridge:2026-08-17
         ports:
         - containerPort: 8581
           name: http
