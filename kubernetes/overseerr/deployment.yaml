@@ -9,6 +9,8 @@ metadata:
     app.kubernetes.io/instance: overseerr
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: overseerr
@@ -19,22 +21,33 @@ spec:
     spec:
       nodeSelector:
         worker: "true"
+      securityContext:
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
       containers:
-      - name: overseerr
-        image: linuxserver/overseerr:1.35.0
+      - name: seerr
+        image: ghcr.io/seerr-team/seerr:v3.4.1
         env:
         - name: TZ
           value: America/Chicago
-        - name: PUID
-          value: "1000"
-        - name: PGID
-          value: "1000"
         ports:
         - containerPort: 5055
           protocol: TCP
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          privileged: false
+          readOnlyRootFilesystem: false
+          runAsGroup: 1000
+          runAsNonRoot: true
+          runAsUser: 1000
+          seccompProfile:
+            type: RuntimeDefault
         volumeMounts:
         - name: overseerr
-          mountPath: /config
+          mountPath: /app/config
       volumes:
       - name: overseerr
         persistentVolumeClaim:
