@@ -74,8 +74,9 @@ spec:
           name: downloads
       volumes:
       - name: config
-        persistentVolumeClaim:
-          claimName: radarr
+        nfs:
+          server: 192.168.1.38
+          path: /mnt/TrueNAS/proxmox/config/radarr
       - name: movies
         nfs:
           server: 192.168.1.38
