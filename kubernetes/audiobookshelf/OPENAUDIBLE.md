@@ -28,6 +28,17 @@ The startup refresh discovers new purchases; OpenAudible then downloads and
 converts them using the saved automation settings. Audiobookshelf discovers the
 completed M4B on its next scheduled library scan.
 
+## Permissions
+
+OpenAudible runs as UID/GID 1000. The `fix-permissions` init container chowns
+the Longhorn config volume to 1000 on every start; without it OpenAudible
+cannot install or persist its license, Audible login, or settings.
+
+On the TrueNAS share, everything is owned by root with group 1000, and
+directories are group-writable with setgid (`chgrp -R 1000`, `chmod g+rwxs`
+on directories). This lets OpenAudible add books under existing author
+folders. Re-apply this if books are copied onto the share as root.
+
 ## Operations
 
 Trigger the automation outside the daily schedule:
