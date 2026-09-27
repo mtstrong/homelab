@@ -1,0 +1,96 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: libation-db
+  namespace: audiobookshelf
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: libation
+  namespace: audiobookshelf
+  labels:
+    app: libation
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: libation
+  template:
+    metadata:
+      labels:
+        app: libation
+    spec:
+      # Run as 1000:1000 to match the group that owns the TrueNAS audiobooks share.
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+      initContainers:
+      # Longhorn volumes start out root-owned.
+      - name: fix-permissions
+        image: busybox:1.36
+        command:
+        - sh
+        - -c
+        - chown -R 1000:1000 /db
+        securityContext:
+          runAsUser: 0
+          runAsNonRoot: false
+        resources:
+          requests:
+            cpu: 10m
+            memory: 16Mi
+          limits:
+            cpu: 100m
+            memory: 64Mi
+        volumeMounts:
+        - name: db
+          mountPath: /db
+      containers:
+      - name: libation
+        image: rmcrackan/libation:14.2.2@sha256:aa182f1eb3002b4b67d8eebdb434f8e8f27debb14363cabc48be75807da5fd5f
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: SLEEP_TIME
+          value: 6h
+        - name: TZ
+          value: America/Chicago
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 2000m
+            memory: 2Gi
+        volumeMounts:
+        # AccountsSettings.json, Settings.json and libation-master.key from the
+        # desktop app. Created out of band; see LIBATION.md.
+        - name: config
+          mountPath: /config
+          readOnly: true
+        - name: db
+          mountPath: /db
+        - name: audiobooks
+          mountPath: /data
+      volumes:
+      - name: config
+        secret:
+          secretName: libation-config
+      - name: db
+        persistentVolumeClaim:
+          claimName: libation-db
+      - name: audiobooks
+        nfs:
+          server: 192.168.1.70
+          path: /mnt/TrueNAS/audiobooks
