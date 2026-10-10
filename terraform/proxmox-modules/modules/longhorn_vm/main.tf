@@ -12,6 +12,9 @@ resource "proxmox_vm_qemu" "longhorn_vm" {
   target_node = var.target_node
   vmid       = var.vmid
 
+  # Start automatically when the Proxmox host boots (e.g. after a power loss)
+  onboot     = true
+
   clone      = var.clone_template
 
   cpu {

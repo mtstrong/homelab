@@ -19,6 +19,16 @@ spec:
         prometheus.io/port: "9487"
         prometheus.io/path: "/metrics"
     spec:
+      tolerations:
+      # Evict quickly if the node dies so Longhorn can reattach volumes elsewhere
+      - key: node.kubernetes.io/not-ready
+        operator: Exists
+        effect: NoExecute
+        tolerationSeconds: 60
+      - key: node.kubernetes.io/unreachable
+        operator: Exists
+        effect: NoExecute
+        tolerationSeconds: 60
       containers:
       - name: tautulli-exporter
         image: nwalke/tautulli_exporter:latest

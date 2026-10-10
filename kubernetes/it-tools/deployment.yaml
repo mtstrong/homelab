@@ -20,6 +20,16 @@ spec:
     spec:
       nodeSelector:
         worker: "true"
+      tolerations:
+      # Evict quickly if the node dies so Longhorn can reattach volumes elsewhere
+      - key: node.kubernetes.io/not-ready
+        operator: Exists
+        effect: NoExecute
+        tolerationSeconds: 60
+      - key: node.kubernetes.io/unreachable
+        operator: Exists
+        effect: NoExecute
+        tolerationSeconds: 60
       containers:
       - name: it-tools
         image: corentinth/it-tools:latest

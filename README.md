@@ -35,7 +35,7 @@ This repository contains the complete infrastructure-as-code for my homelab — 
 - **Full observability** — Prometheus, Grafana, Loki + Promtail, Node Exporter, cAdvisor
 - **IaC everywhere** — Terraform manages Cloudflare DNS, Oracle Cloud, and Azure infrastructure
 - **CI/CD with drift detection** — GitHub Actions pipelines with scheduled drift checks that auto-create issues
-- **Security-first** — Azure OIDC (no stored credentials), tfsec scanning, Vaultwarden
+- **Security-first** — Azure OIDC (no stored credentials), tfsec scanning
 
 ---
 
@@ -89,7 +89,7 @@ graph TB
             MEDIA[Sonarr · Radarr · Prowlarr<br/>Sabnzbd · Overseerr · Tautulli]
             BOOKS[Audiobookshelf · Kavita<br/>Readarr · Calibre]
             HOME[Homebridge]
-            UTIL[Homepage · IT-Tools<br/>Vaultwarden · Mealie · RomM]
+            UTIL[Homepage · IT-Tools<br/>Mealie · RomM]
             AI[Ollama · Open WebUI]
         end
 
@@ -132,7 +132,7 @@ graph TB
 | **Infrastructure as Code** | Terraform (Cloudflare, Oracle Cloud, Azure, Proxmox providers) |
 | **CI/CD** | GitHub Actions (self-hosted + cloud runners), Renovate Bot, Docker Buildx, GHCR |
 | **Monitoring** | Prometheus v3.5.1, Grafana v12.3.1, Loki v3.6.4, Promtail, Node Exporter, cAdvisor |
-| **Security** | HashiCorp Vault, tfsec, Vaultwarden, Azure OIDC |
+| **Security** | HashiCorp Vault, tfsec, Azure OIDC |
 | **Networking** | Traefik, Cert-Manager, Cloudflare DNS/CDN, NordLynx VPN |
 | **Config Management** | Ansible (Linux, Windows, MiSTer FPGA) |
 | **Containers** | Docker, Docker Compose |
@@ -239,7 +239,6 @@ Developer pushes to main
 |:--------|:------------|
 | Homepage | Unified dashboard with live API widgets |
 | IT-Tools | Developer/sysadmin utility collection |
-| Vaultwarden | Self-hosted Bitwarden password manager |
 | Mealie | Recipe manager and meal planner |
 
 ### AI / Machine Learning
@@ -291,7 +290,6 @@ All Terraform state is stored in **Azure Storage** with **OIDC authentication** 
 - **HashiCorp Vault** — Centralized secrets with Kubernetes auth, injected at deploy time via AVP
 - **Azure OIDC** — Federated identity for CI/CD, no stored cloud credentials
 - **tfsec** — Infrastructure security scanning in CI pipelines
-- **Vaultwarden** — Self-hosted password management
 - **Cert-Manager** — Automated TLS certificate provisioning via Let's Encrypt
 - **NordLynx VPN** — WireGuard tunnel for download client traffic
 

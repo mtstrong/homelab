@@ -34,7 +34,6 @@ resources:
 - apps/sonarr.yaml
 - apps/tautulli.yaml
 - apps/velero.yaml
-- apps/vaultwarden.yaml
 - apps/headscale.yaml
 
 patchesStrategicMerge:

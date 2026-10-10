@@ -36,6 +36,16 @@ spec:
         runAsUser: 1000
         runAsGroup: 1000
         runAsNonRoot: true
+      tolerations:
+      # Evict quickly if the node dies so Longhorn can reattach volumes elsewhere
+      - key: node.kubernetes.io/not-ready
+        operator: Exists
+        effect: NoExecute
+        tolerationSeconds: 60
+      - key: node.kubernetes.io/unreachable
+        operator: Exists
+        effect: NoExecute
+        tolerationSeconds: 60
       initContainers:
       # Longhorn volumes start out root-owned.
       - name: fix-permissions

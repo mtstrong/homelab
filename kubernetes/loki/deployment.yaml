@@ -17,6 +17,16 @@ spec:
     spec:
       nodeSelector:
         worker: "true"
+      tolerations:
+      # Evict quickly if the node dies so Longhorn can reattach volumes elsewhere
+      - key: node.kubernetes.io/not-ready
+        operator: Exists
+        effect: NoExecute
+        tolerationSeconds: 60
+      - key: node.kubernetes.io/unreachable
+        operator: Exists
+        effect: NoExecute
+        tolerationSeconds: 60
       securityContext:
         runAsUser: 10001
         runAsGroup: 10001
@@ -24,7 +34,7 @@ spec:
         fsGroupChangePolicy: OnRootMismatch
       containers:
       - name: loki
-        image: grafana/loki:3.7.6
+        image: grafana/loki:3.6.4
         args:
         - -config.file=/etc/loki/config.yaml
         - -config.expand-env=true
