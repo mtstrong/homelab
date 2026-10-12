@@ -33,7 +33,7 @@ spec:
           tolerationSeconds: 60
       containers:
         - name: exporter
-          image: ghcr.io/mtstrong/azure-finops-exporter:latest
+          image: ghcr.io/mtstrong/azure-finops-exporter:20260210-213846
           ports:
             - containerPort: 8080
               name: http-metrics

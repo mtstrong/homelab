@@ -31,7 +31,7 @@ spec:
         tolerationSeconds: 60
       containers:
       - name: tautulli-exporter
-        image: nwalke/tautulli_exporter:latest
+        image: nwalke/tautulli_exporter:v0.1.0
         ports:
         - containerPort: 9487
           name: metrics

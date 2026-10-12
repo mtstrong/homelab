@@ -37,7 +37,7 @@ spec:
         fsGroupChangePolicy: OnRootMismatch
       containers:
       - name: handbrake-server
-        image: ghcr.io/thenickoftime/handbrake-web-server:latest
+        image: ghcr.io/thenickoftime/handbrake-web-server:0.8.1
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 9999
@@ -70,7 +70,7 @@ spec:
         - mountPath: /video
           name: handbrake-data
       - name: handbrake-worker
-        image: ghcr.io/thenickoftime/handbrake-web-worker:latest
+        image: ghcr.io/thenickoftime/handbrake-web-worker:0.8.1
         imagePullPolicy: IfNotPresent
         env:
         - name: WORKER_ID

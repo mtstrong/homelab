@@ -21,7 +21,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: backup
-              image: bitnami/kubectl:latest
+              image: alpine/k8s:1.26.14
               command: ["/bin/sh", "/scripts/backup.sh"]
               volumeMounts:
                 - name: backup-script

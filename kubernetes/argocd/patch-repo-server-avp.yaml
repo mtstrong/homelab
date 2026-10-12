@@ -20,7 +20,7 @@ spec:
           name: argocd-cmp-avp
       containers:
       - name: avp
-        image: flybits/argocd-vault-plugin:latest
+        image: flybits/argocd-vault-plugin:cd7e11a
         imagePullPolicy: IfNotPresent
         command: [ "/var/run/argocd/argocd-cmp-server" ]
         env:

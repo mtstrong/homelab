@@ -33,7 +33,7 @@ spec:
         tolerationSeconds: 60
       containers:
       - name: mariadb
-        image: mariadb:11
+        image: mariadb:11.8.9
         imagePullPolicy: IfNotPresent
         lifecycle:
           postStart:

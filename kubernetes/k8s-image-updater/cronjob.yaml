@@ -20,7 +20,7 @@ spec:
           restartPolicy: OnFailure
           initContainers:
           - name: clone-repo
-            image: alpine/git:latest
+            image: alpine/git:2.54.0
             command:
             - /bin/sh
             - -c
@@ -41,7 +41,7 @@ spec:
               mountPath: /workspace
           containers:
           - name: updater
-            image: ghcr.io/mtstrong/k8s-image-updater:latest
+            image: ghcr.io/mtstrong/k8s-image-updater:main-0e26d29
             imagePullPolicy: Always
             env:
             - name: GITHUB_TOKEN

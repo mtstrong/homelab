@@ -1,7 +1,7 @@
 version: '3.9'
 services:
   mylar3:
-    image: lscr.io/linuxserver/mylar3:latest
+    image: lscr.io/linuxserver/mylar3:v0.11.0-ls275
     container_name: mylar3
     environment:
       - PUID=1000
@@ -16,7 +16,8 @@ services:
     restart: unless-stopped
 
   openaudible:
-    image: openaudible/openaudible:latest
+    # Upstream only publishes "latest"; pinned by digest
+    image: openaudible/openaudible:latest@sha256:de29753bcca6b7a2c465337e073880839b26a5e02fc445cc3ff3d2d0ff383d15
     container_name: openaudible
     ports:
       - 13380:80
