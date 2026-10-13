@@ -7,6 +7,8 @@ resources:
   - _namespace.yaml
   - rbac.yaml
   - configmap.yaml
+  - alert-rules.yaml
+  - alertmanager.yaml
   - deployment.yaml
   - service.yaml
   - pvc.yaml

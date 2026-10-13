@@ -1,0 +1,140 @@
+---
+# Pushover credentials are NOT stored in git. Create them once with:
+#   kubectl create secret generic alertmanager-pushover -n prometheus \
+#     --from-literal=user_key=<your user key> --from-literal=token=<application API token>
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alertmanager-config
+  namespace: prometheus
+data:
+  alertmanager.yml: |
+    route:
+      receiver: pushover
+      group_by: [alertname, instance]
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 12h
+      routes:
+      - matchers: [severity="critical"]
+        receiver: pushover
+        repeat_interval: 4h
+
+    inhibit_rules:
+    # A full filesystem doesn't also need an "almost full" notification
+    - source_matchers: [alertname="FilesystemFull"]
+      target_matchers: [alertname="FilesystemAlmostFull"]
+      equal: [instance, mountpoint]
+    # No quorum already implies the cluster is at risk
+    - source_matchers: [alertname="ProxmoxNoQuorum"]
+      target_matchers: [alertname="ProxmoxQuorumAtRisk"]
+
+    receivers:
+    - name: pushover
+      pushover_configs:
+      - user_key_file: /etc/alertmanager/secrets/user_key
+        token_file: /etc/alertmanager/secrets/token
+        send_resolved: true
+        # critical = high priority (bypasses quiet hours), info = quiet
+        priority: '{{ if eq .CommonLabels.severity "critical" }}1{{ else if eq .CommonLabels.severity "info" }}-1{{ else }}0{{ end }}'
+        title: '{{ if eq .Status "firing" }}🔥{{ else }}✅{{ end }} {{ .CommonLabels.alertname }}{{ if gt (len .Alerts) 1 }} ({{ len .Alerts }}){{ end }}'
+        message: '{{ range .Alerts }}{{ .Annotations.summary }}{{ with .Annotations.description }}{{ "\n" }}{{ . }}{{ end }}{{ "\n" }}{{ end }}'
+        url: 'http://192.168.2.133:9090/alerts'
+        url_title: 'Prometheus alerts'
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alertmanager
+  namespace: prometheus
+  labels:
+    app: alertmanager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alertmanager
+  template:
+    metadata:
+      labels:
+        app: alertmanager
+    spec:
+      nodeSelector:
+        worker: "true"
+      tolerations:
+      # Evict quickly if the node dies so alerting moves to another node
+      - key: node.kubernetes.io/not-ready
+        operator: Exists
+        effect: NoExecute
+        tolerationSeconds: 60
+      - key: node.kubernetes.io/unreachable
+        operator: Exists
+        effect: NoExecute
+        tolerationSeconds: 60
+      securityContext:
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
+      containers:
+      - name: alertmanager
+        image: prom/alertmanager:v0.34.1
+        imagePullPolicy: IfNotPresent
+        args:
+        - --config.file=/etc/alertmanager/alertmanager.yml
+        - --storage.path=/alertmanager
+        ports:
+        - name: http
+          containerPort: 9093
+        readinessProbe:
+          httpGet:
+            path: /-/ready
+            port: 9093
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /-/healthy
+            port: 9093
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        resources:
+          requests:
+            cpu: 10m
+            memory: 32Mi
+          limits:
+            cpu: 200m
+            memory: 128Mi
+        volumeMounts:
+        - name: config
+          mountPath: /etc/alertmanager/alertmanager.yml
+          subPath: alertmanager.yml
+        - name: pushover
+          mountPath: /etc/alertmanager/secrets
+          readOnly: true
+        # Silences and notification state; losing them on restart is acceptable
+        - name: data
+          mountPath: /alertmanager
+      volumes:
+      - name: config
+        configMap:
+          name: alertmanager-config
+      - name: pushover
+        secret:
+          secretName: alertmanager-pushover
+      - name: data
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: alertmanager
+  namespace: prometheus
+  labels:
+    app: alertmanager
+spec:
+  selector:
+    app: alertmanager
+  ports:
+  - name: http
+    port: 9093
+    targetPort: 9093

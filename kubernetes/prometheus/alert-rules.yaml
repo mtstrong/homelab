@@ -1,0 +1,176 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-rules
+  namespace: prometheus
+data:
+  hosts.rules.yml: |
+    groups:
+    # Proxmox hosts (job proxmox-hosts) and k3s VMs (node-exporter DaemonSet)
+    - name: availability
+      rules:
+      - alert: ProxmoxHostDown
+        expr: up{job="proxmox-hosts"} == 0
+        for: 3m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Proxmox host {{ $labels.instance }} is unreachable"
+          description: "node-exporter on {{ $labels.instance }} has not answered for 3 minutes. The host or its network may be down."
+
+      - alert: K3sNodeDown
+        expr: |
+          (up{job="kubernetes-pods", namespace="node-exporter"} == 0)
+            * on(instance) group_left(nodename) max_over_time(node_uname_info[1h])
+        for: 3m
+        labels:
+          severity: critical
+        annotations:
+          summary: "k3s VM {{ $labels.nodename }} is unreachable"
+          description: "node-exporter on {{ $labels.nodename }} ({{ $labels.instance }}) has not answered for 3 minutes."
+
+      - alert: HostRebooted
+        expr: |
+          (changes(node_boot_time_seconds[15m]) > 0)
+            * on(instance) group_left(nodename) node_uname_info
+        labels:
+          severity: info
+        annotations:
+          summary: "{{ $labels.nodename }} rebooted"
+          description: "{{ $labels.nodename }} booted within the last 15 minutes."
+
+    - name: proxmox
+      rules:
+      - alert: ProxmoxNoQuorum
+        expr: pve_cluster_quorate == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Proxmox cluster has no quorum (seen from {{ $labels.instance }})"
+          description: "Without quorum Proxmox won't start VMs and cluster config is read-only."
+
+      - alert: ProxmoxQuorumAtRisk
+        expr: max(pve_cluster_votes{kind="total"}) - max(pve_cluster_votes{kind="quorum"}) < 1
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Proxmox cluster is one vote away from losing quorum"
+          description: "{{ with query \"max(pve_cluster_votes{kind='total'})\" }}{{ . | first | value }}{{ end }} votes present, {{ with query \"max(pve_cluster_votes{kind='quorum'})\" }}{{ . | first | value }}{{ end }} needed. Losing one more member stops VM management."
+
+      - alert: ProxmoxVMStopped
+        expr: pve_vm_running{onboot="1"} == 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "VM {{ $labels.name }} ({{ $labels.vmid }}) is stopped on {{ $labels.instance }}"
+          description: "This VM is set to start on boot but has not been running for 5 minutes."
+
+    - name: disks
+      rules:
+      - alert: DiskSmartFailing
+        expr: smartmon_device_smart_healthy == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "SMART health check failing for {{ $labels.disk }} on {{ $labels.instance }}"
+          description: "The drive reports that it is failing. Back up and replace it."
+
+      - alert: NvmeCriticalWarning
+        expr: nvme_critical_warning_total > 0
+        labels:
+          severity: critical
+        annotations:
+          summary: "NVMe critical warning on {{ $labels.device }} ({{ $labels.instance }})"
+          description: "Critical warning bitmask {{ $value }}: spare, temperature, reliability or read-only problem."
+
+      - alert: NvmeMediaErrors
+        expr: increase(nvme_media_errors_total[1h]) > 0
+        labels:
+          severity: critical
+        annotations:
+          summary: "New NVMe media errors on {{ $labels.device }} ({{ $labels.instance }})"
+          description: "The drive recorded unrecoverable data errors in the last hour."
+
+      - alert: NvmeWearHigh
+        expr: nvme_percentage_used_ratio > 0.8
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: "NVMe {{ $labels.device }} on {{ $labels.instance }} is {{ $value | humanizePercentage }} worn"
+          description: "Plan a replacement before it reaches 100%."
+
+      - alert: NvmeSpareLow
+        expr: nvme_available_spare_ratio < 0.2
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: "NVMe {{ $labels.device }} on {{ $labels.instance }} has {{ $value | humanizePercentage }} spare blocks left"
+
+      - alert: NvmeTemperatureHigh
+        expr: nvme_temperature_celsius > 70
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "NVMe {{ $labels.device }} on {{ $labels.instance }} is at {{ $value }}°C"
+
+      - alert: FilesystemAlmostFull
+        expr: |
+          ((1 - node_filesystem_avail_bytes{fstype=~"ext4|xfs|zfs", mountpoint!~"/boot.*"}
+              / node_filesystem_size_bytes{fstype=~"ext4|xfs|zfs", mountpoint!~"/boot.*"}) > 0.85)
+            * on(instance) group_left(nodename) node_uname_info
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $labels.mountpoint }} on {{ $labels.nodename }} is {{ $value | humanizePercentage }} full"
+
+      - alert: FilesystemFull
+        expr: |
+          ((1 - node_filesystem_avail_bytes{fstype=~"ext4|xfs|zfs", mountpoint!~"/boot.*"}
+              / node_filesystem_size_bytes{fstype=~"ext4|xfs|zfs", mountpoint!~"/boot.*"}) > 0.95)
+            * on(instance) group_left(nodename) node_uname_info
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "{{ $labels.mountpoint }} on {{ $labels.nodename }} is {{ $value | humanizePercentage }} full"
+
+    - name: resources
+      rules:
+      - alert: CpuTemperatureHigh
+        # k10temp (AMD CPU package) sensor on the UM773 hosts
+        expr: node_hwmon_temp_celsius{job="proxmox-hosts", chip="pci0000:00_0000:00:18_3"} > 90
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "CPU on {{ $labels.instance }} is at {{ $value }}°C"
+          description: "Check fans and airflow; the CPU may be throttling."
+
+      - alert: MemoryLow
+        expr: |
+          (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes < 0.1)
+            * on(instance) group_left(nodename) node_uname_info
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $labels.nodename }} has {{ $value | humanizePercentage }} memory available"
+
+    - name: monitoring
+      rules:
+      - alert: HostMetricsStale
+        # SMART/NVMe collectors run every 15 min, the Proxmox script every minute
+        expr: time() - node_textfile_mtime_seconds{job="proxmox-hosts"} > 3600
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $labels.file }} on {{ $labels.instance }} hasn't updated in over an hour"
+          description: "A host health collector stopped running, so disk or quorum problems may go unreported."
