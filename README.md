@@ -150,8 +150,8 @@ graph TB
 | bd790i | Proxmox Host | — |
 | bd795m | Proxmox Host | — |
 | um773a | K3s Worker | Minisforum UM773a |
-| um773b | K3s Worker | Minisforum UM773a |
-| um773c | K3s Worker | Minisforum UM773a |
+| x1b | K3s Worker | Minisforum X1 HX 470 |
+| x1c | K3s Worker | Minisforum X1 HX 470 |
 | — | NAS | TrueNAS (NFS) |
 
 ---

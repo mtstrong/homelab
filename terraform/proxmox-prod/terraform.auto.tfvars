@@ -12,25 +12,25 @@ control_vms = {
     target_node = "um773a"
     vmid        = 201
     cores       = 8
-    memory      = 8192
+    memory      = 12288
     disk_size   = "40G"
     ipconfig    = "ip=dhcp"
   }
   "k3s-02" = {
     name        = "k3s-02"
-    target_node = "um773b"
+    target_node = "x1b"
     vmid        = 202
     cores       = 8
-    memory      = 8192
+    memory      = 12288
     disk_size   = "40G"
     ipconfig    = "ip=dhcp"
   }
   "k3s-03" = {
     name        = "k3s-03"
-    target_node = "um773c"
+    target_node = "x1c"
     vmid        = 203
     cores       = 8
-    memory      = 8192
+    memory      = 12288
     disk_size   = "40G"
     ipconfig    = "ip=dhcp"
   }
@@ -40,19 +40,19 @@ control_vms = {
 worker_vms = {
   "k3s-04" = {
     name        = "k3s-04"
-    target_node = "um773b"
+    target_node = "x1b"
     vmid        = 204
     cores       = 8
-    memory      = 8192
+    memory      = 24576
     disk_size   = "40G"
     ipconfig    = "ip=dhcp"
   }
   "k3s-05" = {
     name        = "k3s-05"
-    target_node = "um773c"
+    target_node = "x1c"
     vmid        = 205
     cores       = 8
-    memory      = 8192
+    memory      = 24576
     disk_size   = "40G"
     ipconfig    = "ip=dhcp"
   }
@@ -61,7 +61,7 @@ worker_vms = {
     target_node = "um773a"
     vmid        = 206
     cores       = 8
-    memory      = 8192
+    memory      = 24576
     disk_size   = "40G"
     ipconfig    = "ip=dhcp"
   }
@@ -74,25 +74,25 @@ longhorn_vms = {
     target_node = "um773a"
     vmid        = 250
     cores       = 4
-    memory      = 4096
+    memory      = 8192
     disk_size   = "250G"
     ipconfig    = "ip=dhcp"
   }
   "lh-02" = {
     name        = "lh-02"
-    target_node = "um773b"
+    target_node = "x1b"
     vmid        = 251
     cores       = 4
-    memory      = 4096
+    memory      = 8192
     disk_size   = "250G"
     ipconfig    = "ip=dhcp"
   }
   "lh-03" = {
     name        = "lh-03"
-    target_node = "um773c"
+    target_node = "x1c"
     vmid        = 252
     cores       = 4
-    memory      = 4096
+    memory      = 8192
     disk_size   = "250G"
     ipconfig    = "ip=dhcp"
   }

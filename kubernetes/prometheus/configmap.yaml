@@ -84,12 +84,12 @@ data:
       - targets: ['192.168.1.109:9100']
         labels:
           instance: um773a
-      - targets: ['192.168.1.107:9100']
+      - targets: ['192.168.1.62:9100']
         labels:
-          instance: um773b
-      - targets: ['192.168.1.105:9100']
+          instance: x1b
+      - targets: ['192.168.1.25:9100']
         labels:
-          instance: um773c
+          instance: x1c
 
     # Optional: scrape Loki metrics if present
     - job_name: 'loki'
