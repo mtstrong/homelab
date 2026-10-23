@@ -175,6 +175,51 @@ data:
           summary: "{{ $labels.file }} on {{ $labels.instance }} hasn't updated in over an hour"
           description: "A host health collector stopped running, so disk or quorum problems may go unreported."
 
+    # Longhorn via longhorn-manager metrics (job longhorn).
+    # robustness: 1 healthy, 2 degraded, 3 faulted. backup_state: 3 completed, 4 error.
+    - name: storage
+      rules:
+      - alert: LonghornVolumeFaulted
+        expr: max by (volume, pvc, pvc_namespace) (longhorn_volume_robustness) == 3
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Longhorn volume {{ $labels.pvc_namespace }}/{{ $labels.pvc }} is faulted"
+          description: "No healthy replica is available; the app using {{ $labels.volume }} is down or read-only."
+
+      - alert: LonghornVolumeDegraded
+        expr: max by (volume, pvc, pvc_namespace) (longhorn_volume_robustness) == 2
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: "Longhorn volume {{ $labels.pvc_namespace }}/{{ $labels.pvc }} has been degraded for an hour"
+          description: "It is running on fewer replicas than configured and isn't rebuilding. Check the volume in the Longhorn UI."
+
+      - alert: LonghornBackupFailed
+        expr: max by (volume, backup) (longhorn_backup_state) == 4
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Longhorn backup {{ $labels.backup }} failed"
+          description: "Backup of {{ $labels.volume }} is in Error state. Check the backup target (TrueNAS NFS) in the Longhorn UI."
+
+      - alert: LonghornVolumeNotBackedUp
+        # Volumes with no completed backup that is newer than 36h (nightly job runs at 03:00)
+        expr: |
+          max by (volume, pvc, pvc_namespace) (longhorn_volume_robustness)
+            unless on (volume)
+          (max by (volume, backup) (longhorn_backup_state == 3)
+            unless on (backup) max by (backup) (longhorn_backup_state offset 36h))
+        for: 24h
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $labels.pvc_namespace }}/{{ $labels.pvc }} has no Longhorn backup from the last 36 hours"
+          description: "The nightly-backup recurring job didn't produce a backup for {{ $labels.volume }}. Check the job and the backup target."
+
     # Radarr/Sonarr/SABnzbd via exportarr (namespace exportarr). Decluttarr clears
     # routine failures, so anything these catch usually needs a human.
     - name: media
