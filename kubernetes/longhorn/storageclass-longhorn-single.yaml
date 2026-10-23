@@ -1,0 +1,19 @@
+# Despite the name, this class now keeps 3 replicas like `longhorn`. Sonarr, Kavita,
+# Tautulli and HandBrake's PVCs were created with it as single-replica volumes, which blocked
+# draining the Longhorn node holding them and risked their data. A PVC's storageClassName
+# can't change after creation, so the class itself was changed instead (existing volumes
+# were raised to 3 replicas directly on the Longhorn volume).
+#
+# Not managed by Argo CD. StorageClass parameters are immutable, so to change it:
+#   kubectl delete storageclass longhorn-single && kubectl apply -f kubernetes/longhorn/storageclass-longhorn-single.yaml
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: longhorn-single
+provisioner: driver.longhorn.io
+allowVolumeExpansion: true
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+parameters:
+  numberOfReplicas: "3"
+  staleReplicaTimeout: "30"

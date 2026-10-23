@@ -91,6 +91,22 @@ data:
         labels:
           instance: x1c
 
+    # Longhorn: each longhorn-manager pod reports volume, node and backup metrics for its node
+    - job_name: 'longhorn'
+      kubernetes_sd_configs:
+      - role: pod
+        namespaces:
+          names: [longhorn-system]
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_label_app]
+        action: keep
+        regex: longhorn-manager
+      - source_labels: [__meta_kubernetes_pod_container_port_number]
+        action: keep
+        regex: '9500'
+      - source_labels: [__meta_kubernetes_pod_node_name]
+        target_label: node
+
     # Optional: scrape Loki metrics if present
     - job_name: 'loki'
       static_configs:

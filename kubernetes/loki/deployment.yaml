@@ -16,6 +16,9 @@ spec:
     metadata:
       labels:
         app: loki
+      annotations:
+        # Loki only reads its config at startup; bump this when editing configmap.yaml
+        config-version: "2"
     spec:
       nodeSelector:
         worker: "true"

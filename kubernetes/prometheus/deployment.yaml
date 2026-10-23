@@ -79,6 +79,28 @@ spec:
           mountPath: /etc/prometheus/rules
         - name: data
           mountPath: /prometheus
+      # Calls Prometheus's /-/reload whenever the config or rules ConfigMaps change,
+      # so Argo-synced rule edits take effect without a restart.
+      - name: config-reloader
+        image: ghcr.io/jimmidyson/configmap-reload:v0.15.0
+        args:
+        - --volume-dir=/etc/prometheus
+        - --volume-dir=/etc/prometheus/rules
+        - --webhook-url=http://127.0.0.1:9090/-/reload
+        volumeMounts:
+        - name: config
+          mountPath: /etc/prometheus
+          readOnly: true
+        - name: rules
+          mountPath: /etc/prometheus/rules
+          readOnly: true
+        resources:
+          requests:
+            memory: "16Mi"
+            cpu: "5m"
+          limits:
+            memory: "64Mi"
+            cpu: "50m"
       volumes:
       - name: config
         configMap:
