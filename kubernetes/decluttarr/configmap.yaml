@@ -1,0 +1,48 @@
+# Decluttarr v2 config (https://github.com/ManiMatter/decluttarr), mounted at /app/config/config.yaml.
+# Only jobs listed under `jobs` run.
+#
+# Deliberately conservative:
+# - Failed imports are only removed when the message says the download is redundant
+#   (not an upgrade, nothing left to import). Items that need a human, like
+#   "matched to series by ID" or episode-number mismatches, are left alone and
+#   surface through the ArrQueueStuck alert instead.
+# - Orphans (SABnzbd jobs Radarr/Sonarr don't track) are kept, because they can
+#   still be imported by hand.
+# - search_missing runs 1 search per app per 10-minute cycle and repeats an item at
+#   most weekly, so the backlog drains over a few days without hitting indexer API limits.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: decluttarr-config
+  namespace: decluttarr
+data:
+  config.yaml: |
+    general:
+      log_level: INFO
+      test_run: false
+      timer: 10
+      request_timeout: 30
+
+    job_defaults:
+      max_strikes: 3
+      min_days_between_searches: 7
+      max_concurrent_searches: 1
+
+    jobs:
+      remove_failed_downloads:
+      remove_failed_imports:
+        message_patterns:
+          - "Not a Custom Format upgrade for existing*"
+          - "Not an upgrade for existing*"
+          - "Not a quality revision upgrade*"
+          - "No files found are eligible for import*"
+      remove_missing_files:
+      search_missing:
+
+    instances:
+      radarr:
+        - base_url: "http://radarr.radarr.svc.cluster.local:7878"
+          api_key: !ENV RADARR_API_KEY
+      sonarr:
+        - base_url: "http://sonarr.sonarr.svc.cluster.local:8989"
+          api_key: !ENV SONARR_API_KEY

@@ -1,14 +1,6 @@
-# Decluttarr (https://github.com/ManiMatter/decluttarr) clears stuck items out of the
-# Radarr/Sonarr queues so failed downloads get blocklisted and retried automatically.
-#
-# Deliberately conservative:
-# - Failed imports are only removed when the message says the download is redundant
-#   (not an upgrade, nothing left to import). Items that need a human, like
-#   "matched to series by ID" or episode-number mismatches, are left alone and
-#   surface through the ArrQueueStuck alert instead.
-# - Orphans (SABnzbd jobs Radarr/Sonarr don't track) are kept, because they can
-#   still be imported by hand.
-# - Stalled/slow/metadata checks are torrent-only; this setup is usenet-only.
+# Decluttarr clears stuck items out of the Radarr/Sonarr queues so failed downloads get
+# blocklisted and retried, and periodically re-searches missing items. Behaviour is set
+# in configmap.yaml.
 #
 # API keys live in the arr-api-keys Secret, created out of band:
 #   kubectl -n decluttarr create secret generic arr-api-keys \
@@ -29,59 +21,33 @@ spec:
     metadata:
       labels:
         app: decluttarr
+      annotations:
+        # Restart when the config changes (bump when editing configmap.yaml)
+        config-version: "2"
     spec:
       nodeSelector:
         worker: "true"
       containers:
       - name: decluttarr
-        image: ghcr.io/manimatter/decluttarr:v1.50.2
+        image: ghcr.io/manimatter/decluttarr:v2.2.0
         env:
         - name: TZ
           value: America/Chicago
-        - name: LOG_LEVEL
-          value: INFO
-        - name: TEST_RUN
-          value: "False"
-        - name: REMOVE_TIMER
-          value: "10"
-        - name: PERMITTED_ATTEMPTS
-          value: "3"
-        - name: REMOVE_FAILED
-          value: "True"
-        - name: REMOVE_FAILED_IMPORTS
-          value: "True"
-        - name: FAILED_IMPORT_MESSAGE_PATTERNS
-          value: '["Not a Custom Format upgrade for existing", "Not an upgrade for existing", "Not a quality revision upgrade", "No files found are eligible for import"]'
-        - name: REMOVE_MISSING_FILES
-          value: "True"
-        - name: REMOVE_ORPHANS
-          value: "False"
-        - name: REMOVE_UNMONITORED
-          value: "False"
-        - name: REMOVE_STALLED
-          value: "False"
-        - name: REMOVE_SLOW
-          value: "False"
-        - name: REMOVE_METADATA_MISSING
-          value: "False"
-        # Re-search missing items weekly, a few at a time, so failures that slipped
-        # through (e.g. SABnzbd jobs the apps lost track of) still get retried.
-        - name: RUN_PERIODIC_RESCANS
-          value: '{"SONARR": {"MISSING": true, "CUTOFF_UNMET": false, "MAX_CONCURRENT_SCANS": 3, "MIN_DAYS_BEFORE_RESCAN": 7}, "RADARR": {"MISSING": true, "CUTOFF_UNMET": false, "MAX_CONCURRENT_SCANS": 3, "MIN_DAYS_BEFORE_RESCAN": 7}}'
-        - name: RADARR_URL
-          value: http://radarr.radarr.svc.cluster.local:7878
-        - name: RADARR_KEY
+        - name: RADARR_API_KEY
           valueFrom:
             secretKeyRef:
               name: arr-api-keys
               key: radarr
-        - name: SONARR_URL
-          value: http://sonarr.sonarr.svc.cluster.local:8989
-        - name: SONARR_KEY
+        - name: SONARR_API_KEY
           valueFrom:
             secretKeyRef:
               name: arr-api-keys
               key: sonarr
+        volumeMounts:
+        - name: config
+          mountPath: /app/config/config.yaml
+          subPath: config.yaml
+          readOnly: true
         resources:
           requests:
             memory: "64Mi"
@@ -89,3 +55,7 @@ spec:
           limits:
             memory: "256Mi"
             cpu: "250m"
+      volumes:
+      - name: config
+        configMap:
+          name: decluttarr-config
