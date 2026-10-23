@@ -11,7 +11,9 @@ resources:
 - apps/audiobookshelf.yaml
 - apps/cadvisor.yaml
 - apps/calibre.yaml
+- apps/decluttarr.yaml
 - apps/dozzle.yaml
+- apps/exportarr.yaml
 - apps/falco.yaml
 - apps/grafana.yaml
 - apps/handbrake.yaml

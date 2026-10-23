@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: decluttarr
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/mtstrong/homelab.git
+    targetRevision: main
+    path: kubernetes/decluttarr
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: decluttarr
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

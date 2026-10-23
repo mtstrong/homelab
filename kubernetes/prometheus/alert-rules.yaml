@@ -174,3 +174,44 @@ data:
         annotations:
           summary: "{{ $labels.file }} on {{ $labels.instance }} hasn't updated in over an hour"
           description: "A host health collector stopped running, so disk or quorum problems may go unreported."
+
+    # Radarr/Sonarr/SABnzbd via exportarr (namespace exportarr). Decluttarr clears
+    # routine failures, so anything these catch usually needs a human.
+    - name: media
+      rules:
+      - alert: MediaExporterDown
+        expr: up{namespace="exportarr"} == 0
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "exportarr pod {{ $labels.pod }} is not being scraped"
+          description: "Radarr/Sonarr/SABnzbd monitoring is blind until it comes back."
+
+      - alert: MediaAppUnreachable
+        # The exporter's successful-scrape counter stops growing when its app stops answering
+        expr: increase({__name__=~"(radarr|sonarr|sabnzbd)_scrape_requests_total", code="200"}[15m]) == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "{{ $labels.url }} has not answered for 15+ minutes"
+          description: "The app is down or its API is hanging. A stuck SABnzbd API also makes Radarr/Sonarr lose track of downloads."
+
+      - alert: ArrQueueStuck
+        expr: sum by (url) ({__name__=~"radarr_queue_total|sonarr_queue_total", download_status="warning"}) > 5
+        for: 6h
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $value }} items stuck in the queue at {{ $labels.url }}"
+          description: "Decluttarr only clears redundant or failed items, so these likely need a manual import or mapping."
+
+      - alert: SabnzbdDiskFilling
+        expr: max by (folder) (sabnzbd_disk_used_bytes / sabnzbd_disk_total_bytes) > 0.85
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: "SABnzbd {{ $labels.folder }} disk is {{ $value | humanizePercentage }} full"
+          description: "SABnzbd pauses when the download share fills. Clear completed/ or check for imports that aren't moving files out."

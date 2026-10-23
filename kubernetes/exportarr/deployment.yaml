@@ -1,0 +1,164 @@
+# Prometheus exporters for Radarr, Sonarr and SABnzbd (https://github.com/onedr0p/exportarr).
+# Scraped through the kubernetes-pods job via the prometheus.io annotations.
+# API keys live in the arr-api-keys Secret, created out of band:
+#   kubectl -n exportarr create secret generic arr-api-keys \
+#     --from-literal=radarr=<key> --from-literal=sonarr=<key> --from-literal=sabnzbd=<key>
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: exportarr-radarr
+  namespace: exportarr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: exportarr-radarr
+  template:
+    metadata:
+      labels:
+        app: exportarr-radarr
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9707"
+        prometheus.io/path: /metrics
+    spec:
+      nodeSelector:
+        worker: "true"
+      containers:
+      - name: exportarr
+        image: ghcr.io/onedr0p/exportarr:v2.3.0
+        args: ["radarr"]
+        env:
+        - name: PORT
+          value: "9707"
+        - name: URL
+          value: http://radarr.radarr.svc.cluster.local:7878
+        - name: APIKEY
+          valueFrom:
+            secretKeyRef:
+              name: arr-api-keys
+              key: radarr
+        - name: ENABLE_UNKNOWN_QUEUE_ITEMS
+          value: "true"
+        ports:
+        - containerPort: 9707
+          name: metrics
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "10m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 9707
+          initialDelaySeconds: 15
+          periodSeconds: 30
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: exportarr-sonarr
+  namespace: exportarr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: exportarr-sonarr
+  template:
+    metadata:
+      labels:
+        app: exportarr-sonarr
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9708"
+        prometheus.io/path: /metrics
+    spec:
+      nodeSelector:
+        worker: "true"
+      containers:
+      - name: exportarr
+        image: ghcr.io/onedr0p/exportarr:v2.3.0
+        args: ["sonarr"]
+        env:
+        - name: PORT
+          value: "9708"
+        - name: URL
+          value: http://sonarr.sonarr.svc.cluster.local:8989
+        - name: APIKEY
+          valueFrom:
+            secretKeyRef:
+              name: arr-api-keys
+              key: sonarr
+        - name: ENABLE_UNKNOWN_QUEUE_ITEMS
+          value: "true"
+        ports:
+        - containerPort: 9708
+          name: metrics
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "10m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 9708
+          initialDelaySeconds: 15
+          periodSeconds: 30
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: exportarr-sabnzbd
+  namespace: exportarr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: exportarr-sabnzbd
+  template:
+    metadata:
+      labels:
+        app: exportarr-sabnzbd
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9709"
+        prometheus.io/path: /metrics
+    spec:
+      nodeSelector:
+        worker: "true"
+      containers:
+      - name: exportarr
+        image: ghcr.io/onedr0p/exportarr:v2.3.0
+        args: ["sabnzbd"]
+        env:
+        - name: PORT
+          value: "9709"
+        - name: URL
+          value: http://sabnzbd.sabnzbd.svc.cluster.local:8080
+        - name: APIKEY
+          valueFrom:
+            secretKeyRef:
+              name: arr-api-keys
+              key: sabnzbd
+        ports:
+        - containerPort: 9709
+          name: metrics
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "10m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 9709
+          initialDelaySeconds: 15
+          periodSeconds: 30
