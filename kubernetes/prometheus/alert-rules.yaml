@@ -252,6 +252,26 @@ data:
           summary: "{{ $value }} items stuck in the queue at {{ $labels.url }}"
           description: "Decluttarr only clears redundant or failed items, so these likely need a manual import or mapping."
 
+      - alert: SabnzbdUnreachableFromArr
+        # Radarr/Sonarr mark a grab "downloadClientUnavailable" when their call to SABnzbd
+        # times out; SABnzbd often still queues it, so these turn into untracked duplicates.
+        expr: sum by (url) ({__name__=~"radarr_queue_total|sonarr_queue_total", status="downloadClientUnavailable"}) > 0
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $labels.url }} can't reach SABnzbd ({{ $value }} grabs waiting)"
+          description: "SABnzbd's API is timing out, usually during heavy repair/unpack over NFS. If this keeps happening, move SABnzbd's intermediate/ folder to local scratch disks on the worker VMs (planned 2026-10-23)."
+
+      - alert: SabnzbdApiSlow
+        # 3+ minutes in the last hour where SABnzbd's queue API took over 5 seconds
+        expr: count_over_time((max(max_over_time(sabnzbd_queue_query_duration_seconds[1m])) > 5)[1h:1m]) >= 3
+        labels:
+          severity: warning
+        annotations:
+          summary: "SABnzbd's API was slow ({{ $value }} minutes over 5s in the last hour)"
+          description: "Radarr/Sonarr calls to SABnzbd are likely timing out. Baseline on 2026-10-23 was 0.1s average with rare spikes."
+
       - alert: SabnzbdDiskFilling
         expr: max by (folder) (sabnzbd_disk_used_bytes / sabnzbd_disk_total_bytes) > 0.85
         for: 30m
