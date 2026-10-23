@@ -5,6 +5,10 @@ metadata:
   name: pvc-backup
   namespace: pvc-backup
 spec:
+  # Suspended: superseded by Longhorn's own nightly backups (kubernetes/longhorn/recurring-backup.yaml).
+  # This job tars volumes through `kubectl exec`, which doesn't work on this cluster, and its
+  # PVC list missed Radarr/Sonarr/SABnzbd.
+  suspend: true
   schedule: "0 2 * * *"  # 2 AM daily
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3

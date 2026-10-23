@@ -1,0 +1,25 @@
+# Nightly Longhorn backups of every volume in the "default" group (all volumes
+# without an explicit recurring-job label) to the TrueNAS NFS backup target.
+#
+# Not managed by Argo CD; apply by hand:
+#   kubectl apply -f kubernetes/longhorn/recurring-backup.yaml
+#
+# The backup target itself is the Longhorn BackupTarget "default":
+#   kubectl -n longhorn-system patch backuptargets.longhorn.io default --type merge \
+#     -p '{"spec":{"backupTargetURL":"nfs://192.168.1.70:/mnt/TrueNAS/proxmox/longhorn-backups"}}'
+#
+# Restore: Longhorn UI -> Backup -> pick the volume -> Restore Latest Backup.
+apiVersion: longhorn.io/v1beta2
+kind: RecurringJob
+metadata:
+  name: nightly-backup
+  namespace: longhorn-system
+spec:
+  task: backup
+  cron: "0 3 * * *"
+  retain: 7
+  concurrency: 2
+  groups:
+  - default
+  labels:
+    schedule: nightly
