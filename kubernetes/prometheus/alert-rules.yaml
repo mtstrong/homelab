@@ -75,7 +75,7 @@ data:
           severity: warning
         annotations:
           summary: "Last vzdump backup job on {{ $labels.instance }} failed"
-          description: "Check the task log in the Proxmox UI and the PBS datastore (bd795m, 192.168.1.117)."
+          description: "Check the task log in the Proxmox UI and the PBS datastore (PBS VM 105 on x1c, 192.168.1.117; data on TrueNAS/pbs)."
 
       - alert: ProxmoxBackupSlow
         # Snapshot-mode backups slow guest writes while they run. On 2026-10-25 a 4.5h run
@@ -426,7 +426,7 @@ data:
           severity: warning
         annotations:
           summary: "Proxmox Backup Server ({{ $labels.instance }}) is not answering"
-          description: "VM backups will fail until it's back. It runs as VM 105 on bd795m."
+          description: "VM backups will fail until it's back. It runs as VM 105 on x1c and stores backups on TrueNAS over NFS."
 
       - alert: BlackboxProbesMissing
         expr: absent(up{job="blackbox-tcp"} == 1)
