@@ -9,6 +9,7 @@ resources:
 - avp-plugin.yaml
 - ingress.yaml
 - apps/audiobookshelf.yaml
+- apps/blackbox-exporter.yaml
 - apps/cadvisor.yaml
 - apps/calibre.yaml
 - apps/decluttarr.yaml
@@ -21,6 +22,7 @@ resources:
 - apps/homepage.yaml
 - apps/it-tools.yaml
 - apps/kavita.yaml
+- apps/kube-state-metrics.yaml
 - apps/loki.yaml
 - apps/mealie.yaml
 - apps/node-exporter.yaml

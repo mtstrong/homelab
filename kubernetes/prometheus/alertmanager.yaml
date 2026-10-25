@@ -16,6 +16,9 @@ data:
       group_interval: 5m
       repeat_interval: 12h
       routes:
+      - matchers: [alertname="Watchdog"]
+        receiver: heartbeat
+        repeat_interval: 5m
       - matchers: [severity="critical"]
         receiver: pushover
         repeat_interval: 4h
@@ -28,8 +31,14 @@ data:
     # No quorum already implies the cluster is at risk
     - source_matchers: [alertname="ProxmoxNoQuorum"]
       target_matchers: [alertname="ProxmoxQuorumAtRisk"]
+    - source_matchers: [alertname="LonghornVolumeDegradedLong"]
+      target_matchers: [alertname="LonghornVolumeDegraded"]
+      equal: [volume]
 
     receivers:
+    # Receives the always-firing Watchdog. Add a webhook_configs entry pointing at an external
+    # dead man's switch (e.g. a healthchecks.io ping URL) so silence from here raises an alarm.
+    - name: heartbeat
     - name: pushover
       pushover_configs:
       - user_key_file: /etc/alertmanager/secrets/user_key
@@ -58,6 +67,9 @@ spec:
     metadata:
       labels:
         app: alertmanager
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9093"
     spec:
       nodeSelector:
         worker: "true"

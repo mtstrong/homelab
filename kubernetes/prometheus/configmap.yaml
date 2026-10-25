@@ -107,6 +107,33 @@ data:
       - source_labels: [__meta_kubernetes_pod_node_name]
         target_label: node
 
+    # Kubernetes object state. honor_labels keeps the namespace/pod labels kube-state-metrics
+    # reports instead of overwriting them with its own pod's.
+    - job_name: 'kube-state-metrics'
+      honor_labels: true
+      static_configs:
+      - targets: ['kube-state-metrics.kube-state-metrics.svc.cluster.local:8080']
+
+    # TCP reachability of hosts outside the cluster, probed through blackbox-exporter
+    - job_name: 'blackbox-tcp'
+      metrics_path: /probe
+      params:
+        module: [tcp_connect]
+      static_configs:
+      - targets: ['192.168.1.70:2049']
+        labels:
+          target_name: truenas-nfs
+      - targets: ['192.168.1.117:8007']
+        labels:
+          target_name: pbs
+      relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter.blackbox-exporter.svc.cluster.local:9115
+
     # Optional: scrape Loki metrics if present
     - job_name: 'loki'
       static_configs:

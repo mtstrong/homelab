@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kube-state-metrics
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: homelab
+    app.kubernetes.io/name: kube-state-metrics
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/mtstrong/homelab.git
+    path: kubernetes/kube-state-metrics
+    targetRevision: HEAD
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-state-metrics
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true

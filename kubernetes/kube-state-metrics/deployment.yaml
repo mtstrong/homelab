@@ -1,0 +1,83 @@
+# kube-state-metrics (https://github.com/kubernetes/kube-state-metrics) turns Kubernetes object
+# state (pod restarts, unavailable replicas, failed Jobs, CronJob runs) into metrics for the
+# `kubernetes` alert group. v2.9 is the release built against Kubernetes 1.26, which k3s runs.
+# Prometheus scrapes it through its own job (honor_labels) so namespace/pod labels stay intact.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kube-state-metrics
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kube-state-metrics
+  namespace: kube-state-metrics
+  labels:
+    app: kube-state-metrics
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kube-state-metrics
+  template:
+    metadata:
+      labels:
+        app: kube-state-metrics
+    spec:
+      serviceAccountName: kube-state-metrics
+      nodeSelector:
+        worker: "true"
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+      containers:
+      - name: kube-state-metrics
+        image: registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.9.2
+        imagePullPolicy: IfNotPresent
+        args:
+        - --resources=cronjobs,daemonsets,deployments,jobs,namespaces,nodes,persistentvolumeclaims,pods,replicasets,statefulsets
+        ports:
+        - name: http-metrics
+          containerPort: 8080
+        - name: telemetry
+          containerPort: 8081
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8081
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 20
+        resources:
+          requests:
+            cpu: 10m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: [ALL]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kube-state-metrics
+  namespace: kube-state-metrics
+  labels:
+    app: kube-state-metrics
+spec:
+  selector:
+    app: kube-state-metrics
+  ports:
+  - name: http-metrics
+    port: 8080
+    targetPort: 8080

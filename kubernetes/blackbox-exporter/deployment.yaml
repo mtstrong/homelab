@@ -1,0 +1,91 @@
+# blackbox-exporter (https://github.com/prometheus/blackbox_exporter) probes things outside the
+# cluster that everything depends on: the TrueNAS NFS server behind every media app and the
+# Proxmox Backup Server. Targets are listed in the Prometheus `blackbox-tcp` scrape job.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: blackbox-exporter
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: blackbox-exporter-config
+  namespace: blackbox-exporter
+data:
+  blackbox.yml: |
+    modules:
+      tcp_connect:
+        prober: tcp
+        timeout: 5s
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blackbox-exporter
+  namespace: blackbox-exporter
+  labels:
+    app: blackbox-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: blackbox-exporter
+  template:
+    metadata:
+      labels:
+        app: blackbox-exporter
+    spec:
+      nodeSelector:
+        worker: "true"
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+      containers:
+      - name: blackbox-exporter
+        image: prom/blackbox-exporter:v0.25.0
+        imagePullPolicy: IfNotPresent
+        args:
+        - --config.file=/etc/blackbox/blackbox.yml
+        ports:
+        - name: http
+          containerPort: 9115
+        readinessProbe:
+          httpGet:
+            path: /-/healthy
+            port: 9115
+          periodSeconds: 10
+        resources:
+          requests:
+            cpu: 10m
+            memory: 16Mi
+          limits:
+            cpu: 100m
+            memory: 64Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: [ALL]
+        volumeMounts:
+        - name: config
+          mountPath: /etc/blackbox
+      volumes:
+      - name: config
+        configMap:
+          name: blackbox-exporter-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: blackbox-exporter
+  namespace: blackbox-exporter
+  labels:
+    app: blackbox-exporter
+spec:
+  selector:
+    app: blackbox-exporter
+  ports:
+  - name: http
+    port: 9115
+    targetPort: 9115

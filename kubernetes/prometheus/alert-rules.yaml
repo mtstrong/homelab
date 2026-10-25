@@ -68,6 +68,35 @@ data:
           summary: "VM {{ $labels.name }} ({{ $labels.vmid }}) is stopped on {{ $labels.instance }}"
           description: "This VM is set to start on boot but has not been running for 5 minutes."
 
+      # vzdump job metrics come from /usr/local/bin/pve-textfile-metrics on each host
+      - alert: ProxmoxBackupFailed
+        expr: pve_backup_job_last_success == 0
+        labels:
+          severity: warning
+        annotations:
+          summary: "Last vzdump backup job on {{ $labels.instance }} failed"
+          description: "Check the task log in the Proxmox UI and the PBS datastore (bd795m, 192.168.1.117)."
+
+      - alert: ProxmoxBackupSlow
+        # Snapshot-mode backups slow guest writes while they run. On 2026-10-25 a 4.5h run
+        # starved Longhorn replicas on lh-* and left 14 volumes degraded.
+        expr: pve_backup_job_last_duration_seconds > 2 * 3600
+        labels:
+          severity: warning
+        annotations:
+          summary: "vzdump job on {{ $labels.instance }} took {{ $value | humanizeDuration }}"
+          description: "Usually a large dirty-bitmap delta from Longhorn rebuilds on lh-* or a slow PBS. Check that the job still has fleecing enabled and that Longhorn volumes are healthy."
+
+      - alert: ProxmoxVMNotBackedUp
+        # The job runs twice a day
+        expr: time() - pve_vm_last_backup_timestamp_seconds > 36 * 3600
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: "VM {{ $labels.name }} ({{ $labels.vmid }}) has no backup from the last 36 hours"
+          description: "Its newest backup on PBS is older than 36h (or it has none). Check the vzdump job and the PBS datastore."
+
     - name: disks
       rules:
       - alert: DiskSmartFailing
@@ -175,6 +204,61 @@ data:
           summary: "{{ $labels.file }} on {{ $labels.instance }} hasn't updated in over an hour"
           description: "A host health collector stopped running, so disk or quorum problems may go unreported."
 
+      - alert: Watchdog
+        # Always firing. Alertmanager sends it to the "heartbeat" receiver; point that at an
+        # external dead man's switch (e.g. healthchecks.io) to find out when alerting itself dies.
+        expr: vector(1)
+        labels:
+          severity: none
+        annotations:
+          summary: "Alerting pipeline heartbeat"
+
+      - alert: PrometheusRuleFailures
+        expr: increase(prometheus_rule_evaluation_failures_total[15m]) > 0
+        labels:
+          severity: warning
+        annotations:
+          summary: "Prometheus rule group {{ $labels.rule_group }} is failing to evaluate"
+          description: "Alerts in this group can't fire. Check the Prometheus logs for the failing expression."
+
+      - alert: PrometheusNotificationsFailing
+        expr: |
+          increase(prometheus_notifications_errors_total[15m]) > 0
+            or prometheus_notifications_alertmanagers_discovered < 1
+        labels:
+          severity: warning
+        annotations:
+          summary: "Prometheus can't deliver alerts to Alertmanager"
+          description: "Firing alerts are not reaching Alertmanager, so none of them will notify."
+
+      - alert: AlertmanagerNotificationsFailing
+        expr: increase(alertmanager_notifications_failed_total[15m]) > 0
+        labels:
+          severity: warning
+        annotations:
+          summary: "Alertmanager failed to send {{ $labels.integration }} notifications"
+          description: "Pushover rejected or didn't answer. This alert may not reach you either; check http://192.168.2.133:9090/alerts."
+
+    - name: certificates
+      rules:
+      - alert: CertificateExpiringSoon
+        # cert-manager renews 30 days out, so under 14 days means renewal is failing
+        expr: certmanager_certificate_expiration_timestamp_seconds - time() < 14 * 86400
+        labels:
+          severity: warning
+        annotations:
+          summary: "Certificate {{ $labels.exported_namespace }}/{{ $labels.name }} expires in {{ $value | humanizeDuration }}"
+          description: "cert-manager hasn't renewed it. Check the Certificate and its CertificateRequest/Order for errors."
+
+      - alert: CertificateNotReady
+        expr: max by (exported_namespace, name) (certmanager_certificate_ready_status{condition="False"}) == 1
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: "Certificate {{ $labels.exported_namespace }}/{{ $labels.name }} is not ready"
+          description: "kubectl -n {{ $labels.exported_namespace }} describe certificate {{ $labels.name }} shows why."
+
     # Longhorn via longhorn-manager metrics (job longhorn).
     # robustness: 1 healthy, 2 degraded, 3 faulted. backup_state: 3 completed, 4 error.
     - name: storage
@@ -196,6 +280,15 @@ data:
         annotations:
           summary: "Longhorn volume {{ $labels.pvc_namespace }}/{{ $labels.pvc }} has been degraded for an hour"
           description: "It is running on fewer replicas than configured and isn't rebuilding. Check the volume in the Longhorn UI."
+
+      - alert: LonghornVolumeDegradedLong
+        expr: max by (volume, pvc, pvc_namespace) (longhorn_volume_robustness) == 2
+        for: 12h
+        labels:
+          severity: critical
+        annotations:
+          summary: "Longhorn volume {{ $labels.pvc_namespace }}/{{ $labels.pvc }} has been degraded for 12 hours"
+          description: "Rebuilds are stuck, so one more failure loses the volume. Look for replicas with rebuildRetryCount 5 that aren't in the engine's replicaModeMap: they hold the per-node rebuild slot. 'failed to start rebuild ... context deadline exceeded' in a worker's longhorn-manager log means that worker's instance-manager needs restarting."
 
       - alert: LonghornBackupFailed
         expr: max by (volume, backup) (longhorn_backup_state) == 4
@@ -219,6 +312,130 @@ data:
         annotations:
           summary: "{{ $labels.pvc_namespace }}/{{ $labels.pvc }} has no Longhorn backup from the last 36 hours"
           description: "The nightly-backup recurring job didn't produce a backup for {{ $labels.volume }}. Check the job and the backup target."
+
+    # Kubernetes object state via kube-state-metrics (job kube-state-metrics); PVC usage via kubelet
+    - name: kubernetes
+      rules:
+      - alert: KubeStateMetricsDown
+        expr: absent(up{job="kube-state-metrics"} == 1)
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "kube-state-metrics isn't being scraped"
+          description: "Pod, Deployment, Job and CronJob alerts can't fire until it's back."
+
+      - alert: KubeNodeNotReady
+        expr: kube_node_status_condition{condition="Ready", status="true"} == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Kubernetes node {{ $labels.node }} is not Ready"
+          description: "Pods on it are being evicted or can't start. Check the VM and k3s on it."
+
+      - alert: KubePodCrashLooping
+        expr: max by (namespace, pod, container) (max_over_time(kube_pod_container_status_waiting_reason{reason="CrashLoopBackOff"}[5m])) >= 1
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container }}) is crash looping"
+          description: "kubectl -n {{ $labels.namespace }} logs {{ $labels.pod }} --previous shows the last crash."
+
+      - alert: KubePodStuckPending
+        # Covers pods stuck in Init too: they stay in phase Pending
+        expr: max by (namespace, pod) (kube_pod_status_phase{phase=~"Pending|Unknown"}) == 1
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $labels.namespace }}/{{ $labels.pod }} has been Pending or Unknown for 30 minutes"
+          description: "It can't be scheduled, its volume can't attach, or an init container is stuck. kubectl describe pod shows which."
+
+      - alert: KubeDeploymentUnavailable
+        expr: kube_deployment_spec_replicas > kube_deployment_status_replicas_available
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Deployment {{ $labels.namespace }}/{{ $labels.deployment }} has had unavailable replicas for 30 minutes"
+
+      - alert: KubeStatefulSetUnavailable
+        expr: kube_statefulset_replicas > kube_statefulset_status_replicas_ready
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: "StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} has had unready replicas for 30 minutes"
+
+      - alert: KubeDaemonSetUnavailable
+        expr: kube_daemonset_status_number_unavailable > 0
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: "DaemonSet {{ $labels.namespace }}/{{ $labels.daemonset }} is missing {{ $value }} pods"
+
+      - alert: KubeJobFailed
+        expr: kube_job_status_failed > 0
+        labels:
+          severity: warning
+        annotations:
+          summary: "Job {{ $labels.namespace }}/{{ $labels.job_name }} failed"
+          description: "Check its pod logs, then delete the Job to clear this alert."
+
+      - alert: KubeCronJobNotSucceeding
+        # 8 days so weekly CronJobs don't fire between runs; suspended CronJobs are skipped
+        expr: |
+          time() - kube_cronjob_status_last_successful_time > 8 * 86400
+            unless on (namespace, cronjob) kube_cronjob_spec_suspend == 1
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: "CronJob {{ $labels.namespace }}/{{ $labels.cronjob }} hasn't succeeded in {{ $value | humanizeDuration }}"
+
+      - alert: PersistentVolumeFillingUp
+        expr: |
+          kubelet_volume_stats_available_bytes / kubelet_volume_stats_capacity_bytes < 0.15
+            and kubelet_volume_stats_used_bytes > 0
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "PVC {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} has {{ $value | humanizePercentage }} free"
+          description: "Apps on a full volume crash or corrupt their data (Prometheus did on 2026-10-18). Expand the PVC or clean it up."
+
+    # TCP probes via blackbox-exporter (job blackbox-tcp)
+    - name: reachability
+      rules:
+      - alert: TrueNASNfsUnreachable
+        expr: probe_success{target_name="truenas-nfs"} == 0
+        for: 3m
+        labels:
+          severity: critical
+        annotations:
+          summary: "TrueNAS NFS ({{ $labels.instance }}) is not answering"
+          description: "Every media app, SABnzbd's downloads and Longhorn's backup target use this NFS server. Expect app and backup alerts to follow."
+
+      - alert: PbsUnreachable
+        expr: probe_success{target_name="pbs"} == 0
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Proxmox Backup Server ({{ $labels.instance }}) is not answering"
+          description: "VM backups will fail until it's back. It runs as VM 105 on bd795m."
+
+      - alert: BlackboxProbesMissing
+        expr: absent(up{job="blackbox-tcp"} == 1)
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "blackbox-exporter probes aren't running"
+          description: "TrueNAS and PBS reachability is unmonitored. Check the blackbox-exporter pod."
 
     # Radarr/Sonarr/SABnzbd via exportarr (namespace exportarr). Decluttarr clears
     # routine failures, so anything these catch usually needs a human.
@@ -253,15 +470,17 @@ data:
           description: "Decluttarr only clears redundant or failed items, so these likely need a manual import or mapping."
 
       - alert: SabnzbdUnreachableFromArr
-        # Radarr/Sonarr mark a grab "downloadClientUnavailable" when their call to SABnzbd
-        # times out; SABnzbd often still queues it, so these turn into untracked duplicates.
+        # Radarr/Sonarr mark a grab "downloadClientUnavailable" whenever they can't hand it to
+        # SABnzbd. Either SABnzbd's API timed out (it often still queues the NZB, leaving an
+        # untracked duplicate) or the indexer refused the NZB download (abNZB serves each NZB
+        # once per 8 hours, so retries of a pending grab get 403s).
         expr: sum by (url) ({__name__=~"radarr_queue_total|sonarr_queue_total", status="downloadClientUnavailable"}) > 0
         for: 10m
         labels:
           severity: warning
         annotations:
-          summary: "{{ $labels.url }} can't reach SABnzbd ({{ $value }} grabs waiting)"
-          description: "SABnzbd's API is timing out, usually during heavy repair/unpack over NFS. If this keeps happening, move SABnzbd's intermediate/ folder to local scratch disks on the worker VMs (planned 2026-10-23)."
+          summary: "{{ $labels.url }} has {{ $value }} grabs it can't hand to SABnzbd"
+          description: "Check the app's log. 'Downloading nzb ... failed' with 403 means the indexer: remove the pending item with blocklist. A timeout means SABnzbd's API is busy with repair/unpack over NFS; if that keeps happening, move intermediate/ to local scratch disks on the workers (planned 2026-10-23)."
 
       - alert: SabnzbdApiSlow
         # 3+ minutes in the last hour where SABnzbd's queue API took over 5 seconds
@@ -280,3 +499,18 @@ data:
         annotations:
           summary: "SABnzbd {{ $labels.folder }} disk is {{ $value | humanizePercentage }} full"
           description: "SABnzbd pauses when the download share fills. Clear completed/ or check for imports that aren't moving files out."
+
+      - alert: UsenetPrimaryMissingArticles
+        # SABnzbd's articles_success counter actually counts articles the server did NOT have
+        # (checked against downloaded bytes on 2026-10-23). NewsDemon normally misses 15-80% in
+        # an hour because of takedowns; missing nearly everything means the account or server is broken.
+        expr: |
+          increase(sabnzbd_server_articles_success{server="news.newsdemon.com"}[1h])
+            / increase(sabnzbd_server_articles_total{server="news.newsdemon.com"}[1h]) > 0.9
+          and increase(sabnzbd_server_articles_total{server="news.newsdemon.com"}[1h]) > 5000
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: "NewsDemon is missing {{ $value | humanizePercentage }} of articles"
+          description: "Almost every download will fail as 'Aborted, cannot be completed'. Test the server in SABnzbd (Config > Servers) and check the NewsDemon account."
