@@ -1,0 +1,92 @@
+---
+# Mylar3 (https://github.com/mylar3/mylar3) watches comic series, searches Prowlarr's
+# indexers, sends NZBs to SABnzbd (category "comics") and files the results into the
+# TrueNAS comics share that Kavita reads.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: mylar3
+  name: mylar3
+  namespace: mylar3
+spec:
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mylar3
+  template:
+    metadata:
+      labels:
+        app: mylar3
+    spec:
+      nodeSelector:
+        worker: "true"
+      tolerations:
+      # Evict quickly if the node dies so Longhorn can reattach volumes elsewhere
+      - key: node.kubernetes.io/not-ready
+        operator: Exists
+        effect: NoExecute
+        tolerationSeconds: 60
+      - key: node.kubernetes.io/unreachable
+        operator: Exists
+        effect: NoExecute
+        tolerationSeconds: 60
+      containers:
+      - name: mylar3
+        image: lscr.io/linuxserver/mylar3:v0.11.0-ls277
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        - name: TZ
+          value: "America/Chicago"
+        ports:
+        - containerPort: 8090
+          name: http
+          protocol: TCP
+        startupProbe:
+          tcpSocket:
+            port: 8090
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          failureThreshold: 30
+        readinessProbe:
+          tcpSocket:
+            port: 8090
+          periodSeconds: 15
+          failureThreshold: 4
+        livenessProbe:
+          tcpSocket:
+            port: 8090
+          periodSeconds: 30
+          failureThreshold: 6
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+        volumeMounts:
+        - mountPath: /config
+          name: config
+        - mountPath: /comics
+          name: comics
+        - mountPath: /downloads
+          name: downloads
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: mylar3
+      - name: comics
+        nfs:
+          server: 192.168.1.70
+          path: /mnt/TrueNAS/comics
+      - name: downloads
+        nfs:
+          server: 192.168.1.70
+          path: /mnt/OneTbs/nzb-dls

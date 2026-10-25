@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mylar3
+  namespace: mylar3
+spec:
+  selector:
+    app: mylar3
+  ports:
+  - name: http
+    port: 8090
+    targetPort: 8090
+    protocol: TCP
+  type: LoadBalancer
