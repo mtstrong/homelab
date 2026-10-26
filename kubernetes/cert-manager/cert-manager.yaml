@@ -1,5 +1,5 @@
-# Upstream cert-manager v1.17.4 static manifest (cert-manager.yaml from the GitHub release), unmodified.
-# https://github.com/cert-manager/cert-manager/releases/tag/v1.17.4
+# Upstream cert-manager v1.18.6 static manifest (cert-manager.yaml from the GitHub release), unmodified.
+# https://github.com/cert-manager/cert-manager/releases/tag/v1.18.6
 # Replaces the Helm install (whose only revision was stuck in 'failed'). Upgrade one minor at a time,
 # staying inside each release's supported Kubernetes range: https://cert-manager.io/docs/releases/
 # Copyright 2022 The cert-manager Authors.
@@ -38,7 +38,7 @@ metadata:
     app.kubernetes.io/name: 'cert-manager'
     app.kubernetes.io/instance: 'cert-manager'
     # Generated labels
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 spec:
   group: cert-manager.io
   names:
@@ -359,7 +359,7 @@ metadata:
     app.kubernetes.io/name: 'cert-manager'
     app.kubernetes.io/instance: 'cert-manager'
     # Generated labels
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 spec:
   group: cert-manager.io
   names:
@@ -435,10 +435,6 @@ spec:
                   description: |-
                     Defines extra output formats of the private key and signed certificate chain
                     to be written to this Certificate's target Secret.
-
-                    This is a Beta Feature enabled by default. It can be disabled with the
-                    `--feature-gates=AdditionalCertificateOutputFormats=false` option set on both
-                    the controller and webhook components.
                   type: array
                   items:
                     description: |-
@@ -642,7 +638,7 @@ spec:
                             `LegacyRC2`: Deprecated. Not supported by default in OpenSSL 3 or Java 20.
                             `LegacyDES`: Less secure algorithm. Use this option for maximal compatibility.
                             `Modern2023`: Secure algorithm. Use this option in case you have to always use secure algorithms
-                            (eg. because of company policy). Please note that the security of the algorithm is not that important
+                            (e.g., because of company policy). Please note that the security of the algorithm is not that important
                             in reality, because the unencrypted certificate and private key are also stored in the Secret.
                           type: string
                           enum:
@@ -795,7 +791,11 @@ spec:
                         to await user intervention.
                         If set to `Always`, a private key matching the specified requirements
                         will be generated whenever a re-issuance occurs.
-                        Default is `Never` for backward compatibility.
+                        Default is `Always`.
+                        The default was changed from `Never` to `Always` in cert-manager >=v1.18.0.
+                        The new default can be disabled by setting the
+                        `--feature-gates=DefaultPrivateKeyRotationPolicyAlways=false` option on
+                        the controller component.
                       type: string
                       enum:
                         - Never
@@ -855,8 +855,7 @@ spec:
                     revisions exceeds this number.
 
                     If set, revisionHistoryLimit must be a value of `1` or greater.
-                    If unset (`nil`), revisions will not be garbage collected.
-                    Default value is `nil`.
+                    Default value is `1`.
                   type: integer
                   format: int32
                 secretName:
@@ -885,6 +884,21 @@ spec:
                       type: object
                       additionalProperties:
                         type: string
+                signatureAlgorithm:
+                  description: |-
+                    Signature algorithm to use.
+                    Allowed values for RSA keys: SHA256WithRSA, SHA384WithRSA, SHA512WithRSA.
+                    Allowed values for ECDSA keys: ECDSAWithSHA256, ECDSAWithSHA384, ECDSAWithSHA512.
+                    Allowed values for Ed25519 keys: PureEd25519.
+                  type: string
+                  enum:
+                    - SHA256WithRSA
+                    - SHA384WithRSA
+                    - SHA512WithRSA
+                    - ECDSAWithSHA256
+                    - ECDSAWithSHA384
+                    - ECDSAWithSHA512
+                    - PureEd25519
                 subject:
                   description: |-
                     Requested set of X509 certificate subject attributes.
@@ -1142,7 +1156,7 @@ metadata:
     app.kubernetes.io/name: 'cert-manager'
     app.kubernetes.io/instance: 'cert-manager'
     # Generated labels
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 spec:
   group: acme.cert-manager.io
   names:
@@ -1215,9 +1229,9 @@ spec:
                   type: string
                 dnsName:
                   description: |-
-                    dnsName is the identifier that this challenge is for, e.g. example.com.
+                    dnsName is the identifier that this challenge is for, e.g., example.com.
                     If the requested DNSName is a 'wildcard', this field MUST be set to the
-                    non-wildcard domain, e.g. for `*.example.com`, it must be `example.com`.
+                    non-wildcard domain, e.g., for `*.example.com`, it must be `example.com`.
                   type: string
                 issuerRef:
                   description: |-
@@ -1411,15 +1425,15 @@ spec:
                               type: object
                               properties:
                                 clientID:
-                                  description: client ID of the managed identity, can not be used at the same time as resourceID
+                                  description: client ID of the managed identity, cannot be used at the same time as resourceID
                                   type: string
                                 resourceID:
                                   description: |-
-                                    resource ID of the managed identity, can not be used at the same time as clientID
+                                    resource ID of the managed identity, cannot be used at the same time as clientID
                                     Cannot be used for Azure Managed Service Identity
                                   type: string
                                 tenantID:
-                                  description: tenant ID of the managed identity, can not be used at the same time as resourceID
+                                  description: tenant ID of the managed identity, cannot be used at the same time as resourceID
                                   type: string
                             resourceGroupName:
                               description: resource group the DNS zone is located in
@@ -1728,7 +1742,7 @@ spec:
                                 when challenges are processed.
                                 This can contain arbitrary JSON data.
                                 Secret values should not be specified in this stanza.
-                                If secret values are needed (e.g. credentials for a DNS service), you
+                                If secret values are needed (e.g., credentials for a DNS service), you
                                 should use a SecretKeySelector to reference a Secret resource.
                                 For details on the schema of this field, consult the webhook provider
                                 implementation's documentation.
@@ -1744,14 +1758,14 @@ spec:
                               description: |-
                                 The name of the solver to use, as defined in the webhook provider
                                 implementation.
-                                This will typically be the name of the provider, e.g. 'cloudflare'.
+                                This will typically be the name of the provider, e.g., 'cloudflare'.
                               type: string
                     http01:
                       description: |-
                         Configures cert-manager to attempt to complete authorizations by
                         performing the HTTP01 challenge flow.
                         It is not possible to obtain certificates for wildcard domain names
-                        (e.g. `*.example.com`) using the HTTP01 challenge mechanism.
+                        (e.g., `*.example.com`) using the HTTP01 challenge mechanism.
                       type: object
                       properties:
                         gatewayHTTPRoute:
@@ -4352,13 +4366,15 @@ metadata:
     app.kubernetes.io/name: 'cert-manager'
     app.kubernetes.io/instance: 'cert-manager'
     # Generated labels
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 spec:
   group: cert-manager.io
   names:
     kind: ClusterIssuer
     listKind: ClusterIssuerList
     plural: clusterissuers
+    shortNames:
+      - ciss
     singular: clusterissuer
     categories:
       - cert-manager
@@ -4509,7 +4525,7 @@ spec:
                         PreferredChain is the chain to use if the ACME server outputs multiple.
                         PreferredChain is no guarantee that this one gets delivered by the ACME
                         endpoint.
-                        For example, for Let's Encrypt's DST crosssign you would use:
+                        For example, for Let's Encrypt's DST cross-sign you would use:
                         "DST Root CA X3" or "ISRG Root X1" for the newer Let's Encrypt root CA.
                         This value picks the first certificate bundle in the combined set of
                         ACME default and alternative chains that has a root-most certificate with
@@ -4538,6 +4554,11 @@ spec:
                             Name of the resource being referred to.
                             More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                           type: string
+                    profile:
+                      description: |-
+                        Profile allows requesting a certificate profile from the ACME server.
+                        Supported profiles are listed by the server's ACME directory URL.
+                      type: string
                     server:
                       description: |-
                         Server is the URL used to access the ACME server's 'directory' endpoint.
@@ -4728,15 +4749,15 @@ spec:
                                     type: object
                                     properties:
                                       clientID:
-                                        description: client ID of the managed identity, can not be used at the same time as resourceID
+                                        description: client ID of the managed identity, cannot be used at the same time as resourceID
                                         type: string
                                       resourceID:
                                         description: |-
-                                          resource ID of the managed identity, can not be used at the same time as clientID
+                                          resource ID of the managed identity, cannot be used at the same time as clientID
                                           Cannot be used for Azure Managed Service Identity
                                         type: string
                                       tenantID:
-                                        description: tenant ID of the managed identity, can not be used at the same time as resourceID
+                                        description: tenant ID of the managed identity, cannot be used at the same time as resourceID
                                         type: string
                                   resourceGroupName:
                                     description: resource group the DNS zone is located in
@@ -5045,7 +5066,7 @@ spec:
                                       when challenges are processed.
                                       This can contain arbitrary JSON data.
                                       Secret values should not be specified in this stanza.
-                                      If secret values are needed (e.g. credentials for a DNS service), you
+                                      If secret values are needed (e.g., credentials for a DNS service), you
                                       should use a SecretKeySelector to reference a Secret resource.
                                       For details on the schema of this field, consult the webhook provider
                                       implementation's documentation.
@@ -5061,14 +5082,14 @@ spec:
                                     description: |-
                                       The name of the solver to use, as defined in the webhook provider
                                       implementation.
-                                      This will typically be the name of the provider, e.g. 'cloudflare'.
+                                      This will typically be the name of the provider, e.g., 'cloudflare'.
                                     type: string
                           http01:
                             description: |-
                               Configures cert-manager to attempt to complete authorizations by
                               performing the HTTP01 challenge flow.
                               It is not possible to obtain certificates for wildcard domain names
-                              (e.g. `*.example.com`) using the HTTP01 challenge mechanism.
+                              (e.g., `*.example.com`) using the HTTP01 challenge mechanism.
                             type: object
                             properties:
                               gatewayHTTPRoute:
@@ -7881,6 +7902,11 @@ spec:
                     server:
                       description: 'Server is the connection address for the Vault server, e.g: "https://vault.example.com:8200".'
                       type: string
+                    serverName:
+                      description: |-
+                        ServerName is used to verify the hostname on the returned certificates
+                        by the Vault server.
+                      type: string
                 venafi:
                   description: |-
                     Venafi configures this issuer to sign certificates using a Venafi TPP
@@ -7917,7 +7943,7 @@ spec:
                         url:
                           description: |-
                             URL is the base URL for Venafi Cloud.
-                            Defaults to "https://api.venafi.cloud/v1".
+                            Defaults to "https://api.venafi.cloud/".
                           type: string
                     tpp:
                       description: |-
@@ -8083,13 +8109,15 @@ metadata:
     app.kubernetes.io/instance: 'cert-manager'
     app.kubernetes.io/component: "crds"
     # Generated labels
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 spec:
   group: cert-manager.io
   names:
     kind: Issuer
     listKind: IssuerList
     plural: issuers
+    shortNames:
+      - iss
     singular: issuer
     categories:
       - cert-manager
@@ -8239,7 +8267,7 @@ spec:
                         PreferredChain is the chain to use if the ACME server outputs multiple.
                         PreferredChain is no guarantee that this one gets delivered by the ACME
                         endpoint.
-                        For example, for Let's Encrypt's DST crosssign you would use:
+                        For example, for Let's Encrypt's DST cross-sign you would use:
                         "DST Root CA X3" or "ISRG Root X1" for the newer Let's Encrypt root CA.
                         This value picks the first certificate bundle in the combined set of
                         ACME default and alternative chains that has a root-most certificate with
@@ -8268,6 +8296,11 @@ spec:
                             Name of the resource being referred to.
                             More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                           type: string
+                    profile:
+                      description: |-
+                        Profile allows requesting a certificate profile from the ACME server.
+                        Supported profiles are listed by the server's ACME directory URL.
+                      type: string
                     server:
                       description: |-
                         Server is the URL used to access the ACME server's 'directory' endpoint.
@@ -8458,15 +8491,15 @@ spec:
                                     type: object
                                     properties:
                                       clientID:
-                                        description: client ID of the managed identity, can not be used at the same time as resourceID
+                                        description: client ID of the managed identity, cannot be used at the same time as resourceID
                                         type: string
                                       resourceID:
                                         description: |-
-                                          resource ID of the managed identity, can not be used at the same time as clientID
+                                          resource ID of the managed identity, cannot be used at the same time as clientID
                                           Cannot be used for Azure Managed Service Identity
                                         type: string
                                       tenantID:
-                                        description: tenant ID of the managed identity, can not be used at the same time as resourceID
+                                        description: tenant ID of the managed identity, cannot be used at the same time as resourceID
                                         type: string
                                   resourceGroupName:
                                     description: resource group the DNS zone is located in
@@ -8775,7 +8808,7 @@ spec:
                                       when challenges are processed.
                                       This can contain arbitrary JSON data.
                                       Secret values should not be specified in this stanza.
-                                      If secret values are needed (e.g. credentials for a DNS service), you
+                                      If secret values are needed (e.g., credentials for a DNS service), you
                                       should use a SecretKeySelector to reference a Secret resource.
                                       For details on the schema of this field, consult the webhook provider
                                       implementation's documentation.
@@ -8791,14 +8824,14 @@ spec:
                                     description: |-
                                       The name of the solver to use, as defined in the webhook provider
                                       implementation.
-                                      This will typically be the name of the provider, e.g. 'cloudflare'.
+                                      This will typically be the name of the provider, e.g., 'cloudflare'.
                                     type: string
                           http01:
                             description: |-
                               Configures cert-manager to attempt to complete authorizations by
                               performing the HTTP01 challenge flow.
                               It is not possible to obtain certificates for wildcard domain names
-                              (e.g. `*.example.com`) using the HTTP01 challenge mechanism.
+                              (e.g., `*.example.com`) using the HTTP01 challenge mechanism.
                             type: object
                             properties:
                               gatewayHTTPRoute:
@@ -11611,6 +11644,11 @@ spec:
                     server:
                       description: 'Server is the connection address for the Vault server, e.g: "https://vault.example.com:8200".'
                       type: string
+                    serverName:
+                      description: |-
+                        ServerName is used to verify the hostname on the returned certificates
+                        by the Vault server.
+                      type: string
                 venafi:
                   description: |-
                     Venafi configures this issuer to sign certificates using a Venafi TPP
@@ -11647,7 +11685,7 @@ spec:
                         url:
                           description: |-
                             URL is the base URL for Venafi Cloud.
-                            Defaults to "https://api.venafi.cloud/v1".
+                            Defaults to "https://api.venafi.cloud/".
                           type: string
                     tpp:
                       description: |-
@@ -11813,7 +11851,7 @@ metadata:
     app.kubernetes.io/instance: 'cert-manager'
     app.kubernetes.io/component: "crds"
     # Generated labels
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 spec:
   group: acme.cert-manager.io
   names:
@@ -11923,6 +11961,11 @@ spec:
                     name:
                       description: Name of the resource being referred to.
                       type: string
+                profile:
+                  description: |-
+                    Profile allows requesting a certificate profile from the ACME server.
+                    Supported profiles are listed by the server's ACME directory URL.
+                  type: string
                 request:
                   description: |-
                     Certificate signing request bytes in DER encoding.
@@ -11973,7 +12016,7 @@ spec:
                               type: string
                             type:
                               description: |-
-                                Type is the type of challenge being offered, e.g. 'http-01', 'dns-01',
+                                Type is the type of challenge being offered, e.g., 'http-01', 'dns-01',
                                 'tls-sni-01', etc.
                                 This is the raw value retrieved from the ACME server.
                                 Only 'http-01' and 'dns-01' are supported by cert-manager, other values
@@ -12079,7 +12122,7 @@ metadata:
     app.kubernetes.io/name: cainjector
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "cainjector"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 ---
 # Source: cert-manager/templates/serviceaccount.yaml
 apiVersion: v1
@@ -12093,7 +12136,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "controller"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 ---
 # Source: cert-manager/templates/webhook-serviceaccount.yaml
 apiVersion: v1
@@ -12107,7 +12150,7 @@ metadata:
     app.kubernetes.io/name: webhook
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "webhook"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 ---
 # Source: cert-manager/templates/cainjector-rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -12119,7 +12162,7 @@ metadata:
     app.kubernetes.io/name: cainjector
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "cainjector"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 rules:
   - apiGroups: ["cert-manager.io"]
     resources: ["certificates"]
@@ -12151,7 +12194,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "controller"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 rules:
   - apiGroups: ["cert-manager.io"]
     resources: ["issuers", "issuers/status"]
@@ -12177,7 +12220,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "controller"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 rules:
   - apiGroups: ["cert-manager.io"]
     resources: ["clusterissuers", "clusterissuers/status"]
@@ -12203,7 +12246,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "controller"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 rules:
   - apiGroups: ["cert-manager.io"]
     resources: ["certificates", "certificates/status", "certificaterequests", "certificaterequests/status"]
@@ -12238,7 +12281,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "controller"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 rules:
   - apiGroups: ["acme.cert-manager.io"]
     resources: ["orders", "orders/status"]
@@ -12276,7 +12319,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "controller"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 rules:
   # Use to update challenge resource status
   - apiGroups: ["acme.cert-manager.io"]
@@ -12336,7 +12379,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "controller"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 rules:
   - apiGroups: ["cert-manager.io"]
     resources: ["certificates", "certificaterequests"]
@@ -12373,7 +12416,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "controller"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
     rbac.authorization.k8s.io/aggregate-to-cluster-reader: "true"
 rules:
   - apiGroups: ["cert-manager.io"]
@@ -12390,7 +12433,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "controller"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
     rbac.authorization.k8s.io/aggregate-to-view: "true"
     rbac.authorization.k8s.io/aggregate-to-edit: "true"
     rbac.authorization.k8s.io/aggregate-to-admin: "true"
@@ -12413,7 +12456,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "controller"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
     rbac.authorization.k8s.io/aggregate-to-edit: "true"
     rbac.authorization.k8s.io/aggregate-to-admin: "true"
 rules:
@@ -12438,7 +12481,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "cert-manager"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 rules:
   - apiGroups: ["cert-manager.io"]
     resources: ["signers"]
@@ -12460,7 +12503,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "cert-manager"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 rules:
   - apiGroups: ["certificates.k8s.io"]
     resources: ["certificatesigningrequests"]
@@ -12486,7 +12529,7 @@ metadata:
     app.kubernetes.io/name: webhook
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "webhook"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 rules:
 - apiGroups: ["authorization.k8s.io"]
   resources: ["subjectaccessreviews"]
@@ -12502,7 +12545,7 @@ metadata:
     app.kubernetes.io/name: cainjector
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "cainjector"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -12522,7 +12565,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "controller"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -12542,7 +12585,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "controller"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -12562,7 +12605,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "controller"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -12582,7 +12625,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "controller"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -12602,7 +12645,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "controller"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -12622,7 +12665,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "controller"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -12642,7 +12685,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "cert-manager"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -12662,7 +12705,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "cert-manager"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -12682,7 +12725,7 @@ metadata:
     app.kubernetes.io/name: webhook
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "webhook"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -12704,7 +12747,7 @@ metadata:
     app.kubernetes.io/name: cainjector
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "cainjector"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 rules:
   # Used for leader election by the controller
   # cert-manager-cainjector-leader-election is used by the CertificateBased injector controller
@@ -12730,7 +12773,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "controller"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 rules:
   - apiGroups: ["coordination.k8s.io"]
     resources: ["leases"]
@@ -12751,7 +12794,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "controller"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 rules:
   - apiGroups: [""]
     resources: ["serviceaccounts/token"]
@@ -12769,7 +12812,7 @@ metadata:
     app.kubernetes.io/name: webhook
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "webhook"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 rules:
 - apiGroups: [""]
   resources: ["secrets"]
@@ -12794,7 +12837,7 @@ metadata:
     app.kubernetes.io/name: cainjector
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "cainjector"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -12817,7 +12860,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "controller"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -12839,7 +12882,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "controller"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -12860,7 +12903,7 @@ metadata:
     app.kubernetes.io/name: webhook
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "webhook"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -12881,7 +12924,7 @@ metadata:
     app.kubernetes.io/name: cainjector
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "cainjector"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 spec:
   type: ClusterIP
   ports:
@@ -12904,14 +12947,14 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "controller"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 spec:
   type: ClusterIP
   ports:
   - protocol: TCP
     port: 9402
     name: tcp-prometheus-servicemonitor
-    targetPort: 9402
+    targetPort: http-metrics
   selector:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/instance: cert-manager
@@ -12928,7 +12971,7 @@ metadata:
     app.kubernetes.io/name: webhook
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "webhook"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 spec:
   type: ClusterIP
   ports:
@@ -12956,7 +12999,7 @@ metadata:
     app.kubernetes.io/name: cainjector
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "cainjector"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 spec:
   replicas: 1
   selector:
@@ -12971,7 +13014,7 @@ spec:
         app.kubernetes.io/name: cainjector
         app.kubernetes.io/instance: cert-manager
         app.kubernetes.io/component: "cainjector"
-        app.kubernetes.io/version: "v1.17.4"
+        app.kubernetes.io/version: "v1.18.6"
       annotations:
         prometheus.io/path: "/metrics"
         prometheus.io/scrape: 'true'
@@ -12985,7 +13028,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: cert-manager-cainjector
-          image: "quay.io/jetstack/cert-manager-cainjector:v1.17.4"
+          image: "quay.io/jetstack/cert-manager-cainjector:v1.18.6"
           imagePullPolicy: IfNotPresent
           args:
           - --v=2
@@ -13006,7 +13049,7 @@ spec:
               - ALL
             readOnlyRootFilesystem: true
       nodeSelector:
-        kubernetes.io/os: linux
+        kubernetes.io/os: "linux"
 ---
 # Source: cert-manager/templates/deployment.yaml
 apiVersion: apps/v1
@@ -13019,7 +13062,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "controller"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 spec:
   replicas: 1
   selector:
@@ -13034,7 +13077,7 @@ spec:
         app.kubernetes.io/name: cert-manager
         app.kubernetes.io/instance: cert-manager
         app.kubernetes.io/component: "controller"
-        app.kubernetes.io/version: "v1.17.4"
+        app.kubernetes.io/version: "v1.18.6"
       annotations:
         prometheus.io/path: "/metrics"
         prometheus.io/scrape: 'true'
@@ -13048,13 +13091,13 @@ spec:
           type: RuntimeDefault
       containers:
         - name: cert-manager-controller
-          image: "quay.io/jetstack/cert-manager-controller:v1.17.4"
+          image: "quay.io/jetstack/cert-manager-controller:v1.18.6"
           imagePullPolicy: IfNotPresent
           args:
           - --v=2
           - --cluster-resource-namespace=$(POD_NAMESPACE)
           - --leader-election-namespace=kube-system
-          - --acme-http01-solver-image=quay.io/jetstack/cert-manager-acmesolver:v1.17.4
+          - --acme-http01-solver-image=quay.io/jetstack/cert-manager-acmesolver:v1.18.6
           - --max-concurrent-challenges=60
           ports:
           - containerPort: 9402
@@ -13088,7 +13131,7 @@ spec:
             successThreshold: 1
             failureThreshold: 8
       nodeSelector:
-        kubernetes.io/os: linux
+        kubernetes.io/os: "linux"
 ---
 # Source: cert-manager/templates/webhook-deployment.yaml
 apiVersion: apps/v1
@@ -13101,7 +13144,7 @@ metadata:
     app.kubernetes.io/name: webhook
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "webhook"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
 spec:
   replicas: 1
   selector:
@@ -13116,7 +13159,7 @@ spec:
         app.kubernetes.io/name: webhook
         app.kubernetes.io/instance: cert-manager
         app.kubernetes.io/component: "webhook"
-        app.kubernetes.io/version: "v1.17.4"
+        app.kubernetes.io/version: "v1.18.6"
       annotations:
         prometheus.io/path: "/metrics"
         prometheus.io/scrape: 'true'
@@ -13130,7 +13173,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: cert-manager-webhook
-          image: "quay.io/jetstack/cert-manager-webhook:v1.17.4"
+          image: "quay.io/jetstack/cert-manager-webhook:v1.18.6"
           imagePullPolicy: IfNotPresent
           args:
           - --v=2
@@ -13154,7 +13197,7 @@ spec:
           livenessProbe:
             httpGet:
               path: /livez
-              port: 6080
+              port: healthcheck
               scheme: HTTP
             initialDelaySeconds: 60
             periodSeconds: 10
@@ -13164,7 +13207,7 @@ spec:
           readinessProbe:
             httpGet:
               path: /healthz
-              port: 6080
+              port: healthcheck
               scheme: HTTP
             initialDelaySeconds: 5
             periodSeconds: 5
@@ -13183,7 +13226,7 @@ spec:
               fieldRef:
                 fieldPath: metadata.namespace
       nodeSelector:
-        kubernetes.io/os: linux
+        kubernetes.io/os: "linux"
 ---
 # Source: cert-manager/templates/crds.yaml
 #
@@ -13214,7 +13257,7 @@ metadata:
     app.kubernetes.io/name: webhook
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "webhook"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
   annotations:
     cert-manager.io/inject-ca-from-secret: "cert-manager/cert-manager-webhook-ca"
 webhooks:
@@ -13253,7 +13296,7 @@ metadata:
     app.kubernetes.io/name: webhook
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: "webhook"
-    app.kubernetes.io/version: "v1.17.4"
+    app.kubernetes.io/version: "v1.18.6"
   annotations:
     cert-manager.io/inject-ca-from-secret: "cert-manager/cert-manager-webhook-ca"
 webhooks:
