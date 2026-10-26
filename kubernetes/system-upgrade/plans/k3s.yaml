@@ -1,7 +1,11 @@
-# k3s upgrade Plans for system-upgrade-controller. Changing `version` in both Plans starts an
-# upgrade: control-plane nodes first, one at a time, then the agents, one at a time.
-# Agents are cordoned but not drained, so pods keep running while k3s restarts under them.
-# Upgrade one minor version at a time (see the k3s upgrade plan: 1.26 -> 1.36).
+# k3s upgrade Plans for system-upgrade-controller. Changing `version` in all three Plans starts
+# an upgrade: control-plane nodes first, then the workers, then the Longhorn storage nodes, one
+# node at a time. Upgrade one minor version at a time (see the k3s upgrade plan: 1.26 -> 1.36).
+#
+# Workers are drained so their apps are already running elsewhere if a node doesn't come back
+# (used for the containerd 2 switch in 1.31). For routine upgrades the drain block can be
+# removed so pods keep running while k3s restarts under them. Storage nodes are only cordoned:
+# draining them would evict Longhorn's instance managers and force replica rebuilds.
 apiVersion: upgrade.cattle.io/v1
 kind: Plan
 metadata:
@@ -24,7 +28,7 @@ spec:
   serviceAccountName: system-upgrade
   upgrade:
     image: rancher/k3s-upgrade
-  version: v1.30.14+k3s2
+  version: v1.31.14+k3s1
 ---
 apiVersion: upgrade.cattle.io/v1
 kind: Plan
@@ -34,10 +38,15 @@ metadata:
 spec:
   concurrency: 1
   cordon: true
+  drain:
+    force: true
+    ignoreDaemonSets: true
+    deleteEmptydirData: true
   nodeSelector:
     matchExpressions:
-    - key: node-role.kubernetes.io/control-plane
-      operator: DoesNotExist
+    - key: worker
+      operator: In
+      values: ["true"]
   prepare:
     # Wait until every control-plane node is on the new version
     image: rancher/k3s-upgrade
@@ -45,4 +54,27 @@ spec:
   serviceAccountName: system-upgrade
   upgrade:
     image: rancher/k3s-upgrade
-  version: v1.30.14+k3s2
+  version: v1.31.14+k3s1
+---
+apiVersion: upgrade.cattle.io/v1
+kind: Plan
+metadata:
+  name: storage-plan
+  namespace: system-upgrade
+spec:
+  concurrency: 1
+  cordon: true
+  nodeSelector:
+    matchExpressions:
+    - key: node-role.kubernetes.io/control-plane
+      operator: DoesNotExist
+    - key: worker
+      operator: DoesNotExist
+  prepare:
+    # Wait until every worker is on the new version
+    image: rancher/k3s-upgrade
+    args: ["prepare", "agent-plan"]
+  serviceAccountName: system-upgrade
+  upgrade:
+    image: rancher/k3s-upgrade
+  version: v1.31.14+k3s1
