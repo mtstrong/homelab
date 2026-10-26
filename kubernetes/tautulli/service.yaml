@@ -4,8 +4,6 @@ kind: Service
 metadata:
   name: tautulli
   namespace: tautulli
-  annotations:
-    kube-vip.io/loadbalancerIPs: "192.168.2.133"
 spec:
   selector:
     app: tautulli
