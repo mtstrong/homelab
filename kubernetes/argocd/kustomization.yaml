@@ -37,6 +37,7 @@ resources:
 - apps/romm.yaml
 - apps/sabnzbd.yaml
 - apps/sonarr.yaml
+- apps/system-upgrade.yaml
 - apps/tautulli.yaml
 - apps/velero.yaml
 - apps/headscale.yaml
