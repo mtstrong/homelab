@@ -1,0 +1,48 @@
+# k3s upgrade Plans for system-upgrade-controller. Changing `version` in both Plans starts an
+# upgrade: control-plane nodes first, one at a time, then the agents, one at a time.
+# Agents are cordoned but not drained, so pods keep running while k3s restarts under them.
+# Upgrade one minor version at a time (see the k3s upgrade plan: 1.26 -> 1.36).
+apiVersion: upgrade.cattle.io/v1
+kind: Plan
+metadata:
+  name: server-plan
+  namespace: system-upgrade
+spec:
+  concurrency: 1
+  cordon: true
+  nodeSelector:
+    matchExpressions:
+    - key: node-role.kubernetes.io/control-plane
+      operator: In
+      values: ["true"]
+  tolerations:
+  - key: node-role.kubernetes.io/master
+    operator: Exists
+    effect: NoSchedule
+  - key: CriticalAddonsOnly
+    operator: Exists
+  serviceAccountName: system-upgrade
+  upgrade:
+    image: rancher/k3s-upgrade
+  version: v1.26.15+k3s1
+---
+apiVersion: upgrade.cattle.io/v1
+kind: Plan
+metadata:
+  name: agent-plan
+  namespace: system-upgrade
+spec:
+  concurrency: 1
+  cordon: true
+  nodeSelector:
+    matchExpressions:
+    - key: node-role.kubernetes.io/control-plane
+      operator: DoesNotExist
+  prepare:
+    # Wait until every control-plane node is on the new version
+    image: rancher/k3s-upgrade
+    args: ["prepare", "server-plan"]
+  serviceAccountName: system-upgrade
+  upgrade:
+    image: rancher/k3s-upgrade
+  version: v1.26.15+k3s1
