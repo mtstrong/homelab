@@ -1,0 +1,20 @@
+# MetalLB in L2 mode, managed by Argo (app: metallb). Upgrade by replacing metallb-native.yaml
+# with the next release's upstream file.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- metallb-native.yaml
+- config.yaml
+patches:
+# Since 0.16 the metrics endpoint is HTTPS with RBAC; Prometheus's plain pod scrape can't use it,
+# so turn the scrape annotation off rather than leave a failing target.
+- target: {kind: Deployment, name: controller}
+  patch: |-
+    - op: replace
+      path: /spec/template/metadata/annotations/prometheus.io~1scrape
+      value: "false"
+- target: {kind: DaemonSet, name: speaker}
+  patch: |-
+    - op: replace
+      path: /spec/template/metadata/annotations/prometheus.io~1scrape
+      value: "false"
