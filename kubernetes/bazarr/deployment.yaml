@@ -1,0 +1,92 @@
+---
+# Bazarr (https://www.bazarr.media) fetches subtitles for everything Sonarr and Radarr manage.
+# It writes .srt files next to the media, so /tv and /movies must match the paths Sonarr
+# and Radarr report (same TrueNAS shares, same mount points).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: bazarr
+  name: bazarr
+  namespace: bazarr
+spec:
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bazarr
+  template:
+    metadata:
+      labels:
+        app: bazarr
+    spec:
+      nodeSelector:
+        worker: "true"
+      tolerations:
+      # Evict quickly if the node dies so Longhorn can reattach volumes elsewhere
+      - key: node.kubernetes.io/not-ready
+        operator: Exists
+        effect: NoExecute
+        tolerationSeconds: 60
+      - key: node.kubernetes.io/unreachable
+        operator: Exists
+        effect: NoExecute
+        tolerationSeconds: 60
+      containers:
+      - name: bazarr
+        image: lscr.io/linuxserver/bazarr:v1.6.2-ls369
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        - name: TZ
+          value: "America/Chicago"
+        ports:
+        - containerPort: 6767
+          name: http
+          protocol: TCP
+        startupProbe:
+          tcpSocket:
+            port: 6767
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          failureThreshold: 30
+        readinessProbe:
+          tcpSocket:
+            port: 6767
+          periodSeconds: 15
+          failureThreshold: 4
+        livenessProbe:
+          tcpSocket:
+            port: 6767
+          periodSeconds: 30
+          failureThreshold: 6
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+        volumeMounts:
+        - mountPath: /config
+          name: config
+        - mountPath: /tv
+          name: tv
+        - mountPath: /movies
+          name: movies
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: bazarr
+      - name: tv
+        nfs:
+          server: 192.168.1.70
+          path: /mnt/TrueNAS/tv
+      - name: movies
+        nfs:
+          server: 192.168.1.70
+          path: /mnt/TrueNAS/movies

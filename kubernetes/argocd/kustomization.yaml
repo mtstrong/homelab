@@ -9,6 +9,7 @@ resources:
 - avp-plugin.yaml
 - ingress.yaml
 - apps/audiobookshelf.yaml
+- apps/bazarr.yaml
 - apps/blackbox-exporter.yaml
 - apps/cadvisor.yaml
 - apps/cert-manager.yaml
