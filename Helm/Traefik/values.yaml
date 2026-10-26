@@ -1,0 +1,56 @@
+# Values for the traefik Helm release (namespace traefik), chart traefik/traefik 42.x.
+# Migrated from the chart 37 layout: ports http options under `http:` (chart 39),
+# service settings under `service.spec` (chart 40), `logs.access` -> `accessLog` (chart 41).
+# The CrowdSec bouncer plugin and its cert volume were dropped 2026-10-26: CrowdSec is no longer
+# deployed and no Middleware used the plugin.
+# Upgrade: apply the chart's CRDs first (server-side), then
+#   helm upgrade traefik traefik/traefik -n traefik --version <ver> -f Helm/Traefik/values.yaml
+additionalArguments:
+- --serversTransport.insecureSkipVerify=true
+- --log.level=INFO
+- --providers.kubernetescrd
+global:
+  checkNewVersion: true
+  sendAnonymousUsage: false
+deployment:
+  enabled: true
+  replicas: 2
+nodeSelector:
+  worker: "true"
+image:
+  pullPolicy: Always
+ingressRoute:
+  dashboard:
+    enabled: false
+accessLog:
+  enabled: true
+ports:
+  web:
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+          permanent: true
+  websecure:
+    http:
+      tls:
+        enabled: true
+providers:
+  kubernetesCRD:
+    enabled: true
+    allowCrossNamespace: true
+    allowExternalNameServices: true
+  kubernetesIngress:
+    enabled: true
+    allowExternalNameServices: true
+    publishedService:
+      enabled: false
+rbac:
+  enabled: true
+service:
+  enabled: true
+  spec:
+    type: LoadBalancer
+    externalTrafficPolicy: Local
+    loadBalancerIP: 192.168.2.125
