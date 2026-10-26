@@ -11,6 +11,7 @@ resources:
 - apps/audiobookshelf.yaml
 - apps/blackbox-exporter.yaml
 - apps/cadvisor.yaml
+- apps/cert-manager.yaml
 - apps/calibre.yaml
 - apps/decluttarr.yaml
 - apps/dozzle.yaml

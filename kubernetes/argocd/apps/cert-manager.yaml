@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cert-manager
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: homelab
+    app.kubernetes.io/name: cert-manager
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/mtstrong/homelab.git
+    path: kubernetes/cert-manager
+    targetRevision: HEAD
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: cert-manager
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    # The CRDs are too large for client-side apply, and Helm still owns the existing fields
+    - ServerSideApply=true
