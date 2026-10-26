@@ -1,5 +1,7 @@
-﻿# kube-vip control-plane VIP (192.168.2.110, ARP, leader election), applied by hand with
-# `kubectl apply -f kubernetes/kube-vip/kube-vip-ds.yaml` (not Argo-managed: Argo depends on the API it serves).
+﻿# kube-vip control-plane VIP (192.168.2.110, ARP, leader election). Not Argo-managed (Argo depends on the API it
+# serves): this file is installed as the k3s auto-deploy manifest /var/lib/rancher/k3s/server/manifests/kube-vip.yaml
+# on k3s-01, which k3s re-applies on every start — so edit it THERE (and here), not just with kubectl, or a server
+# restart reverts the DaemonSet (happened 2026-10-26: reboot rolled 1.2.4 back to 0.8.2 and it crash-looped).
 # Upgraded 0.8.2 -> 1.2.4 on 2026-10-26 (vip_cidr renamed to vip_subnet in 0.9). Services are load-balanced by
 # MetalLB, so svc_enable stays false; the kube-vip cloud provider was removed.
 apiVersion: apps/v1
@@ -7,8 +9,7 @@ kind: DaemonSet
 metadata:
   labels:
     app.kubernetes.io/name: kube-vip-ds
-    app.kubernetes.io/version: v0.8.2
-    objectset.rio.cattle.io/hash: df8554deac08f5bfb609d09470da1244dab4a242
+    app.kubernetes.io/version: v1.2.4
   name: kube-vip-ds
   namespace: kube-system
 spec:
@@ -20,7 +21,7 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: kube-vip-ds
-        app.kubernetes.io/version: v0.8.2
+        app.kubernetes.io/version: v1.2.4
     spec:
       affinity:
         nodeAffinity:
