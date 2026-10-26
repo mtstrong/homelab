@@ -30,7 +30,8 @@ spec:
         tolerationSeconds: 60
       containers:
       - name: kavita
-        image: jvmilazz0/kavita:0.9.0.2
+        # 0.9.1.4 hotfix build: Docker Hub has no 0.9.1.4 tag, so the 0.9.1 tag is pinned by digest
+        image: jvmilazz0/kavita:0.9.1@sha256:31181a32f0dda73cae68721867028a7253d57881b58bea5754cd9e578e75421a
         env:
         - name: TZ
           value: "America/Chicago"
