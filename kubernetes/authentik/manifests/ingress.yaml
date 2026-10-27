@@ -15,10 +15,11 @@ spec:
       port: 80
   tls: {}
 ---
-# Forward-auth middleware for other apps' IngressRoutes. Reference it cross-namespace as
-# `authentik-authentik@kubernetescrd`, or by name/namespace in the route's middlewares list.
-# Each protected host needs a Proxy Provider (forward auth, single application) in Authentik,
-# bound to the embedded outpost.
+# Forward-auth middleware for other apps' IngressRoutes (reference it with name: authentik, namespace: authentik).
+# Each protected host needs a Proxy Provider (forward auth, single application) in Authentik, bound to the
+# embedded outpost, plus a route for Host(...) && PathPrefix(`/outpost.goauthentik.io/`) to authentik-server
+# (see kubernetes/sabnzbd/ingress.yaml). The embedded outpost runs inside authentik-server; there is no
+# separate outpost Service.
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
@@ -26,7 +27,7 @@ metadata:
   namespace: authentik
 spec:
   forwardAuth:
-    address: http://ak-outpost-authentik-embedded-outpost.authentik.svc.cluster.local:9000/outpost.goauthentik.io/auth/traefik
+    address: http://authentik-server.authentik.svc.cluster.local/outpost.goauthentik.io/auth/traefik
     trustForwardHeader: true
     authResponseHeaders:
     - X-authentik-username

@@ -1,4 +1,7 @@
 ---
+# sab.tehmatt.com is behind Authentik (forward auth, Google login). The API stays outside it, since
+# it is protected by SABnzbd's API key and apps such as nzb360 can't do the Authentik login.
+# Sonarr/Radarr talk to SABnzbd directly on its LoadBalancer IP, not through here.
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
@@ -8,11 +11,26 @@ spec:
   entryPoints:
   - websecure
   routes:
+  - match: Host(`sab.tehmatt.com`) && (PathPrefix(`/api`) || PathPrefix(`/sabnzbd/api`))
+    kind: Rule
+    services:
+    - name: sabnzbd
+      port: 8080
+    middlewares:
+    - name: default-headers
+  - match: Host(`sab.tehmatt.com`) && PathPrefix(`/outpost.goauthentik.io/`)
+    kind: Rule
+    services:
+    - name: authentik-server
+      namespace: authentik
+      port: 80
   - match: Host(`sab.tehmatt.com`)
     kind: Rule
     services:
     - name: sabnzbd
       port: 8080
     middlewares:
+    - name: authentik
+      namespace: authentik
     - name: default-headers
   tls: {}
