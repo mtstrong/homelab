@@ -1,15 +1,72 @@
 # Recyclarr (https://recyclarr.dev) syncs TRaSH Guides custom formats and their scores into Sonarr and Radarr.
-# Replaced Notifiarr's TRaSH sync on 2026-10-26. Generated from the scores live at the time, so the first
-# sync changed no scores; Recyclarr now keeps the format definitions current with TRaSH.
-# Only custom formats + scores are managed: quality profiles' allowed qualities, cutoffs and quality sizes
-# are left as configured in the apps. Edit scores here, not in the UI (the next sync reverts UI edits).
+# Replaced Notifiarr's TRaSH sync on 2026-10-26; scores were generated from the live values at that time.
+# 2026-10-26: HD-1080p made "1080p Bluray first" in both apps (TRaSH HD Bluray + WEB style): HD Bluray tiers
+# score above WEB tiers, upgrades on until Bluray-1080p, Radarr remuxes no longer grabbed (existing ones kept).
+# Recyclarr manages custom formats, their scores, and the HD-1080p profiles below; the other profiles' qualities
+# and the quality sizes are left as configured in the apps. Edit here, not in the UI (the next sync reverts UI edits).
 # Run on demand: kubectl -n recyclarr create job --from=cronjob/recyclarr recyclarr-manual
 
 sonarr:
   sonarr:
     base_url: http://sonarr.sonarr.svc.cluster.local:8989
     api_key: !env_var SONARR_API_KEY
+    quality_profiles:
+      - name: HD-1080p
+        upgrade:
+          allowed: true
+          until_quality: Bluray-1080p
+          until_score: 10000
+        min_format_score: 0
+        quality_sort: top
+        qualities:
+          - name: Bluray-2160p Remux
+            enabled: false
+          - name: Bluray-2160p
+            enabled: false
+          - name: WEB 2160p
+            enabled: false
+            qualities: [WEBRip-2160p, WEBDL-2160p]
+          - name: HDTV-2160p
+            enabled: false
+          - name: Bluray-1080p Remux
+            enabled: false
+          - name: Bluray-1080p
+          - name: WEB 1080p
+            qualities: [WEBRip-1080p, WEBDL-1080p]
+          - name: HDTV-1080p
+          - name: Bluray-720p
+            enabled: false
+          - name: WEB 720p
+            enabled: false
+            qualities: [WEBRip-720p, WEBDL-720p]
+          - name: Raw-HD
+            enabled: false
+          - name: HDTV-720p
+            enabled: false
+          - name: Bluray-576p
+            enabled: false
+          - name: Bluray-480p
+            enabled: false
+          - name: DVD
+            enabled: false
+          - name: WEB 480p
+            enabled: false
+            qualities: [WEBRip-480p, WEBDL-480p]
+          - name: SDTV
+            enabled: false
+          - name: Unknown
+            enabled: false
     custom_formats:
+      - trash_ids:
+          - d6819cba26b1a6508138d25fb5e32293 # HD Bluray Tier 01
+        assign_scores_to:
+          - name: HD-1080p
+            score: 1800
+      - trash_ids:
+          - c2216b7b8aa545dc1ce8388c618f8d57 # HD Bluray Tier 02
+        assign_scores_to:
+          - name: HD-1080p
+            score: 1750
       - trash_ids:
           - e6258996055b9fbab7e9cb2f75819294 # WEB Tier 01
         assign_scores_to:
@@ -154,6 +211,69 @@ radarr:
   radarr:
     base_url: http://radarr.radarr.svc.cluster.local:7878
     api_key: !env_var RADARR_API_KEY
+    quality_profiles:
+      - name: HD-1080p
+        upgrade:
+          allowed: true
+          until_quality: Bluray-1080p
+          until_score: 10000
+        min_format_score: 0
+        quality_sort: top
+        qualities:
+          - name: Raw-HD
+            enabled: false
+          - name: BR-DISK
+            enabled: false
+          - name: Remux-2160p
+            enabled: false
+          - name: Bluray-2160p
+            enabled: false
+          - name: WEB 2160p
+            enabled: false
+            qualities: [WEBDL-2160p, WEBRip-2160p]
+          - name: HDTV-2160p
+            enabled: false
+          # Remux stays listed (disabled) so existing remux files rank above the cutoff and are never "upgraded" to encodes.
+          - name: Remux-1080p
+            enabled: false
+          - name: Bluray-1080p
+          - name: WEB 1080p
+            qualities: [WEBDL-1080p, WEBRip-1080p]
+          - name: HDTV-1080p
+          - name: Bluray-720p
+            enabled: false
+          - name: WEB 720p
+            enabled: false
+            qualities: [WEBDL-720p, WEBRip-720p]
+          - name: HDTV-720p
+            enabled: false
+          - name: Bluray-576p
+            enabled: false
+          - name: Bluray-480p
+            enabled: false
+          - name: WEB 480p
+            enabled: false
+            qualities: [WEBDL-480p, WEBRip-480p]
+          - name: DVD-R
+            enabled: false
+          - name: DVD
+            enabled: false
+          - name: SDTV
+            enabled: false
+          - name: DVDSCR
+            enabled: false
+          - name: REGIONAL
+            enabled: false
+          - name: TELECINE
+            enabled: false
+          - name: TELESYNC
+            enabled: false
+          - name: CAM
+            enabled: false
+          - name: WORKPRINT
+            enabled: false
+          - name: Unknown
+            enabled: false
     custom_formats:
       - trash_ids:
           - 3a3ff47579026e76d6504ebea39390de # Remux Tier 01
@@ -163,8 +283,6 @@ radarr:
           - name: SD
             score: 1950
           - name: HD-720p
-            score: 1950
-          - name: HD-1080p
             score: 1950
           - name: Ultra-HD
             score: 1950
@@ -179,8 +297,6 @@ radarr:
             score: 1900
           - name: HD-720p
             score: 1900
-          - name: HD-1080p
-            score: 1900
           - name: Ultra-HD
             score: 1900
           - name: HD - 720p/1080p
@@ -194,12 +310,25 @@ radarr:
             score: 1850
           - name: HD-720p
             score: 1850
-          - name: HD-1080p
-            score: 1850
           - name: Ultra-HD
             score: 1850
           - name: HD - 720p/1080p
             score: 1850
+      - trash_ids:
+          - ed27ebfef2f323e964fb1f61391bcb35 # HD Bluray Tier 01
+        assign_scores_to:
+          - name: HD-1080p
+            score: 1800
+      - trash_ids:
+          - c20c8647f2746a1f4c4262b0fbbeeeae # HD Bluray Tier 02
+        assign_scores_to:
+          - name: HD-1080p
+            score: 1750
+      - trash_ids:
+          - 5608c71bcebba0a5e666223bae8c9227 # HD Bluray Tier 03
+        assign_scores_to:
+          - name: HD-1080p
+            score: 1700
       - trash_ids:
           - c20f169ef63c5f40c2def54abaf4438e # WEB Tier 01
         assign_scores_to:
