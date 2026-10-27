@@ -10,6 +10,8 @@
 #   still be imported by hand.
 # - search_missing runs 1 search per app per 10-minute cycle and repeats an item at
 #   most weekly, so the backlog drains over a few days without hitting indexer API limits.
+# - search_unmet_cutoff (added 2026-10-26 with the Bluray-first HD-1080p profiles) works the
+#   same way through items below the Bluray-1080p cutoff (~7.8k episodes ≈ 8 weeks at this pace).
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -38,6 +40,7 @@ data:
           - "No files found are eligible for import*"
       remove_missing_files:
       search_missing:
+      search_unmet_cutoff:
 
     instances:
       radarr:
