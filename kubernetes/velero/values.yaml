@@ -1,3 +1,11 @@
+# Velero backs up Kubernetes objects (including Secrets that aren't in git) to the Garage S3 app on
+# TrueNAS (http://192.168.1.70:30188, bucket "velero", data in /mnt/TrueNAS/garage/data).
+# Volume data is NOT included: Longhorn's nightly-backup recurring job already copies every volume to
+# nfs://192.168.1.70:/mnt/TrueNAS/proxmox/longhorn-backups. Restore an app = Longhorn restore of its
+# volume + `velero restore create --from-backup <backup> --include-namespaces <ns>`.
+#
+# The S3 key lives in the Secret velero-credentials (key "cloud", AWS credentials-file format), created
+# by hand from Garage's admin API — not in git.
 configuration:
   backupStorageLocation:
     - name: default
@@ -5,22 +13,34 @@ configuration:
       bucket: velero
       default: true
       config:
-        region: homelab
-        s3Url: http://minio.minio.svc.cluster.local:9000
+        region: garage
+        s3Url: http://192.168.1.70:30188
         s3ForcePathStyle: "true"
-  volumeSnapshotLocation:
-    - name: default
-      provider: aws
-      config:
-        region: homelab
+  volumeSnapshotLocation: []
+
+snapshotsEnabled: false
+deployNodeAgent: false
 
 credentials:
   useSecret: true
   existingSecret: velero-credentials
 
+nodeSelector:
+  worker: "true"
+
 initContainers:
   - name: velero-plugin-for-aws
-    image: velero/velero-plugin-for-aws:v1.14.2
+    image: velero/velero-plugin-for-aws:v1.14.4
     volumeMounts:
       - mountPath: /target
         name: plugins
+
+schedules:
+  daily:
+    schedule: "30 4 * * *"
+    useOwnerReferencesInBackup: false
+    template:
+      ttl: 720h
+      snapshotVolumes: false
+      includedNamespaces:
+        - "*"

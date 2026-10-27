@@ -1,23 +1,13 @@
 # Velero (Argo CD + Helm)
 
-This folder provides Helm values for Velero, deployed via Argo CD.
+Helm values for Velero, deployed by the Argo app `kubernetes/argocd/apps/velero.yaml`.
 
-## Required setup
-- Create a secret named velero-credentials in the velero namespace.
-- Update values.yaml to match your backup target (S3-compatible or cloud object storage).
+- **What it backs up:** Kubernetes objects in every namespace, daily at 04:30, kept 30 days. That includes
+  Secrets that aren't in git. Volume data is left to Longhorn's nightly backups to TrueNAS.
+- **Where:** the Garage S3 app on TrueNAS (`http://192.168.1.70:30188`, region `garage`, bucket `velero`).
+  Garage's admin API is on port 30190; its admin token is in the user's `~/.garage-secrets`.
+- **Credentials:** the Secret `velero-credentials` in the `velero` namespace (key `cloud`, AWS
+  credentials-file format), created by hand from a Garage key named `velero`. Not in git.
 
-## Example secret
-Use your preferred secret workflow (Vault/AVP, External Secrets, or kubectl) to create:
-
-```yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: velero-credentials
-  namespace: velero
-stringData:
-  cloud: |
-    [default]
-    aws_access_key_id=REPLACE_ME
-    aws_secret_access_key=REPLACE_ME
-```
+Restore one app: restore its volume from Longhorn's backup, then
+`velero restore create --from-backup <backup> --include-namespaces <ns>`.
