@@ -1,0 +1,61 @@
+# Authentik (https://goauthentik.io) — SSO for *.tehmatt.com via Traefik forward auth, with Google login.
+# Helm chart authentik/authentik, deployed by the Argo app kubernetes/argocd/apps/authentik.yaml together
+# with the manifests in ./manifests (IngressRoute, forward-auth Middleware).
+#
+# Secrets are NOT in git. Create the Secret `authentik-secrets` in the authentik namespace first, with keys:
+#   AUTHENTIK_SECRET_KEY, AUTHENTIK_POSTGRESQL__PASSWORD, AUTHENTIK_BOOTSTRAP_PASSWORD, AUTHENTIK_BOOTSTRAP_EMAIL,
+#   password, postgres-password  (the last two are read by the bundled Postgres)
+# Because existingSecret is set, the chart renders no env of its own, so the Postgres connection settings
+# that aren't secret are given below in global.env.
+global:
+  nodeSelector:
+    worker: "true"
+  env:
+  - name: AUTHENTIK_POSTGRESQL__HOST
+    value: authentik-postgresql
+  - name: AUTHENTIK_POSTGRESQL__NAME
+    value: authentik
+  - name: AUTHENTIK_POSTGRESQL__USER
+    value: authentik
+  - name: AUTHENTIK_ERROR_REPORTING__ENABLED
+    value: "false"
+
+authentik:
+  existingSecret:
+    secretName: authentik-secrets
+
+server:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 512Mi
+    limits:
+      memory: 1Gi
+
+worker:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 512Mi
+    limits:
+      memory: 1Gi
+
+postgresql:
+  enabled: true
+  auth:
+    username: authentik
+    database: authentik
+    existingSecret: authentik-secrets
+  primary:
+    nodeSelector:
+      worker: "true"
+    persistence:
+      enabled: true
+      storageClass: longhorn
+      size: 5Gi
+    resources:
+      requests:
+        cpu: 50m
+        memory: 256Mi
+      limits:
+        memory: 1Gi

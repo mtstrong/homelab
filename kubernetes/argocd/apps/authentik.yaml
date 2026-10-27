@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: authentik
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: homelab
+    app.kubernetes.io/name: authentik
+spec:
+  project: default
+  sources:
+    - repoURL: https://charts.goauthentik.io
+      chart: authentik
+      targetRevision: 2026.8.5
+      helm:
+        releaseName: authentik
+        valueFiles:
+          - $values/kubernetes/authentik/values.yaml
+    - repoURL: https://github.com/mtstrong/homelab.git
+      targetRevision: main
+      ref: values
+    - repoURL: https://github.com/mtstrong/homelab.git
+      targetRevision: main
+      path: kubernetes/authentik/manifests
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: authentik
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
