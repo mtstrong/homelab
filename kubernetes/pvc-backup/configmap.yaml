@@ -34,7 +34,6 @@ data:
     homebridge homebridge-config
     kavita kavita
     loki-stack loki-data-pvc
-    notifiarr notifiarr-config
     prometheus prometheus-pvc
     prowlarr prowlarr-config
     readarr readarr

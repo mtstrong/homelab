@@ -1,0 +1,13 @@
+# Recyclarr runs as a daily CronJob. recyclarr.yml becomes a ConfigMap (hash-suffixed, so edits roll
+# into the next run). The Secret recyclarr-secrets (SONARR_API_KEY, RADARR_API_KEY) is created by hand,
+# not kept in git.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: recyclarr
+resources:
+- namespace.yaml
+- cronjob.yaml
+configMapGenerator:
+- name: recyclarr-config
+  files:
+  - recyclarr.yml

@@ -31,13 +31,13 @@ resources:
 - apps/metallb.yaml
 - apps/mylar3.yaml
 - apps/node-exporter.yaml
-- apps/notifiarr.yaml
 - apps/overseerr.yaml
 - apps/plex-exporter.yaml
 - apps/prometheus.yaml
 - apps/prowlarr.yaml
 - apps/radarr.yaml
 - apps/readarr.yaml
+- apps/recyclarr.yaml
 - apps/romm.yaml
 - apps/sabnzbd.yaml
 - apps/sonarr.yaml

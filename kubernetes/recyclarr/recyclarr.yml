@@ -1,0 +1,394 @@
+# Recyclarr (https://recyclarr.dev) syncs TRaSH Guides custom formats and their scores into Sonarr and Radarr.
+# Replaced Notifiarr's TRaSH sync on 2026-10-26. Generated from the scores live at the time, so the first
+# sync changed no scores; Recyclarr now keeps the format definitions current with TRaSH.
+# Only custom formats + scores are managed: quality profiles' allowed qualities, cutoffs and quality sizes
+# are left as configured in the apps. Edit scores here, not in the UI (the next sync reverts UI edits).
+# Run on demand: kubectl -n recyclarr create job --from=cronjob/recyclarr recyclarr-manual
+
+sonarr:
+  sonarr:
+    base_url: http://sonarr.sonarr.svc.cluster.local:8989
+    api_key: !env_var SONARR_API_KEY
+    custom_formats:
+      - trash_ids:
+          - e6258996055b9fbab7e9cb2f75819294 # WEB Tier 01
+        assign_scores_to:
+          - name: Any
+            score: 1700
+          - name: SD
+            score: 1700
+          - name: HD-720p
+            score: 1700
+          - name: HD-1080p
+            score: 1700
+          - name: Ultra-HD
+            score: 1700
+          - name: HD - 720p/1080p
+            score: 1700
+      - trash_ids:
+          - 58790d4e2fdcd9733aa7ae68ba2bb503 # WEB Tier 02
+        assign_scores_to:
+          - name: Any
+            score: 1650
+          - name: SD
+            score: 1650
+          - name: HD-720p
+            score: 1650
+          - name: HD-1080p
+            score: 1650
+          - name: Ultra-HD
+            score: 1650
+          - name: HD - 720p/1080p
+            score: 1650
+      - trash_ids:
+          - d0c516558625b04b363fa6c5c2c7cfd4 # WEB Scene
+          - d84935abd3f8556dcd51d4f27e22d0a6 # WEB Tier 03
+        assign_scores_to:
+          - name: Any
+            score: 1600
+          - name: SD
+            score: 1600
+          - name: HD-720p
+            score: 1600
+          - name: HD-1080p
+            score: 1600
+          - name: Ultra-HD
+            score: 1600
+          - name: HD - 720p/1080p
+            score: 1600
+      - trash_ids:
+          - d660701077794679fd59e8bdf4ce3a29 # AMZN
+          - f67c9ca88f463a48346062e8ad07713f # ATVP
+          - 77a7b25585c18af08f60b1547bb9b4fb # CC
+          - 36b72f59f4ea20aad9316f475f2d9fbb # DCU
+          - 89358767a60cc28783cdc3d0be9388a4 # DSNP
+          - 7a235133c87f7da4c8cccceca7e3c7a6 # HBO
+          - a880d6abc21e7c16884f3ae393f84179 # HMAX
+          - f6cce30f1733d5c8194222a7507909bb # HULU
+          - 0ac24a2a68a9700bcb7eeca8e5cd644c # iT
+          - 81d1fbf600e2540cee87f3a23f9d3c1c # MAX
+          - d34870697c9db575f17700212167be23 # NF
+          - 1656adc6d7bb2c8cca6acfb6592db421 # PCOK
+          - c67a75ae4a1715f2bb4d492755ba4195 # PMTP
+          - ae58039e1319178e6be73caab5c42166 # SHO
+          - 1efe8da11bfd74fbbcd4d8117ddb9213 # STAN
+        assign_scores_to:
+          - name: Any
+            score: 75
+          - name: SD
+            score: 75
+          - name: HD-720p
+            score: 75
+          - name: HD-1080p
+            score: 75
+          - name: Ultra-HD
+            score: 75
+          - name: HD - 720p/1080p
+            score: 75
+      - trash_ids:
+          - 44e7c4de10ae50265753082e5dc76047 # Repack3
+        assign_scores_to:
+          - name: Any
+            score: 7
+          - name: SD
+            score: 7
+          - name: HD-720p
+            score: 7
+          - name: HD-1080p
+            score: 7
+          - name: Ultra-HD
+            score: 7
+          - name: HD - 720p/1080p
+            score: 7
+      - trash_ids:
+          - eb3d5cc0a2be0db205fb823640db6a3c # Repack2
+        assign_scores_to:
+          - name: Any
+            score: 6
+          - name: SD
+            score: 6
+          - name: HD-720p
+            score: 6
+          - name: HD-1080p
+            score: 6
+          - name: Ultra-HD
+            score: 6
+          - name: HD - 720p/1080p
+            score: 6
+      - trash_ids:
+          - ec8fa7296b64e8cd390a1600981f3923 # Repack/Proper
+        assign_scores_to:
+          - name: Any
+            score: 5
+          - name: SD
+            score: 5
+          - name: HD-720p
+            score: 5
+          - name: HD-1080p
+            score: 5
+          - name: Ultra-HD
+            score: 5
+          - name: HD - 720p/1080p
+            score: 5
+      - trash_ids:
+          - 85c61753df5da1fb2aab6f2a47426b09 # BR-DISK
+          - fbcb31d8dabd2a319072b84fc0b7249c # Extras
+          - 9c11cd3f07101cdba90a2d81cf0e56b4 # LQ
+          - e2315f990da2e2cbfc9fa5b7a6fcfe48 # LQ (Release Title)
+          - 47435ece6b99a0b477caf360e79ba0bb # x265 (HD)
+        assign_scores_to:
+          - name: Any
+            score: -10000
+          - name: SD
+            score: -10000
+          - name: HD-720p
+            score: -10000
+          - name: HD-1080p
+            score: -10000
+          - name: Ultra-HD
+            score: -10000
+          - name: HD - 720p/1080p
+            score: -10000
+
+radarr:
+  radarr:
+    base_url: http://radarr.radarr.svc.cluster.local:7878
+    api_key: !env_var RADARR_API_KEY
+    custom_formats:
+      - trash_ids:
+          - 3a3ff47579026e76d6504ebea39390de # Remux Tier 01
+        assign_scores_to:
+          - name: Any
+            score: 1950
+          - name: SD
+            score: 1950
+          - name: HD-720p
+            score: 1950
+          - name: HD-1080p
+            score: 1950
+          - name: Ultra-HD
+            score: 1950
+          - name: HD - 720p/1080p
+            score: 1950
+      - trash_ids:
+          - 9f98181fe5a3fbeb0cc29340da2a468a # Remux Tier 02
+        assign_scores_to:
+          - name: Any
+            score: 1900
+          - name: SD
+            score: 1900
+          - name: HD-720p
+            score: 1900
+          - name: HD-1080p
+            score: 1900
+          - name: Ultra-HD
+            score: 1900
+          - name: HD - 720p/1080p
+            score: 1900
+      - trash_ids:
+          - 8baaf0b3142bf4d94c42a724f034e27a # Remux Tier 03
+        assign_scores_to:
+          - name: Any
+            score: 1850
+          - name: SD
+            score: 1850
+          - name: HD-720p
+            score: 1850
+          - name: HD-1080p
+            score: 1850
+          - name: Ultra-HD
+            score: 1850
+          - name: HD - 720p/1080p
+            score: 1850
+      - trash_ids:
+          - c20f169ef63c5f40c2def54abaf4438e # WEB Tier 01
+        assign_scores_to:
+          - name: Any
+            score: 1700
+          - name: SD
+            score: 1700
+          - name: HD-720p
+            score: 1700
+          - name: HD-1080p
+            score: 1700
+          - name: Ultra-HD
+            score: 1700
+          - name: HD - 720p/1080p
+            score: 1700
+      - trash_ids:
+          - 403816d65392c79236dcb6dd591aeda4 # WEB Tier 02
+        assign_scores_to:
+          - name: Any
+            score: 1650
+          - name: SD
+            score: 1650
+          - name: HD-720p
+            score: 1650
+          - name: HD-1080p
+            score: 1650
+          - name: Ultra-HD
+            score: 1650
+          - name: HD - 720p/1080p
+            score: 1650
+      - trash_ids:
+          - af94e0fe497124d1f9ce732069ec8c3b # WEB Tier 03
+        assign_scores_to:
+          - name: Any
+            score: 1600
+          - name: SD
+            score: 1600
+          - name: HD-720p
+            score: 1600
+          - name: HD-1080p
+            score: 1600
+          - name: Ultra-HD
+            score: 1600
+          - name: HD - 720p/1080p
+            score: 1600
+      - trash_ids:
+          - eecf3a857724171f968a66cb5719e152 # IMAX
+          - 9f6cbff8cfe4ebbc1bde14c7b7bec0de # IMAX Enhanced
+        assign_scores_to:
+          - name: Any
+            score: 800
+          - name: SD
+            score: 800
+          - name: HD-720p
+            score: 800
+          - name: HD-1080p
+            score: 800
+          - name: Ultra-HD
+            score: 800
+          - name: HD - 720p/1080p
+            score: 800
+      - trash_ids:
+          - 957d0f44b592285f26449575e8b1167e # Special Edition
+        assign_scores_to:
+          - name: Any
+            score: 125
+          - name: SD
+            score: 125
+          - name: HD-720p
+            score: 125
+          - name: HD-1080p
+            score: 125
+          - name: Ultra-HD
+            score: 125
+          - name: HD - 720p/1080p
+            score: 125
+      - trash_ids:
+          - 0f12c086e289cf966fa5948eac571f44 # Hybrid
+        assign_scores_to:
+          - name: Any
+            score: 100
+          - name: SD
+            score: 100
+          - name: HD-720p
+            score: 100
+          - name: HD-1080p
+            score: 100
+          - name: Ultra-HD
+            score: 100
+          - name: HD - 720p/1080p
+            score: 100
+      - trash_ids:
+          - eca37840c13c6ef2dd0262b141a5482f # 4K Remaster
+          - e0c07d59beb37348e975a930d5e50319 # Criterion Collection
+          - 9d27d9d2181838f76dee150882bdc58c # Masters of Cinema
+          - 570bc9ebecd92723d2d21500f4be314c # Remaster
+          - db9b4c4b53d312a3ca5f1378f6440fc9 # Vinegar Syndrome
+        assign_scores_to:
+          - name: Any
+            score: 25
+          - name: SD
+            score: 25
+          - name: HD-720p
+            score: 25
+          - name: HD-1080p
+            score: 25
+          - name: Ultra-HD
+            score: 25
+          - name: HD - 720p/1080p
+            score: 25
+      - trash_ids:
+          - 16622a6911d1ab5d5b8b713d5b0036d4 # CRiT
+          - 2a6039655313bf5dab1e43523b62c374 # MA
+        assign_scores_to:
+          - name: Any
+            score: 20
+          - name: SD
+            score: 20
+          - name: HD-720p
+            score: 20
+          - name: HD-1080p
+            score: 20
+          - name: Ultra-HD
+            score: 20
+          - name: HD - 720p/1080p
+            score: 20
+      - trash_ids:
+          - cc5e51a9e85a6296ceefe097a77f12f4 # BCORE
+        assign_scores_to:
+          - name: Any
+            score: 15
+          - name: SD
+            score: 15
+          - name: HD-720p
+            score: 15
+          - name: HD-1080p
+            score: 15
+          - name: Ultra-HD
+            score: 15
+          - name: HD - 720p/1080p
+            score: 15
+      - trash_ids:
+          - ae43b294509409a6a13919dedd4764c4 # Repack2
+        assign_scores_to:
+          - name: Any
+            score: 6
+          - name: SD
+            score: 6
+          - name: HD-720p
+            score: 6
+          - name: HD-1080p
+            score: 6
+          - name: Ultra-HD
+            score: 6
+          - name: HD - 720p/1080p
+            score: 6
+      - trash_ids:
+          - e7718d7a3ce595f289bfee26adc178f5 # Repack/Proper
+        assign_scores_to:
+          - name: Any
+            score: 5
+          - name: SD
+            score: 5
+          - name: HD-720p
+            score: 5
+          - name: HD-1080p
+            score: 5
+          - name: Ultra-HD
+            score: 5
+          - name: HD - 720p/1080p
+            score: 5
+      - trash_ids:
+          - b8cd450cbfa689c0259a01d9e29ba3d6 # 3D
+          - ed38b889b31be83fda192888e2286d83 # BR-DISK
+          - 0a3f082873eb454bde444150b70253cc # Extras
+          - 90a6f9a284dff5103f6346090e6280c8 # LQ
+          - e204b80c87be9497a8a6eaff48f72905 # LQ (Release Title)
+          - bfd8eb01832d646a0a89c4deb46f8564 # Upscaled
+          - dc98083864ea246d05a42df0d05f81cc # x265 (HD)
+        assign_scores_to:
+          - name: Any
+            score: -10000
+          - name: SD
+            score: -10000
+          - name: HD-720p
+            score: -10000
+          - name: HD-1080p
+            score: -10000
+          - name: Ultra-HD
+            score: -10000
+          - name: HD - 720p/1080p
+            score: -10000
