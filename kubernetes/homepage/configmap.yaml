@@ -35,7 +35,7 @@ data:
     \           node: x1b\n    - Proxmox:\n        icon: proxmox.svg\n        href:
     https://192.168.1.25:8006\n        description: x1c\n        widget:\n            type:
     proxmox\n            url: https://192.168.1.25:8006\n            username:  api@pam!homepage\n
-    \           password:  {{HOMEPAGE_VAR_PROXMOX_PASSWORD}}\n            node: x1c\n-
+    \           password:  {{HOMEPAGE_VAR_PROXMOX_PASSWORD}}\n            node: x1c\n    - Proxmox:\n        icon: proxmox.svg\n        href: https://192.168.1.87:8006\n        description: x1a\n        widget:\n            type: proxmox\n            url: https://192.168.1.87:8006\n            username:  api@pam!homepage\n            password:  {{HOMEPAGE_VAR_PROXMOX_PASSWORD}}\n            node: x1a\n-
     Storage:\n    - Synology:\n        href: http://192.168.1.70\n        icon: synology.png\n
     \       description: NAS\n        widget:\n            type: diskstation\n            url:
     http://192.168.1.70:5000\n            username: {{HOMEPAGE_VAR_SYNOLOGY_USERNAME}}\n
