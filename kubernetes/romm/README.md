@@ -21,7 +21,7 @@ This folder contains Kubernetes manifests to deploy [RomM](https://romm.app/) an
 - Networking:
   - `Service/romm-db` (ClusterIP :3306)
   - `Service/romm` (ClusterIP :80 -> container :8080)
-  - `IngressRoute/romm` (Traefik, TLS via `tehmatt-tls`)
+  - `IngressRoute/romm` (Traefik, default TLS cert)
 
 ## Prereqs
 
