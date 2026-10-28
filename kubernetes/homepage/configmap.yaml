@@ -24,11 +24,7 @@ data:
   services.yaml: "- Desktops:\n    - Proxmox:\n        icon: proxmox.svg\n        href:
     https://192.168.1.195:8006\n        description: bd790i\n        widget:\n            type:
     proxmox\n            url: https://192.168.1.195:8006\n            username:  api@pam!homepage\n
-    \           password:  {{HOMEPAGE_VAR_PROXMOX_PASSWORD}}\n            node: bd790i\n
-    \   - Proxmox:\n        icon: proxmox.svg\n        href: https://192.168.1.106:8006\n
-    \       description: bd795m\n        widget:\n            type: proxmox\n            url:
-    https://192.168.1.106:8006\n            username:  api@pam!homepage\n            password:
-    \ {{HOMEPAGE_VAR_PROXMOX_PASSWORD}}\n            node: bd795m\n- MiniPCs:\n    -
+    \           password:  {{HOMEPAGE_VAR_PROXMOX_PASSWORD}}\n            node: bd790i\n- MiniPCs:\n    -
     Proxmox:\n    \n        icon: proxmox.svg\n        href: https://192.168.1.109:8006\n
     \       description: um773a\n        widget:\n            type: proxmox\n            url:
     https://192.168.1.109:8006\n            username:  api@pam!homepage\n            password:
