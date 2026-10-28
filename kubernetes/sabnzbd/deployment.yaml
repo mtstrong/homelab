@@ -84,7 +84,7 @@ spec:
       - name: downloads
         nfs:
           server: 192.168.1.70
-          path: /mnt/OneTbs/nzb-dls
+          path: /mnt/TrueNAS/nzb-dls
       # 300G scsi1 disk on each worker VM, mounted at /mnt/scratch (fstab, nofail).
       # Type Directory, not DirectoryOrCreate: if the disk didn't mount, the
       # subdir is missing and the pod waits instead of filling the root disk.
