@@ -15,7 +15,7 @@ spec:
     services:
     - name: romm
       port: 80
-      passHostHeader: false
+      passHostHeader: true
     middlewares:
     - name: default-headers
       namespace: romm

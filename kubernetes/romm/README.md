@@ -1,11 +1,11 @@
 # RomM on Kubernetes
 
-This folder contains Kubernetes manifests to deploy [RomM](https://romm.app/) and a MariaDB database, matching the style used elsewhere in this repo (namespace file, AVP-backed secrets, PVCs, Deployment, Service, and Traefik IngressRoute).
+This folder contains Kubernetes manifests to deploy [RomM](https://romm.app/) and a MariaDB database, matching the style used elsewhere in this repo (namespace file, PVCs, Deployment, Service, and Traefik IngressRoute).
 
 ## Components
 
 - Namespace: `romm`
-- Secrets (Argo CD Vault Plugin):
+- Secrets (created with kubectl, see Prereqs):
   - `romm-secrets` (app env incl. DB creds and provider API keys)
   - `romm-db-secrets` (MariaDB root/user credentials)
 - Storage (PVCs):
@@ -13,7 +13,7 @@ This folder contains Kubernetes manifests to deploy [RomM](https://romm.app/) an
   - `romm-redis-pvc` (internal cache)
   - `romm-assets-pvc` (uploads: saves, states, etc.)
   - `romm-config-pvc` (config.yml lives here)
-  - `romm-library-pvc` (ROM library; adjust/replace with NFS as needed)
+  - `romm-library-pvc` (ROM library, NFS from TrueNAS)
   - `romm-mysql-pvc` (MariaDB data)
 - Workloads:
   - `Deployment/romm-db` (MariaDB)
@@ -25,20 +25,17 @@ This folder contains Kubernetes manifests to deploy [RomM](https://romm.app/) an
 
 ## Prereqs
 
-- Populate Vault KV with the following keys before syncing:
-  - Path `kv/data/apps/romm` (secret `romm-secrets`):
-    - `DB_NAME`, `DB_USER`, `DB_PASSWD`
-    - `ROMM_AUTH_SECRET_KEY` (generate: `openssl rand -hex 32`)
+- Secrets are created by hand with kubectl (not in git; Vault is not running):
+  - `romm-secrets`: `DB_NAME`, `DB_USER`, `DB_PASSWD`, `ROMM_AUTH_SECRET_KEY` (`openssl rand -hex 32`), `OIDC_CLIENT_SECRET`
     - Optional providers: `IGDB_CLIENT_ID`, `IGDB_CLIENT_SECRET`, `SCREENSCRAPER_USER`, `SCREENSCRAPER_PASSWORD`, `RETROACHIEVEMENTS_API_KEY`, `MOBYGAMES_API_KEY`, `STEAMGRIDDB_API_KEY`, `PLAYMATCH_API_ENABLED`, `HASHEOUS_API_ENABLED`, `LAUNCHBOX_API_ENABLED`
-  - Path `kv/data/apps/romm/db` (secret `romm-db-secrets`):
-    - `MARIADB_ROOT_PASSWORD`, `MARIADB_DATABASE`, `MARIADB_USER`, `MARIADB_PASSWORD`
+  - `romm-db-secrets`: `MARIADB_ROOT_PASSWORD`, `MARIADB_DATABASE`, `MARIADB_USER`, `MARIADB_PASSWORD`
 
-- Adjust PVC sizes in `deployment.yaml` to suit your storage and library size. If you host the library on NAS/NFS, replace `romm-library-pvc` with an NFS-backed claim or mount.
+- ROM library is the TrueNAS dataset `TrueNAS/roms` over NFS, mounted at `/romm/library`. Put games in one folder per platform under `roms/`, e.g. `roms/nes/`, `roms/snes/`. Subfolders inside a platform folder are treated as one multi-file game, so keep platform folders flat.
 
-- Set your domain and TLS secret in `ingress.yaml` (defaults to `romm.tehmatt.com` and `tehmatt-tls`).
+- Web login uses Authentik OIDC (provider and application `romm`; its email mapping sends `email_verified: true`, which RomM requires). The RomM user's email must match the Authentik user's. There is deliberately no Authentik forward-auth on the IngressRoute: the Argosy Android client calls RomM's API with a local RomM account.
 
 ## Notes
 
-- Container image is pinned to `rommapp/romm:5.2.0`. Update as needed.
+- Container image is pinned to `rommapp/romm:5.4.1`. Update as needed.
 - MariaDB uses basic liveness/readiness checks. For heavier loads, consider switching to a StatefulSet and tuning resources.
 - RomM exposes port 8080 internally; the Service maps it to 80 consistent with other apps.

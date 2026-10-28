@@ -1,14 +1,17 @@
 ---
+# ROM library: TrueNAS dataset TrueNAS/roms (NFS share id 26).
+# RomM expects platform folders under roms/, e.g. /mnt/TrueNAS/roms/roms/nes/
 apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: romm-library-pv
 spec:
   capacity:
-    storage: 200Gi
+    storage: 1Ti
   accessModes:
   - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
   mountOptions:
   - nfsvers=4.1
   - hard
@@ -21,11 +24,26 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  name: romm-library-pvc
+  namespace: romm
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Ti
+  storageClassName: ""
+  volumeName: romm-library-pv
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
   name: romm-resources-pvc
   namespace: romm
 spec:
   accessModes:
   - ReadWriteOnce
+  storageClassName: longhorn
   resources:
     requests:
       storage: 10Gi
@@ -38,6 +56,7 @@ metadata:
 spec:
   accessModes:
   - ReadWriteOnce
+  storageClassName: longhorn
   resources:
     requests:
       storage: 1Gi
@@ -50,6 +69,7 @@ metadata:
 spec:
   accessModes:
   - ReadWriteOnce
+  storageClassName: longhorn
   resources:
     requests:
       storage: 20Gi
@@ -62,43 +82,10 @@ metadata:
 spec:
   accessModes:
   - ReadWriteOnce
+  storageClassName: longhorn
   resources:
     requests:
       storage: 1Gi
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: romm-library-pvc
-  namespace: romm
-spec:
-  # PVC bound to the static NFS PV above
-  accessModes:
-  - ReadWriteMany
-  resources:
-    requests:
-      storage: 200Gi
-  storageClassName: ""
-  volumeName: romm-library-pv2
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: romm-library-pv2
-spec:
-  capacity:
-    storage: 200Gi
-  accessModes:
-  - ReadWriteMany
-  persistentVolumeReclaimPolicy: Retain
-  mountOptions:
-  - nfsvers=4.1
-  - hard
-  - timeo=600
-  - retrans=2
-  nfs:
-    server: 192.168.1.70
-    path: /mnt/TrueNAS/roms
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -108,6 +95,7 @@ metadata:
 spec:
   accessModes:
   - ReadWriteOnce
+  storageClassName: longhorn
   resources:
     requests:
       storage: 20Gi

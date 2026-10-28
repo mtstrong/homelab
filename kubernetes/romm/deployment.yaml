@@ -105,18 +105,6 @@ spec:
         persistentVolumeClaim:
           claimName: romm-mysql-pvc
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: romm-mysql-pvc
-  namespace: romm
-spec:
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 20Gi
----
 # (romm-db) Service
 apiVersion: v1
 kind: Service
@@ -166,7 +154,7 @@ spec:
       enableServiceLinks: false
       containers:
       - name: romm
-        image: rommapp/romm:5.2.0
+        image: rommapp/romm:5.4.1
         imagePullPolicy: IfNotPresent
         env:
         - name: ROMM_PORT
@@ -193,6 +181,23 @@ spec:
             secretKeyRef:
               name: romm-secrets
               key: ROMM_AUTH_SECRET_KEY
+        # Web UI login via Authentik (provider/app "romm"). Local RomM accounts
+        # keep working, which is what Argosy on Android uses.
+        - name: OIDC_ENABLED
+          value: "true"
+        - name: OIDC_PROVIDER
+          value: authentik
+        - name: OIDC_CLIENT_ID
+          value: romm
+        - name: OIDC_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: romm-secrets
+              key: OIDC_CLIENT_SECRET
+        - name: OIDC_REDIRECT_URI
+          value: https://romm.tehmatt.com/api/oauth/openid
+        - name: OIDC_SERVER_APPLICATION_URL
+          value: https://auth.tehmatt.com/application/o/romm
         # Optional metadata providers
         - name: IGDB_CLIENT_ID
           valueFrom:
