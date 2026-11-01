@@ -213,6 +213,19 @@ data:
         annotations:
           summary: "Alerting pipeline heartbeat"
 
+      - alert: PrometheusTSDBMaintenanceFailing
+        # A failing WAL checkpoint keeps the WAL growing; size retention then deletes every block
+        # to make room for it, and the disk fills (2026-11-01: 19.5G WAL from one corrupt segment).
+        expr: |
+          increase(prometheus_tsdb_compactions_failed_total[3h]) > 0
+            or increase(prometheus_tsdb_wal_truncations_failed_total[3h]) > 0
+            or increase(prometheus_tsdb_checkpoint_creations_failed_total[3h]) > 0
+        labels:
+          severity: warning
+        annotations:
+          summary: "Prometheus can't compact its data or truncate its WAL"
+          description: "History is at risk. Check the Prometheus logs for compaction errors before the volume fills."
+
       - alert: PrometheusRuleFailures
         expr: increase(prometheus_rule_evaluation_failures_total[15m]) > 0
         labels:

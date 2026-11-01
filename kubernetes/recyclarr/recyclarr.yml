@@ -2,6 +2,8 @@
 # Replaced Notifiarr's TRaSH sync on 2026-10-26; scores were generated from the live values at that time.
 # 2026-10-26: HD-1080p made "1080p Bluray first" in both apps (TRaSH HD Bluray + WEB style): HD Bluray tiers
 # score above WEB tiers, upgrades on until Bluray-1080p, Radarr remuxes no longer grabbed (existing ones kept).
+# 2026-11-01: Sonarr cutoff lowered to WEB 1080p so WEB episodes leave the Wanted > Cutoff Unmet backlog (most TV never
+# gets a Bluray release). until_score stays unreachable, so a Bluray found later still upgrades a WEB file.
 # Recyclarr manages custom formats, their scores, and the HD-1080p profiles below; the other profiles' qualities
 # and the quality sizes are left as configured in the apps. Edit here, not in the UI (the next sync reverts UI edits).
 # Run on demand: kubectl -n recyclarr create job --from=cronjob/recyclarr recyclarr-manual
@@ -14,7 +16,7 @@ sonarr:
       - name: HD-1080p
         upgrade:
           allowed: true
-          until_quality: Bluray-1080p
+          until_quality: WEB 1080p
           until_score: 10000
         min_format_score: 0
         quality_sort: top
@@ -222,8 +224,6 @@ radarr:
         qualities:
           - name: Raw-HD
             enabled: false
-          - name: BR-DISK
-            enabled: false
           - name: Remux-2160p
             enabled: false
           - name: Bluray-2160p
@@ -273,6 +273,9 @@ radarr:
           - name: WORKPRINT
             enabled: false
           - name: Unknown
+            enabled: false
+          # BR-DISK ranks last so existing BR-DISK files fall below the cutoff and get replaced by encodes.
+          - name: BR-DISK
             enabled: false
     custom_formats:
       - trash_ids:
