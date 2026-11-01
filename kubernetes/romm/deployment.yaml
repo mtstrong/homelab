@@ -159,6 +159,9 @@ spec:
         env:
         - name: ROMM_PORT
           value: "8080"
+        # 48h in seconds: the default 4h stops a full library scan part-way through arcade
+        - name: SCAN_TIMEOUT
+          value: "172800"
         - name: DB_HOST
           value: romm-db
         - name: DB_NAME
@@ -287,8 +290,10 @@ spec:
             cpu: 2000m
             memory: 4Gi
         volumeMounts:
-        - name: romm-resources
+        # Artwork lives on TrueNAS next to the library: it's re-downloadable and outgrows Longhorn.
+        - name: romm-library
           mountPath: /romm/resources
+          subPath: _romm-resources
         - name: romm-redis
           mountPath: /redis-data
         - name: romm-library
@@ -298,9 +303,6 @@ spec:
         - name: romm-config
           mountPath: /romm/config
       volumes:
-      - name: romm-resources
-        persistentVolumeClaim:
-          claimName: romm-resources-pvc
       - name: romm-redis
         persistentVolumeClaim:
           claimName: romm-redis-pvc
