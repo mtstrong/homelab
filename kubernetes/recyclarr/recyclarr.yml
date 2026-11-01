@@ -60,15 +60,16 @@ sonarr:
             enabled: false
     custom_formats:
       - trash_ids:
+          # Bluray tiers stay above the best WEB score (Tier 01 + streaming service = 1775 + repack) so they replace WEB files.
           - d6819cba26b1a6508138d25fb5e32293 # HD Bluray Tier 01
         assign_scores_to:
           - name: HD-1080p
-            score: 1800
+            score: 1900
       - trash_ids:
           - c2216b7b8aa545dc1ce8388c618f8d57 # HD Bluray Tier 02
         assign_scores_to:
           - name: HD-1080p
-            score: 1750
+            score: 1850
       - trash_ids:
           - e6258996055b9fbab7e9cb2f75819294 # WEB Tier 01
         assign_scores_to:
