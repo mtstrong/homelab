@@ -9,7 +9,7 @@ This folder contains Kubernetes manifests to deploy [RomM](https://romm.app/) an
   - `romm-secrets` (app env incl. DB creds and provider API keys)
   - `romm-db-secrets` (MariaDB root/user credentials)
 - Storage (PVCs):
-  - `romm-resources-pvc` (covers, screenshots, etc.)
+  - `romm-library-pvc`, subPath `_romm-resources` (covers, screenshots, etc., on TrueNAS)
   - `romm-redis-pvc` (internal cache)
   - `romm-assets-pvc` (uploads: saves, states, etc.)
   - `romm-config-pvc` (config.yml lives here)
