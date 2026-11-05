@@ -88,7 +88,6 @@ graph TB
         end
 
         subgraph Automation["⚙️ Automation"]
-            IMGUPD[K8s Image Updater<br/>CronJob — Weekly]
             PVCBAK[PVC Backup<br/>CronJob — Daily]
         end
     end
@@ -290,8 +289,7 @@ All Terraform state is stored in **Azure Storage** with **OIDC authentication** 
 
 | Tool | Function |
 |:-----|:---------|
-| **Renovate Bot** | Automated dependency update PRs |
-| **K8s Image Updater** | Weekly CronJob checking for container image updates |
+| **Renovate Bot** | Image and dependency update PRs for the Kubernetes manifests, Compose stack and Dockerfiles |
 | **PVC Backup** | Daily CronJob backing up persistent volumes to NFS |
 | **Ansible Playbooks** | OS updates for Linux servers, Windows machines, and MiSTer FPGA |
 | **Drift Detection** | Scheduled Terraform plans that auto-create GitHub Issues on infrastructure drift |

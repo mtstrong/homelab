@@ -2,5 +2,38 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:recommended"
+  ],
+  "kubernetes": {
+    "managerFilePatterns": [
+      "/^kubernetes/.+\\.ya?ml$/"
+    ]
+  },
+  "ignorePaths": [
+    "kubernetes/cert-manager/cert-manager.yaml",
+    "kubernetes/longhorn/**",
+    "kubernetes/metallb/metallb-native.yaml",
+    "kubernetes/system-upgrade/**"
+  ],
+  "packageRules": [
+    {
+      "description": "Vendored upstream bundles are upgraded as a whole, not image by image",
+      "matchPackageNames": [
+        "quay.io/jetstack/**",
+        "docker.io/longhornio/**",
+        "longhornio/**",
+        "quay.io/metallb/**",
+        "rancher/k3s-upgrade",
+        "rancher/system-upgrade-controller"
+      ],
+      "enabled": false
+    },
+    {
+      "description": "linuxserver tags: <version>-ls<build>",
+      "matchPackageNames": [
+        "lscr.io/linuxserver/**",
+        "linuxserver/**"
+      ],
+      "versioning": "regex:^v?(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)(?:\\.(?<build>\\d+))?(?:-ls(?<revision>\\d+))?$"
+    }
   ]
 }
