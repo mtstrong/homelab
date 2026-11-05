@@ -25,7 +25,7 @@ This folder contains Kubernetes manifests to deploy [RomM](https://romm.app/) an
 
 ## Prereqs
 
-- Secrets are created by hand with kubectl (not in git; Vault is not running):
+- Secrets are created by hand with kubectl (not in git):
   - `romm-secrets`: `DB_NAME`, `DB_USER`, `DB_PASSWD`, `ROMM_AUTH_SECRET_KEY` (`openssl rand -hex 32`), `OIDC_CLIENT_SECRET`
     - Optional providers: `IGDB_CLIENT_ID`, `IGDB_CLIENT_SECRET`, `SCREENSCRAPER_USER`, `SCREENSCRAPER_PASSWORD`, `RETROACHIEVEMENTS_API_KEY`, `MOBYGAMES_API_KEY`, `STEAMGRIDDB_API_KEY`, `PLAYMATCH_API_ENABLED`, `HASHEOUS_API_ENABLED`, `LAUNCHBOX_API_ENABLED`
   - `romm-db-secrets`: `MARIADB_ROOT_PASSWORD`, `MARIADB_DATABASE`, `MARIADB_USER`, `MARIADB_PASSWORD`

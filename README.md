@@ -9,7 +9,6 @@
 [![Terraform](https://img.shields.io/badge/Terraform-IaC-844FBA?logo=terraform&logoColor=white)](https://www.terraform.io/)
 [![Prometheus](https://img.shields.io/badge/Prometheus-v3.5.1-E6522C?logo=prometheus&logoColor=white)](https://prometheus.io/)
 [![Grafana](https://img.shields.io/badge/Grafana-v12.3.1-F46800?logo=grafana&logoColor=white)](https://grafana.com/)
-[![Vault](https://img.shields.io/badge/Vault-v1.18.1-FFEC6E?logo=vault&logoColor=black)](https://www.vaultproject.io/)
 [![Renovate](https://img.shields.io/badge/Renovate-enabled-1A1F6C?logo=renovatebot&logoColor=white)](https://renovatebot.com/)
 [![GitHub Actions](https://img.shields.io/badge/CI%2FCD-GitHub_Actions-2088FF?logo=githubactions&logoColor=white)](https://github.com/features/actions)
 
@@ -27,11 +26,11 @@
 
 ## 📋 Overview
 
-This repository contains the complete infrastructure-as-code for my homelab — a multi-node K3s Kubernetes cluster running 30+ services, backed by GitOps continuous delivery, automated secret management, full-stack observability, and Terraform-managed cloud resources.
+This repository contains the complete infrastructure-as-code for my homelab — a multi-node K3s Kubernetes cluster running 30+ services, backed by GitOps continuous delivery, full-stack observability, and Terraform-managed cloud resources.
 
 **Key highlights:**
 - **GitOps-driven** — Argo CD automatically syncs all Kubernetes workloads from this repo with self-healing and auto-pruning
-- **Secrets managed in Vault** — HashiCorp Vault with Kubernetes auth, injected via Argo CD Vault Plugin (AVP)
+- **Secrets kept out of git** — created by hand with kubectl and referenced by name from the manifests
 - **Full observability** — Prometheus, Grafana, Loki + Promtail, Node Exporter, cAdvisor
 - **IaC everywhere** — Terraform manages Cloudflare DNS, Oracle Cloud, and Azure infrastructure
 - **CI/CD with drift detection** — GitHub Actions pipelines with scheduled drift checks that auto-create issues
@@ -69,11 +68,6 @@ graph TB
 
         subgraph GitOps
             ARGOCD[🔄 Argo CD]
-            AVP[Vault Plugin]
-        end
-
-        subgraph Secrets
-            VAULT[🔐 HashiCorp Vault<br/>Raft Storage]
         end
 
         subgraph Monitoring["📊 Monitoring & Observability"]
@@ -106,8 +100,6 @@ graph TB
 
     CF -->|HTTPS| TRAEFIK
     REPO -->|GitOps Sync| ARGOCD
-    ARGOCD --> AVP
-    AVP -->|Read Secrets| VAULT
     ARGOCD -->|Deploy| Apps
     ARGOCD -->|Deploy| Monitoring
     GHA -->|Build & Push| GHCR
@@ -128,11 +120,11 @@ graph TB
 | Layer | Technologies |
 |:------|:-------------|
 | **Kubernetes** | K3s, Kustomize, Longhorn, MetalLB/kube-vip |
-| **GitOps** | Argo CD v3.2.6, Argo CD Vault Plugin |
+| **GitOps** | Argo CD v3.2.6 |
 | **Infrastructure as Code** | Terraform (Cloudflare, Oracle Cloud, Azure, Proxmox providers) |
 | **CI/CD** | GitHub Actions (self-hosted + cloud runners), Renovate Bot, Docker Buildx, GHCR |
 | **Monitoring** | Prometheus v3.5.1, Grafana v12.3.1, Loki v3.6.4, Promtail, Node Exporter, cAdvisor |
-| **Security** | HashiCorp Vault, tfsec, Azure OIDC |
+| **Security** | tfsec, Azure OIDC |
 | **Networking** | Traefik, Cert-Manager, Cloudflare DNS/CDN, NordLynx VPN |
 | **Config Management** | Ansible (Linux, Windows, MiSTer FPGA) |
 | **Containers** | Docker, Docker Compose |
@@ -171,14 +163,13 @@ homelab/
 ├── 📂 docs/                   # Operational runbooks and upgrade guides
 ├── 📂 Helm/                   # Helm values for Traefik, Cert-Manager
 ├── 📂 kubernetes/             # 31 Kustomize-based app manifests (the core of the repo)
-│   ├── argocd/                # Argo CD + Vault Plugin
+│   ├── argocd/                # Argo CD
 │   ├── prometheus/            # Prometheus with K8s service discovery
 │   ├── grafana/               # Grafana with provisioned dashboards + datasources
 │   ├── loki/                  # Loki + Promtail log aggregation
-│   ├── vault/                 # HashiCorp Vault with Raft storage
 │   ├── homepage/              # Dashboard with live API widgets
 │   └── ...                    # 25 more application directories
-├── 📂 scripts/                # Vault helpers, volume management
+├── 📂 scripts/                # Volume management
 ├── 📂 terraform/              # IaC for Cloudflare DNS, Oracle Cloud, Proxmox
 │   ├── cloudflare-dns/        # 20+ DNS records for tehmatt.com
 │   ├── oracle-uptimekuma/     # Free-tier OCI VM provisioning

@@ -6,7 +6,6 @@ namespace: argocd
 # Pin to a specific Argo CD version
 resources:
 - https://raw.githubusercontent.com/argoproj/argo-cd/v3.5.6/manifests/install.yaml
-- avp-plugin.yaml
 - ingress.yaml
 - apps/audiobookshelf.yaml
 - apps/authentik.yaml
@@ -45,9 +44,6 @@ resources:
 - apps/tautulli.yaml
 - apps/velero.yaml
 - apps/headscale.yaml
-
-patchesStrategicMerge:
-- patch-repo-server-avp.yaml
 
 patches:
 - target:
