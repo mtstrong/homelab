@@ -55,6 +55,18 @@ data:
         global:
           - 1.1.1.1
           - 1.0.0.1
+      # Internal-only apps: mesh clients resolve these to Traefik's LAN IP, which
+      # tailscale-subnet-router advertises (see subnet-router.yaml)
+      extra_records:
+        - name: sonarr.tehmatt.com
+          type: A
+          value: 192.168.2.125
+        - name: radarr.tehmatt.com
+          type: A
+          value: 192.168.2.125
+        - name: sab.tehmatt.com
+          type: A
+          value: 192.168.2.125
   acl.hujson: |
     {
       "acls": [

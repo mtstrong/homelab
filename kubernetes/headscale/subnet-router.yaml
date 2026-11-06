@@ -1,0 +1,101 @@
+# Tailscale subnet router joined to Headscale. It advertises Traefik's LAN IP so mesh clients can
+# reach the internal-only apps (sonarr, radarr, sab) through Traefik with the existing hostnames
+# and wildcard cert. DNS for those hostnames comes from dns.extra_records in configmap.yaml.
+#
+# The auth key is not in git. Create it once before syncing (see README.md):
+#   kubectl -n headscale create secret generic tailscale-subnet-router-auth --from-literal=TS_AUTHKEY=<key>
+# Node state is kept in the tailscale-subnet-router-state Secret, which the pod creates itself.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tailscale-subnet-router
+  namespace: headscale
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: tailscale-subnet-router
+  namespace: headscale
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["create"]
+  - apiGroups: [""]
+    resources: ["secrets"]
+    resourceNames: ["tailscale-subnet-router-state"]
+    verbs: ["get", "update", "patch"]
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["get", "create", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: tailscale-subnet-router
+  namespace: headscale
+subjects:
+  - kind: ServiceAccount
+    name: tailscale-subnet-router
+    namespace: headscale
+roleRef:
+  kind: Role
+  name: tailscale-subnet-router
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tailscale-subnet-router
+  namespace: headscale
+  labels:
+    app: tailscale-subnet-router
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: tailscale-subnet-router
+  template:
+    metadata:
+      labels:
+        app: tailscale-subnet-router
+    spec:
+      serviceAccountName: tailscale-subnet-router
+      containers:
+        - name: tailscale
+          image: tailscale/tailscale:v1.104.2
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: TS_KUBE_SECRET
+              value: tailscale-subnet-router-state
+            - name: TS_AUTHKEY
+              valueFrom:
+                secretKeyRef:
+                  name: tailscale-subnet-router-auth
+                  key: TS_AUTHKEY
+            - name: TS_HOSTNAME
+              value: k3s-subnet-router
+            # Only Traefik's LoadBalancer IP, not the whole LAN
+            - name: TS_ROUTES
+              value: 192.168.2.125/32
+            - name: TS_USERSPACE
+              value: "true"
+            - name: TS_ACCEPT_DNS
+              value: "false"
+            - name: TS_EXTRA_ARGS
+              value: --login-server=https://headscale.tehmatt.com
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 20m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi

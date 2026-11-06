@@ -16,6 +16,9 @@ spec:
     metadata:
       labels:
         app: headscale
+      annotations:
+        # Headscale reads config.yaml only at startup. Bump this after editing configmap.yaml.
+        homelab/config-revision: "2"
     spec:
       nodeSelector:
         worker: "true"

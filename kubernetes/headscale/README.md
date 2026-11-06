@@ -43,6 +43,35 @@ tailscale up --login-server https://headscale.tehmatt.com --auth-key <preauth-ke
 
 Replace with your real hostname and generated key.
 
+## Subnet router for internal-only apps
+
+`subnet-router.yaml` runs a Tailscale node (`k3s-subnet-router`) that advertises Traefik's
+LoadBalancer IP, `192.168.2.125/32`. `dns.extra_records` in `configmap.yaml` points
+`sonarr.tehmatt.com`, `radarr.tehmatt.com` and `sab.tehmatt.com` at that IP for mesh clients, so
+the existing IngressRoutes and wildcard cert work over the mesh with no public DNS.
+
+One-time setup (the auth key stays out of git):
+
+```bash
+kubectl -n headscale exec deploy/headscale -- headscale users create k8s
+kubectl -n headscale exec deploy/headscale -- headscale users list   # note the k8s user ID
+kubectl -n headscale exec deploy/headscale -- \
+  headscale preauthkeys create --user <k8s-user-id> --expiration 1h
+kubectl -n headscale create secret generic tailscale-subnet-router-auth \
+  --from-literal=TS_AUTHKEY=<key>
+```
+
+After the pod joins, approve the route:
+
+```bash
+kubectl -n headscale exec deploy/headscale -- headscale nodes list   # note the router's ID
+kubectl -n headscale exec deploy/headscale -- \
+  headscale nodes approve-routes -i <id> -r 192.168.2.125/32
+```
+
+To add another internal app, add an `extra_records` entry pointing at `192.168.2.125` and bump
+`homelab/config-revision` in `deployment.yaml` so Headscale restarts and reloads its config.
+
 ## ACL policy for Synology-only access
 
 This deployment includes a starter ACL policy in `configmap.yaml` (`acl.hujson`).
