@@ -6,163 +6,325 @@ data:
             - abbr: GH
               href: https://github.com/mtstrong/
   custom.css: ""
-  custom.js: |
-    // Append a visitor counter badge to the bottom-right corner
-    window.addEventListener('load', function() {
-      var counter = document.createElement('img');
-      counter.src = 'https://visitor-badge.laobi.icu/badge?page_id=tehmatt.homepage';
-      counter.alt = 'visitor count';
-      counter.style.position = 'fixed';
-      counter.style.bottom = '10px';
-      counter.style.right = '10px';
-      counter.style.zIndex = '9999';
-      document.body.appendChild(counter);
-      // No custom JavaScript currently in use.
+  custom.js: ""
   docker.yaml: ""
   kubernetes.yaml: |
     mode: cluster
-  services.yaml: "- Desktops:\n    - Proxmox:\n        icon: proxmox.svg\n        href:
-    https://192.168.1.195:8006\n        description: bd790i\n        widget:\n            type:
-    proxmox\n            url: https://192.168.1.195:8006\n            username:  api@pam!homepage\n
-    \           password:  {{HOMEPAGE_VAR_PROXMOX_PASSWORD}}\n            node: bd790i\n- MiniPCs:\n    -
-    Proxmox:\n    \n        icon: proxmox.svg\n        href: https://192.168.1.109:8006\n
-    \       description: um773a\n        widget:\n            type: proxmox\n            url:
-    https://192.168.1.109:8006\n            username:  api@pam!homepage\n            password:
-    \ {{HOMEPAGE_VAR_PROXMOX_PASSWORD}}\n            node: um773a\n    - Proxmox:\n
-    \       icon: proxmox.svg\n        href: https://192.168.1.62:8006\n        description:
-    x1b\n        widget:\n            type: proxmox\n            url: https://192.168.1.62:8006\n
-    \           username:  api@pam!homepage\n            password:  {{HOMEPAGE_VAR_PROXMOX_PASSWORD}}\n
-    \           node: x1b\n    - Proxmox:\n        icon: proxmox.svg\n        href:
-    https://192.168.1.25:8006\n        description: x1c\n        widget:\n            type:
-    proxmox\n            url: https://192.168.1.25:8006\n            username:  api@pam!homepage\n
-    \           password:  {{HOMEPAGE_VAR_PROXMOX_PASSWORD}}\n            node: x1c\n    - Proxmox:\n        icon: proxmox.svg\n        href: https://192.168.1.87:8006\n        description: x1a\n        widget:\n            type: proxmox\n            url: https://192.168.1.87:8006\n            username:  api@pam!homepage\n            password:  {{HOMEPAGE_VAR_PROXMOX_PASSWORD}}\n            node: x1a\n-
-    Storage:\n    - Synology:\n        href: http://192.168.1.70\n        icon: synology.png\n
-    \       description: NAS\n        widget:\n            type: diskstation\n            url:
-    http://192.168.1.70:5000\n            username: {{HOMEPAGE_VAR_SYNOLOGY_USERNAME}}\n
-    \           password: {{HOMEPAGE_VAR_SYNOLOGY_PASSWORD}}\n    - TrueNAS:\n        icon:
-    truenas.png\n        href: http://192.168.1.70\n        description: NAS\n        widget:\n
-    \           type: truenas\n            url: http://192.168.1.70\n            key:
-    {{HOMEPAGE_VAR_TRUENAS_KEY}}\n    - Proxmox Backup Server:\n        icon: proxmox.svg\n
-    \       href: https://192.168.1.117:8007\n        widget:\n            type: proxmoxbackupserver\n
-    \           url: https://192.168.1.117:8007\n            username:  root@pam!api\n
-    \           password:  {{HOMEPAGE_VAR_PROXMOX_BACKUP_PASSWORD}}\n            datastore:
-    backup-local\n- Media Management:\n    - Sonarr:\n        icon: sonarr.png\n        href:
-    https://sonarr.tehmatt.com\n        description: TV Show Management\n        widget:\n
-    \           type: sonarr\n            url: http://sonarr.sonarr.svc.cluster.local:8989\n            key:
-    {{HOMEPAGE_VAR_SONARR_KEY}}\n    - Radarr:\n        icon: radarr.png\n        href:
-    https://radarr.tehmatt.com\n        description: Movie Management\n        widget:\n
-    \           type: radarr\n            url: http://radarr.radarr.svc.cluster.local:7878\n            key:
-    {{HOMEPAGE_VAR_RADARR_KEY}}\n    - Readarr:\n        icon: readarr.png\n        href:
-    http://192.168.2.127:8787\n        description: Book Management\n        widget:\n
-    \           type: readarr\n            url: http://readarr.readarr.svc.cluster.local:8787\n            key:
-    {{HOMEPAGE_VAR_READARR_KEY}}\n    - Prowlarr:\n        icon: prowlarr.png\n        href:
-    http://192.168.2.122:9696\n        description: Indexer
-    Manager\n        widget:\n            type: prowlarr\n            url: http://prowlarr.prowlarr.svc.cluster.local:9696\n
-    \           key: {{HOMEPAGE_VAR_PROWLARR_KEY}}\n- Media:\n    - Plex:\n        href:
-    https://app.plex.tv/desktop\n        icon: plex.png\n        description: Media
-    Server\n        widget:\n            type: plex\n            url: http://192.168.1.70:32400\n
-    \           key: {{HOMEPAGE_VAR_PLEX_KEY}}\n    - Audiobookshelf:\n        icon:
-    audiobookshelf.png\n        href: https://abs.tehmatt.com\n        description:
-    Audiobook Server\n        widget:\n            type: audiobookshelf\n            url:
-    http://audiobookshelf.audiobookshelf.svc.cluster.local:80\n            key: {{HOMEPAGE_VAR_AUDIOBOOKSHELF_KEY}}\n
-    \   - Kavita:\n        icon: kavita.png\n        href: https://kavita.tehmatt.com\n
-    \       description: Comic Server\n        widget:\n            type: kavita\n
-    \           url: http://kavita.kavita.svc.cluster.local:5000\n            #key: 9804e636-f42e-4d38-9bbb-66b7def5ae39\n
-    \           username: matt\n            password: {{HOMEPAGE_VAR_COMMON_PASSWORD}}\n
-    \   - Calibre-Web:\n        icon: calibre.png\n        href: https://calibre.tehmatt.com\n
-    \       description: eBook Server\n- Networking:\n    - pfSense:\n        description:
-    Firewall & Router\n        href: https://192.168.1.1\n        siteMonitor: https://192.168.1.1\n
-    \       icon: pfsense.png\n        widget:\n            type: pfsense\n            url:
-    https://192.168.1.1\n            fields: [ \"load\", \"memory\", \"wanStatus\",
-    \"disk\" ]\n            username: admin\n            headers:\n              X-API-Key:
-    {{HOMEPAGE_VAR_PFSENSE_API_KEY}}\n            wan: igc0\n            version:
-    2        \n    - Traefik: \n        icon: traefik.png\n        href: https://traefik.tehmatt.com\n
-    \       widget:\n            type: traefik\n            url: https://traefik.tehmatt.com\n
-    \           username: matt\n            password: {{HOMEPAGE_VAR_COMMON_PASSWORD}}\n-
-    Kubernetes Management:\n    - ArgoCD:\n        icon: argo-cd.png\n        href: https://argocd.tehmatt.com\n
-    \       description: GitOps CD\n        widget:\n            type: argocd\n            url:
-    http://argocd-server.argocd.svc.cluster.local:80\n            key: \"{{HOMEPAGE_VAR_ARGOCD_TOKEN}}\"\n-
-    AI Services:\n    - Ollama:\n        icon: sh-ollama-light.png\n        description:
-    A.I Backend\n        widget:\n          type: customapi\n          url: http://192.168.1.37:11434/api/ps\n
-    \         method: GET\n          mappings:\n            - field: models[0].name\n
-    \             label: \"Running Model\"\n              format: text\n            -
-    field: models[0].size\n              label: \"Model Size\"\n              format:
-    bytes\n            - field: models[0].size_vram\n              label: \"VRAM Used\"\n
-    \             format: bytes\n    - Open WebUI:\n        icon: open-webui-light.png\n
-    \       href: http://192.168.1.37:3008\n        description: A.I Frontend\n        widget:\n
-    \         type: customapi\n          url: http://ollama.ollama.svc.cluster.local:3008/api/models\n
-    \         headers:\n            Authorization: \"Bearer {{HOMEPAGE_VAR_OPENWEBUI_TOKEN}}\"\n
-    \         mappings:\n            - field: data\n              label: Total Models\n
-    \             format: size\n- Home Automation:\n    - Homebridge:\n        icon: homebridge.png\n
-    \       href: http://192.168.2.130:8581\n        widget:\n            type: homebridge\n
-    \           url: http://homebridge.homebridge.svc.cluster.local:8581\n            username: matt\n            password:
-    {{HOMEPAGE_VAR_COMMON_PASSWORD}}\n- Uptime:\n    - Uptime Kuma:\n        href:
-    http://mthomelabmonitor.eastus.azurecontainer.io:3001\n        description: External Service Monitoring\n        icon:
-    uptime-kuma.png\n        widget:\n            type: uptimekuma\n            url:
-    http://mthomelabmonitor.eastus.azurecontainer.io:3001\n            slug: public\n    - Uptime Kuma:\n        href:
-    http://192.168.1.37:3001\n        description: Internal Service Monitoring\n        icon:
-    uptime-kuma.png\n        widget:\n            type: uptimekuma\n            url:
-    http://192.168.1.37:3001\n            slug: private\n- Monitoring:\n    - Grafana:\n        icon: grafana.png\n        href: https://grafana.tehmatt.com\n        description: Dashboards & Visualization\n        widget:\n            type: grafana\n            url: http://grafana.grafana.svc.cluster.local:3000\n            username: admin\n            password: {{HOMEPAGE_VAR_GRAFANA_PASSWORD}}\n    - Prometheus:\n        icon: prometheus.png\n        href: https://prometheus.tehmatt.com\n        description: Metrics Collection\n        widget:\n            type: prometheus\n            url: http://prometheus.prometheus.svc.cluster.local:9090\n    - Tautulli:\n        icon: tautulli.png\n        href: https://tautulli.tehmatt.com\n        description: Plex Monitoring\n        widget:\n            type: tautulli\n            url: http://tautulli.tautulli.svc.cluster.local:8181\n            key: {{HOMEPAGE_VAR_TAUTULLI_KEY}}\n    - Loki:\n        icon: loki\n        href: https://loki.tehmatt.com\n        description: Log Aggregation\n        siteMonitor: http://loki.loki-stack.svc.cluster.local:3100/ready\n    - Azure FinOps:\n        icon: microsoft-azure.png\n        href: https://grafana.tehmatt.com/d/azure-finops-dashboard\n        description: Azure Cost Monitoring\n        widget:\n            type: customapi\n            url: http://azure-finops-exporter.azure-finops.svc.cluster.local:8080/api/summary\n            mappings:\n                - field: mtd_cost_usd\n                  label: MTD Cost\n                  format: currency\n                - field: budget_utilisation_pct\n                  label: Budget Used\n                  format: percent\n                - field: projected_monthly_usd\n                  label: Projected\n                  format: currency\n"
+  services.yaml: |
+    - Proxmox:
+        - x1a:
+            icon: proxmox.svg
+            href: https://192.168.1.87:8006
+            widget:
+              type: proxmox
+              url: https://192.168.1.87:8006
+              username: api@pam!homepage
+              password: {{HOMEPAGE_VAR_PROXMOX_PASSWORD}}
+              node: x1a
+        - x1b:
+            icon: proxmox.svg
+            href: https://192.168.1.62:8006
+            widget:
+              type: proxmox
+              url: https://192.168.1.62:8006
+              username: api@pam!homepage
+              password: {{HOMEPAGE_VAR_PROXMOX_PASSWORD}}
+              node: x1b
+        - x1c:
+            icon: proxmox.svg
+            href: https://192.168.1.25:8006
+            widget:
+              type: proxmox
+              url: https://192.168.1.25:8006
+              username: api@pam!homepage
+              password: {{HOMEPAGE_VAR_PROXMOX_PASSWORD}}
+              node: x1c
+        - um773a:
+            icon: proxmox.svg
+            href: https://192.168.1.109:8006
+            description: Spare
+            widget:
+              type: proxmox
+              url: https://192.168.1.109:8006
+              username: api@pam!homepage
+              password: {{HOMEPAGE_VAR_PROXMOX_PASSWORD}}
+              node: um773a
+
+    - Storage:
+        - TrueNAS:
+            icon: truenas.png
+            href: https://192.168.1.70
+            description: NAS
+            widget:
+              type: truenas
+              url: https://192.168.1.70
+              key: {{HOMEPAGE_VAR_TRUENAS_KEY}}
+        - Proxmox Backup Server:
+            icon: proxmox.svg
+            href: https://192.168.1.117:8007
+            description: VM backups
+            widget:
+              type: proxmoxbackupserver
+              url: https://192.168.1.117:8007
+              username: root@pam!api
+              password: {{HOMEPAGE_VAR_PROXMOX_BACKUP_PASSWORD}}
+              datastore: truenas
+
+    - Networking:
+        - pfSense:
+            icon: pfsense.png
+            href: https://192.168.1.1
+            description: Firewall & Router
+            siteMonitor: https://192.168.1.1
+            widget:
+              type: pfsense
+              url: https://192.168.1.1
+              fields: ["load", "memory", "wanStatus", "disk"]
+              username: admin
+              headers:
+                X-API-Key: {{HOMEPAGE_VAR_PFSENSE_API_KEY}}
+              wan: igc0
+              version: 2
+        - Traefik:
+            icon: traefik.png
+            href: https://traefik.tehmatt.com
+            description: Reverse Proxy
+            widget:
+              type: traefik
+              url: https://traefik.tehmatt.com
+              username: matt
+              password: {{HOMEPAGE_VAR_COMMON_PASSWORD}}
+        - Headscale:
+            icon: headscale.png
+            href: https://headscale.tehmatt.com
+            description: Tailnet Control Server
+
+    - Platform:
+        - ArgoCD:
+            icon: argo-cd.png
+            href: https://argocd.tehmatt.com
+            description: GitOps CD
+            widget:
+              type: argocd
+              url: http://argocd-server.argocd.svc.cluster.local:80
+              key: "{{HOMEPAGE_VAR_ARGOCD_TOKEN}}"
+        - Authentik:
+            icon: authentik.png
+            href: https://auth.tehmatt.com
+            description: SSO
+        - IT-Tools:
+            icon: it-tools.png
+            href: https://tools.tehmatt.com
+            description: Developer Utilities
+
+    - Media:
+        - Plex:
+            icon: plex.png
+            href: https://app.plex.tv/desktop
+            description: Media Server
+            widget:
+              type: plex
+              url: http://192.168.1.70:32400
+              key: {{HOMEPAGE_VAR_PLEX_KEY}}
+        - Overseerr:
+            icon: overseerr.png
+            href: https://request.tehmatt.com
+            description: Requests
+            widget:
+              type: overseerr
+              url: http://overseerr.overseerr.svc.cluster.local:5055
+              key: {{HOMEPAGE_VAR_OVERSEERR_KEY}}
+        - Audiobookshelf:
+            icon: audiobookshelf.png
+            href: https://abs.tehmatt.com
+            description: Audiobook Server
+            widget:
+              type: audiobookshelf
+              url: http://audiobookshelf.audiobookshelf.svc.cluster.local:80
+              key: {{HOMEPAGE_VAR_AUDIOBOOKSHELF_KEY}}
+        - Kavita:
+            icon: kavita.png
+            href: https://kavita.tehmatt.com
+            description: Comic Server
+            widget:
+              type: kavita
+              url: http://kavita.kavita.svc.cluster.local:5000
+              username: matt
+              password: {{HOMEPAGE_VAR_COMMON_PASSWORD}}
+        - Calibre-Web:
+            icon: calibre.png
+            href: https://calibre.tehmatt.com
+            description: eBook Server
+        - RomM:
+            icon: romm.png
+            href: https://romm.tehmatt.com
+            description: ROM Library
+
+    - Media Management:
+        - Sonarr:
+            icon: sonarr.png
+            href: https://sonarr.tehmatt.com
+            description: TV Shows
+            widget:
+              type: sonarr
+              url: http://sonarr.sonarr.svc.cluster.local:8989
+              key: {{HOMEPAGE_VAR_SONARR_KEY}}
+        - Radarr:
+            icon: radarr.png
+            href: https://radarr.tehmatt.com
+            description: Movies
+            widget:
+              type: radarr
+              url: http://radarr.radarr.svc.cluster.local:7878
+              key: {{HOMEPAGE_VAR_RADARR_KEY}}
+        - Prowlarr:
+            icon: prowlarr.png
+            href: https://prowlarr.tehmatt.com
+            description: Indexers
+            widget:
+              type: prowlarr
+              url: http://prowlarr.prowlarr.svc.cluster.local:9696
+              key: {{HOMEPAGE_VAR_PROWLARR_KEY}}
+        - Bazarr:
+            icon: bazarr.png
+            href: https://bazarr.tehmatt.com
+            description: Subtitles
+            widget:
+              type: bazarr
+              url: http://bazarr.bazarr.svc.cluster.local:6767
+              key: {{HOMEPAGE_VAR_BAZARR_KEY}}
+        - Mylar3:
+            icon: mylar.png
+            href: https://mylar.tehmatt.com
+            description: Comics
+            widget:
+              type: mylar
+              url: http://mylar3.mylar3.svc.cluster.local:8090
+              key: {{HOMEPAGE_VAR_MYLAR_KEY}}
+        - Readarr:
+            icon: readarr.png
+            href: http://192.168.2.127:8787
+            description: Books
+            widget:
+              type: readarr
+              url: http://readarr.readarr.svc.cluster.local:8787
+              key: {{HOMEPAGE_VAR_READARR_KEY}}
+
+    - Downloads:
+        - SABnzbd:
+            icon: sabnzbd.png
+            href: https://sab.tehmatt.com
+            description: Usenet Downloader
+            widget:
+              type: sabnzbd
+              url: http://sabnzbd.sabnzbd.svc.cluster.local:8080
+              key: {{HOMEPAGE_VAR_SABNZBD_KEY}}
+        - HandBrake:
+            icon: handbrake.png
+            href: https://handbrake.tehmatt.com
+            description: Video Transcoding
+
+    - Home:
+        - Home Assistant:
+            icon: home-assistant.png
+            href: http://192.168.1.68:8123
+            description: Home Automation
+            widget:
+              type: homeassistant
+              url: http://192.168.1.68:8123
+              key: {{HOMEPAGE_VAR_HOMEASSISTANT_KEY}}
+        - Homebridge:
+            icon: homebridge.png
+            href: http://192.168.2.130:8581
+            description: HomeKit Bridge
+            widget:
+              type: homebridge
+              url: http://homebridge.homebridge.svc.cluster.local:8581
+              username: matt
+              password: {{HOMEPAGE_VAR_COMMON_PASSWORD}}
+        - Mealie:
+            icon: mealie.png
+            href: https://mealie.tehmatt.com
+            description: Recipes
+
+    - Monitoring:
+        - Grafana:
+            icon: grafana.png
+            href: https://grafana.tehmatt.com
+            description: Dashboards
+            widget:
+              type: grafana
+              url: http://grafana.grafana.svc.cluster.local:3000
+              username: admin
+              password: {{HOMEPAGE_VAR_GRAFANA_PASSWORD}}
+        - Prometheus:
+            icon: prometheus.png
+            href: https://prometheus.tehmatt.com
+            description: Metrics
+            widget:
+              type: prometheus
+              url: http://prometheus.prometheus.svc.cluster.local:9090
+        - Loki:
+            icon: loki.png
+            href: https://grafana.tehmatt.com/explore
+            description: Logs
+            siteMonitor: http://loki.loki-stack.svc.cluster.local:3100/ready
+        - Tautulli:
+            icon: tautulli.png
+            href: https://tautulli.tehmatt.com
+            description: Plex Monitoring
+            widget:
+              type: tautulli
+              url: http://tautulli.tautulli.svc.cluster.local:8181
+              key: {{HOMEPAGE_VAR_TAUTULLI_KEY}}
+        - Azure FinOps:
+            icon: microsoft-azure.png
+            href: https://grafana.tehmatt.com/d/azure-finops-dashboard
+            description: Azure Costs
+            widget:
+              type: customapi
+              url: http://azure-finops-exporter.azure-finops.svc.cluster.local:8080/api/summary
+              mappings:
+                - field: mtd_cost_usd
+                  label: MTD Cost
+                  format: currency
+                - field: budget_utilisation_pct
+                  label: Budget Used
+                  format: percent
+                - field: projected_monthly_usd
+                  label: Projected
+                  format: currency
   settings.yaml: |
     title: Matt Strong's Homepage
-
-    providers:
-      openweathermap: openweathermapapikey
-      weatherapi: weatherapiapikey
 
     useEqualHeights: true
 
     layout:
-      Desktops:
-        header: true
+      Proxmox:
         style: row
-        columns: 2
-      MiniPCs:
-        header: true
-        style: row
-        columns: 3
+        columns: 4
       Storage:
-        header: true
+        style: row
+        columns: 2
+      Networking:
         style: row
         columns: 3
-      Networking:
-        header: true
+      Platform:
         style: row
-        columns: 2
-      Kubernetes Management:
-        header: true
-        style: row
-        columns: 1
-      AI Services:
-        header: true
-        style: row
-        columns: 2
-      Home Automation:
-        header: true
-        style: row
-        columns: 2
+        columns: 3
       Media:
-        header: true
         style: row
-        columns: 4
+        columns: 3
       Media Management:
-        header: true
-        style: row
-        columns: 4
-      Containers:
-        header: true
         style: row
         columns: 3
       Downloads:
-        header: true
         style: row
         columns: 2
-      Uptime:
-        header: true
+      Home:
         style: row
-        columns: 2
+        columns: 3
       Monitoring:
-        header: true
         style: row
         columns: 5
   widgets.yaml: |
