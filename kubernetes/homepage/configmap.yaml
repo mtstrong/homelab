@@ -197,10 +197,8 @@ data:
             icon: mylar.png
             href: https://mylar.tehmatt.com
             description: Comics
-            widget:
-              type: mylar
-              url: http://mylar3.mylar3.svc.cluster.local:8090
-              key: {{HOMEPAGE_VAR_MYLAR_KEY}}
+            # Re-add the mylar widget once the library has series: with zero series
+            # its series endpoint returns an error (code 460) and the tile shows it.
         - Readarr:
             icon: readarr.png
             href: http://192.168.2.127:8787
