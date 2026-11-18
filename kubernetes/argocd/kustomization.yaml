@@ -7,6 +7,7 @@ namespace: argocd
 resources:
 - https://raw.githubusercontent.com/argoproj/argo-cd/v3.5.6/manifests/install.yaml
 - ingress.yaml
+- apps/arr-autoimport.yaml
 - apps/audiobookshelf.yaml
 - apps/authentik.yaml
 - apps/bazarr.yaml
