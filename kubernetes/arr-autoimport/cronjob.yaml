@@ -1,0 +1,70 @@
+# Every 15 minutes, imports Sonarr/Radarr downloads stuck on "matched to series/movie by ID"
+# or "Unable to determine if file is a sample" when the manual-import checks all pass.
+# The rules are in autoimport.py; everything it skips is logged and left for ArrQueueStuck.
+#
+# API keys live in the arr-api-keys Secret, created out of band (same keys as Decluttarr's):
+#   kubectl -n arr-autoimport create secret generic arr-api-keys \
+#     --from-literal=radarr=<key> --from-literal=sonarr=<key>
+# Run on demand: kubectl -n arr-autoimport create job --from=cronjob/arr-autoimport arr-autoimport-manual
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: arr-autoimport
+  namespace: arr-autoimport
+spec:
+  schedule: "*/15 * * * *"
+  timeZone: America/Chicago
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 600
+      ttlSecondsAfterFinished: 86400
+      template:
+        spec:
+          restartPolicy: Never
+          nodeSelector:
+            worker: "true"
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
+          containers:
+          - name: autoimport
+            image: python:3.13.17-alpine
+            command: ["python", "-I", "/app/autoimport.py"]
+            env:
+            - name: TZ
+              value: America/Chicago
+            - name: DRY_RUN
+              value: "false"
+            - name: SONARR_URL
+              value: http://sonarr.sonarr.svc.cluster.local:8989
+            - name: RADARR_URL
+              value: http://radarr.radarr.svc.cluster.local:7878
+            - name: SONARR_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: arr-api-keys
+                  key: sonarr
+            - name: RADARR_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: arr-api-keys
+                  key: radarr
+            resources:
+              requests:
+                cpu: 10m
+                memory: 32Mi
+              limits:
+                memory: 128Mi
+            volumeMounts:
+            - name: script
+              mountPath: /app
+              readOnly: true
+          volumes:
+          - name: script
+            configMap:
+              name: arr-autoimport-script

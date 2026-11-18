@@ -1,0 +1,11 @@
+# autoimport.py becomes a ConfigMap (hash-suffixed, so edits roll into the next run).
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: arr-autoimport
+resources:
+- namespace.yaml
+- cronjob.yaml
+configMapGenerator:
+- name: arr-autoimport-script
+  files:
+  - autoimport.py
