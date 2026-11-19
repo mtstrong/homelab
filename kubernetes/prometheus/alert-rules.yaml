@@ -418,7 +418,28 @@ data:
           severity: warning
         annotations:
           summary: "PVC {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} has {{ $value | humanizePercentage }} free"
-          description: "Apps on a full volume crash or corrupt their data (Prometheus did on 2026-10-18). Expand the PVC or clean it up."
+          description: "Apps on a full volume crash or corrupt their data (Prometheus did on 2026-10-18, Radarr on 2026-11-19). Expand the PVC (bump storage in the app's storage.yaml) or clean it up."
+
+      - alert: PersistentVolumeNearlyFull
+        expr: |
+          kubelet_volume_stats_available_bytes / kubelet_volume_stats_capacity_bytes < 0.05
+            and kubelet_volume_stats_used_bytes > 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "PVC {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} has only {{ $value | humanizePercentage }} free"
+          description: "The app will fail to start or write very soon. Expand the PVC (bump storage in the app's storage.yaml) now."
+
+      - alert: VolumeStatsMissing
+        # Guards the two alerts above: without kubelet metrics they silently never fire
+        expr: absent(kubelet_volume_stats_capacity_bytes)
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: "No kubelet volume stats in Prometheus"
+          description: "PVC fill-up alerts can't fire. Check the 'kubelet' scrape job's targets in Prometheus."
 
     # TCP probes via blackbox-exporter (job blackbox-tcp)
     - name: reachability
