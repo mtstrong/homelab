@@ -33,7 +33,7 @@ spec:
             runAsNonRoot: true
           containers:
           - name: autoimport
-            image: python:3.13.17-alpine
+            image: python:3.15.2-alpine
             command: ["python", "-I", "/app/autoimport.py"]
             env:
             - name: TZ
