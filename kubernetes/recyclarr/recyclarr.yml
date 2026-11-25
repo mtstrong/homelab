@@ -418,8 +418,9 @@ radarr:
             score: 100
           - name: HD-720p
             score: 100
+          # User wants regular Blu-ray rips, not fan-made hybrid encodes (2026-11-24)
           - name: HD-1080p
-            score: 100
+            score: -10000
           - name: Ultra-HD
             score: 100
           - name: HD - 720p/1080p
